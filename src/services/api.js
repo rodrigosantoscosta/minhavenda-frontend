@@ -2,7 +2,7 @@ import axios from 'axios'
 import logger from '../utils/logger'
 
 // URL base da API (backend)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 // Criar instância do Axios
 const api = axios.create({
