@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from './AuthContext'
 import { useToast } from '../components/common/Toast'
 import storageUtil from '../utils/storageUtil'
@@ -16,27 +16,41 @@ export function CartProvider({ children }) {
   const toast = useToast()
   const { user, isAuthenticated } = useAuth()
 
-  // 3. Carregar carrinho ao iniciar e quando auth mudar
-  useEffect(() => {
-    logger.info({ isAuthenticated, userId: user?.id }, 'Auth state changed - loading cart')
-    loadCart()
-  }, [isAuthenticated, user])
+  // Flag para evitar múltiplas inicializações
+  const isInitialized = useRef(false)
+  const previousAuthState = useRef(isAuthenticated)
 
-  // Carregar carrinho (localStorage ou backend)
+  // Carregar carrinho apenas quando auth muda de false para true
+  useEffect(() => {
+    // Detectar mudança de estado de autenticação
+    const authChanged = previousAuthState.current !== isAuthenticated
+    previousAuthState.current = isAuthenticated
+
+    // Carregar apenas se:
+    // 1. Não foi inicializado ainda, OU
+    // 2. Estado de auth mudou
+    if (!isInitialized.current || authChanged) {
+      logger.info({ isAuthenticated, userId: user?.id, authChanged }, 'Auth state changed - loading cart')
+      isInitialized.current = true
+      loadCart()
+    }
+  }, [isAuthenticated]) // 
+
+  // ✅ FIX: loadCart sem dependências problemáticas
   const loadCart = useCallback(async () => {
     try {
-      if (isAuthenticated && user) {
-        logger.info({ userId: user.id }, 'Loading cart from backend')
+      if (isAuthenticated) {
+        logger.info('Loading cart from backend')
         await loadCartFromBackend()
       } else {
         logger.info('Loading cart from localStorage')
         loadCartFromLocalStorage()
       }
     } catch (error) {
-      logger.error({ error, userId: user?.id }, 'Error loading cart')
+      logger.error({ error }, 'Error loading cart')
       loadCartFromLocalStorage()
     }
-  }, [isAuthenticated, user])
+  }, [isAuthenticated]) // 
 
   // Carregar do localStorage
   const loadCartFromLocalStorage = () => {
@@ -67,14 +81,13 @@ export function CartProvider({ children }) {
           return { id, estoque: 0 }
         }
       })
-      
+
       const stocks = await Promise.all(stockPromises)
-      
       const stockMap = {}
       stocks.forEach(({ id, estoque }) => {
         stockMap[id] = estoque
       })
-      
+
       logger.debug({ stockMap }, 'Product stocks fetched')
       return stockMap
     } catch (error) {
@@ -85,25 +98,31 @@ export function CartProvider({ children }) {
 
   // Carregar do backend (quando logado)
   const loadCartFromBackend = async () => {
+    // Prevenir múltiplas chamadas simultâneas
+    if (loading) {
+      logger.debug('loadCartFromBackend already in progress, skipping')
+      return
+    }
+
     try {
       setLoading(true)
-      logger.info({ userId: user?.id }, 'Fetching cart from API')
-      
+      logger.info('Fetching cart from API')
+
       const response = await api.get('/carrinho')
       const backendCart = response.data
-      
-      logger.info({ 
-        carrinhoId: backendCart.id, 
+
+      logger.info({
+        carrinhoId: backendCart.id,
         itemCount: backendCart.itens?.length || 0,
-        valorTotal: backendCart.valorTotal 
+        valorTotal: backendCart.valorTotal
       }, 'Cart loaded from backend')
-      
+
       // Extrair IDs dos produtos para buscar estoques
       const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
-      
+
       // Buscar estoques atuais
       const stockMap = await fetchProductsStock(produtoIds)
-      
+
       // Transformar itens do backend para formato local
       const backendItems = (backendCart.itens || []).map(item => ({
         id: item.produtoId,
@@ -116,10 +135,10 @@ export function CartProvider({ children }) {
         categoria: item.categoriaNome || 'Sem categoria',
         itemId: item.id // ID do item no carrinho
       }))
-      
+
       setCart(backendCart)
       setItems(backendItems)
-      
+
       // Sincronizar items locais se existirem
       const localItems = storageUtil.getItem('cart') || []
       if (localItems.length > 0 && backendItems.length === 0) {
@@ -128,15 +147,14 @@ export function CartProvider({ children }) {
       } else {
         storageUtil.removeItem('cart')
       }
-      
     } catch (error) {
-      logger.error({ error, userId: user?.id }, 'Error loading cart from backend')
-      
+      logger.error({ error }, 'Error loading cart from backend')
+
       if (error.response?.status === 404) {
         logger.info('Cart not found (404) - initializing empty cart')
         setCart(null)
         setItems([])
-        
+
         const localItems = storageUtil.getItem('cart') || []
         if (localItems.length > 0) {
           logger.info({ localItemCount: localItems.length }, 'Syncing local items after 404')
@@ -154,7 +172,7 @@ export function CartProvider({ children }) {
   const syncCartWithBackend = async (localItems) => {
     try {
       logger.info({ itemCount: localItems.length }, 'Starting cart sync to backend')
-      
+
       for (const item of localItems) {
         try {
           await api.post('/carrinho/itens', {
@@ -166,10 +184,9 @@ export function CartProvider({ children }) {
           logger.error({ error, itemId: item.id, nome: item.nome }, 'Failed to sync item')
         }
       }
-      
+
       await loadCartFromBackend()
       storageUtil.removeItem('cart')
-      
       logger.info('Cart sync completed successfully')
       toast.success('Carrinho sincronizado com sucesso!')
     } catch (error) {
@@ -181,32 +198,31 @@ export function CartProvider({ children }) {
   const addItem = async (produto, quantidade = 1) => {
     try {
       setLoading(true)
-      
-      if (isAuthenticated && user) {
-        logger.info({ 
-          produtoId: produto.id, 
-          nome: produto.nome, 
-          quantidade,
-          userId: user.id 
+
+      if (isAuthenticated) {
+        logger.info({
+          produtoId: produto.id,
+          nome: produto.nome,
+          quantidade
         }, 'Adding item via API')
-        
+
         const response = await api.post('/carrinho/itens', {
           produtoId: produto.id,
           quantidade: quantidade
         })
-        
+
         const backendCart = response.data
-        
-        logger.info({ 
+
+        logger.info({
           carrinhoId: backendCart.id,
           itemCount: backendCart.itens?.length,
-          valorTotal: backendCart.valorTotal 
+          valorTotal: backendCart.valorTotal
         }, 'Item added - cart updated')
-        
+
         // Buscar estoques atualizados
         const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
         const stockMap = await fetchProductsStock(produtoIds)
-        
+
         const backendItems = (backendCart.itens || []).map(item => ({
           id: item.produtoId,
           nome: item.produtoNome,
@@ -218,15 +234,14 @@ export function CartProvider({ children }) {
           categoria: item.categoriaNome || 'Sem categoria',
           itemId: item.id
         }))
-        
+
         setCart(backendCart)
         setItems(backendItems)
         toast.success(`${produto.nome} adicionado ao carrinho!`)
-        
       } else {
         // Não autenticado - adicionar localmente
         logger.info({ produtoId: produto.id, nome: produto.nome, quantidade }, 'Adding item to localStorage')
-        
+
         const existingItemIndex = items.findIndex(item => item.id === produto.id)
 
         if (existingItemIndex >= 0) {
@@ -234,10 +249,10 @@ export function CartProvider({ children }) {
           const novaQuantidade = updatedItems[existingItemIndex].quantidade + quantidade
 
           if (produto.quantidadeEstoque && novaQuantidade > produto.quantidadeEstoque) {
-            logger.warn({ 
-              produtoId: produto.id, 
-              solicitado: novaQuantidade, 
-              estoque: produto.quantidadeEstoque 
+            logger.warn({
+              produtoId: produto.id,
+              solicitado: novaQuantidade,
+              estoque: produto.quantidadeEstoque
             }, 'Insufficient stock')
             toast.warning('Quantidade solicitada maior que o estoque disponível')
             return
@@ -246,15 +261,14 @@ export function CartProvider({ children }) {
           updatedItems[existingItemIndex].quantidade = novaQuantidade
           setItems(updatedItems)
           storageUtil.setItem('cart', updatedItems)
-          
           logger.info({ produtoId: produto.id, novaQuantidade }, 'Item quantity updated in localStorage')
           toast.success('Quantidade atualizada no carrinho')
         } else {
           if (produto.quantidadeEstoque && quantidade > produto.quantidadeEstoque) {
-            logger.warn({ 
-              produtoId: produto.id, 
-              solicitado: quantidade, 
-              estoque: produto.quantidadeEstoque 
+            logger.warn({
+              produtoId: produto.id,
+              solicitado: quantidade,
+              estoque: produto.quantidadeEstoque
             }, 'Insufficient stock for new item')
             toast.warning('Quantidade solicitada maior que o estoque disponível')
             return
@@ -274,7 +288,6 @@ export function CartProvider({ children }) {
           const updatedItems = [...items, newItem]
           setItems(updatedItems)
           storageUtil.setItem('cart', updatedItems)
-          
           logger.info({ produtoId: produto.id, nome: produto.nome }, 'New item added to localStorage')
           toast.success(`${produto.nome} adicionado ao carrinho!`)
         }
@@ -288,28 +301,30 @@ export function CartProvider({ children }) {
     }
   }
 
+
   // 6. Remover item do carrinho
   const removeItem = async (produtoId) => {
     try {
       setLoading(true)
-      
-      if (isAuthenticated && user) {
+
+      if (isAuthenticated) {
         const item = items.find(item => item.id === produtoId)
+
         if (!item || !item.itemId) {
           logger.warn({ produtoId }, 'Item not found in cart')
           toast.error('Item não encontrado no carrinho')
           return
         }
-        
+
         logger.info({ itemId: item.itemId, produtoId, nome: item.nome }, 'Removing item via API')
-        
+
         const response = await api.delete(`/carrinho/itens/${item.itemId}`)
         const backendCart = response.data
-        
+
         // Buscar estoques atualizados
         const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
         const stockMap = await fetchProductsStock(produtoIds)
-        
+
         const backendItems = (backendCart.itens || []).map(item => ({
           id: item.produtoId,
           nome: item.produtoNome,
@@ -321,25 +336,23 @@ export function CartProvider({ children }) {
           categoria: item.categoriaNome || 'Sem categoria',
           itemId: item.id
         }))
-        
+
         setCart(backendCart)
         setItems(backendItems)
-        
         logger.info({ produtoId, itemCount: backendItems.length }, 'Item removed successfully')
         toast.info('Item removido do carrinho')
-        
       } else {
         logger.info({ produtoId }, 'Removing item from localStorage')
-        
+
         const updatedItems = items.filter(item => item.id !== produtoId)
         setItems(updatedItems)
-        
+
         if (updatedItems.length > 0) {
           storageUtil.setItem('cart', updatedItems)
         } else {
           storageUtil.removeItem('cart')
         }
-        
+
         logger.info({ produtoId, remainingItems: updatedItems.length }, 'Item removed from localStorage')
         toast.info('Item removido do carrinho')
       }
@@ -359,34 +372,35 @@ export function CartProvider({ children }) {
         await removeItem(produtoId)
         return
       }
-      
+
       setLoading(true)
-      
-      if (isAuthenticated && user) {
+
+      if (isAuthenticated) {
         const item = items.find(item => item.id === produtoId)
+
         if (!item || !item.itemId) {
           logger.warn({ produtoId }, 'Item not found for quantity update')
           toast.error('Item não encontrado no carrinho')
           return
         }
-        
-        logger.info({ 
-          itemId: item.itemId, 
-          produtoId, 
+
+        logger.info({
+          itemId: item.itemId,
+          produtoId,
           oldQuantity: item.quantidade,
-          newQuantity: novaQuantidade 
+          newQuantity: novaQuantidade
         }, 'Updating quantity via API')
-        
+
         const response = await api.put(`/carrinho/itens/${item.itemId}`, {
           quantidade: novaQuantidade
         })
-        
+
         const backendCart = response.data
-        
+
         // Buscar estoques atualizados
         const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
         const stockMap = await fetchProductsStock(produtoIds)
-        
+
         const backendItems = (backendCart.itens || []).map(item => ({
           id: item.produtoId,
           nome: item.produtoNome,
@@ -398,42 +412,41 @@ export function CartProvider({ children }) {
           categoria: item.categoriaNome || 'Sem categoria',
           itemId: item.id
         }))
-        
+
         setCart(backendCart)
         setItems(backendItems)
-        
         logger.info({ produtoId, novaQuantidade, valorTotal: backendCart.valorTotal }, 'Quantity updated successfully')
-        
       } else {
         logger.info({ produtoId, novaQuantidade }, 'Updating quantity in localStorage')
-        
+
         const updatedItems = items.map(item => {
           if (item.id === produtoId) {
             if (novaQuantidade > item.estoque) {
-              logger.warn({ 
-                produtoId, 
-                solicitado: novaQuantidade, 
-                estoque: item.estoque 
+              logger.warn({
+                produtoId,
+                solicitado: novaQuantidade,
+                estoque: item.estoque
               }, 'Quantity exceeds stock')
               toast.warning('Quantidade maior que o estoque disponível')
               return item
             }
+
             return { ...item, quantidade: novaQuantidade }
           }
+
           return item
         })
 
         setItems(updatedItems)
         storageUtil.setItem('cart', updatedItems)
-        
         logger.info({ produtoId, novaQuantidade }, 'Quantity updated in localStorage')
       }
     } catch (error) {
       logger.error({ error, produtoId, novaQuantidade }, 'Error updating quantity')
       const message = error.response?.data?.message || 'Erro ao atualizar quantidade'
       toast.error(message)
-      
-      if (isAuthenticated && user) {
+
+      if (isAuthenticated) {
         await loadCartFromBackend()
       }
     } finally {
@@ -445,25 +458,20 @@ export function CartProvider({ children }) {
   const clearCart = async () => {
     try {
       setLoading(true)
-      
-      if (isAuthenticated && user) {
-        logger.info({ userId: user.id }, 'Clearing cart via API')
-        
+
+      if (isAuthenticated) {
+        logger.info('Clearing cart via API')
         const response = await api.delete('/carrinho')
         const backendCart = response.data
-        
+
         setCart(backendCart)
         setItems([])
-        
-        logger.info({ userId: user.id }, 'Cart cleared successfully')
+        logger.info('Cart cleared successfully')
         toast.info('Carrinho esvaziado')
-        
       } else {
         logger.info('Clearing cart from localStorage')
-        
         setItems([])
         storageUtil.removeItem('cart')
-        
         logger.info('Cart cleared from localStorage')
         toast.info('Carrinho esvaziado')
       }
@@ -515,7 +523,6 @@ export function CartProvider({ children }) {
   const transferLocalCartToBackend = async () => {
     try {
       const localItems = storageUtil.getItem('cart')
-      
       if (localItems && localItems.length > 0) {
         logger.info({ itemCount: localItems.length }, 'Transferring local cart to backend after login')
         await syncCartWithBackend(localItems)
@@ -527,7 +534,7 @@ export function CartProvider({ children }) {
 
   // 16. Atualizar carrinho do backend
   const refreshCart = async () => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated) {
       logger.info('Manual cart refresh requested')
       await loadCartFromBackend()
     }
@@ -536,7 +543,7 @@ export function CartProvider({ children }) {
   // 17. Valor que será compartilhado
   const value = {
     items,
-    setItems,  // Export setItems for direct manipulation
+    setItems, // Export setItems for direct manipulation
     cart,
     loading,
     addItem,
@@ -569,11 +576,9 @@ export function CartProvider({ children }) {
 // 19. Hook customizado
 export function useCart() {
   const context = useContext(CartContext)
-  
   if (!context) {
     throw new Error('useCart deve ser usado dentro de CartProvider')
   }
-  
   return context
 }
 

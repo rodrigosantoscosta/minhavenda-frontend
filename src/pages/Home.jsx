@@ -239,11 +239,12 @@ export default function Home() {
           )}
 
           {/* Debug Info (REMOVER EM PRODUÇÃO) */}
-          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
+          {/* <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
             <p className="text-sm text-blue-800">
-              🔍 Debug: {produtos.length} produtos no estado | Página: {page + 1} | Total Páginas: {totalPages}
+               Debug: {produtos.length} produtos no estado | Página: {page + 1} | Total Páginas: {totalPages}
+              
             </p>
-          </div>
+          </div> */}
 
           {/* Grid de Produtos */}
           {produtos.length === 0 ? (
