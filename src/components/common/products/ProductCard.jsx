@@ -46,7 +46,7 @@ export default function ProductCard({ produto, viewMode = 'grid' }) {
     >
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img
-          src={imageError ? 'https://placehold.co/600x400/transparent/F00' : produto.imagem}
+          src={imageError ? 'https://placehold.co/600x400/transparent/F00' : produto.urlImagem}
           alt={produto.nome}
           onError={() => setImageError(true)}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
