@@ -59,7 +59,7 @@ api.interceptors.response.use(
     // Tratamento de erros específicos
     switch (status) {
       case 401:
-        // ✨ MODIFICADO: Disparar evento customizado em vez de redirecionar diretamente
+        
         logger.warn({ url }, 'Token inválido ou expirado - disparando evento')
 
         // Limpar localStorage

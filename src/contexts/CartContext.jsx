@@ -281,7 +281,7 @@ export function CartProvider({ children }) {
             precoOriginal: produto.preco.valor,
             quantidade: quantidade,
             estoque: produto.quantidadeEstoque,
-            imagem: produto.imagem,
+            imagem: produto.urlImagem,
             categoria: produto.categoria?.nome || 'Sem categoria',
           }
 
