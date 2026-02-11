@@ -1,5 +1,6 @@
-// src/services/authService.js - CORRIGIDO
 import api from './api'
+import jwtHelper from '../utils/jwtHelper'
+import logger from '../utils/logger'
 
 const authService = {
   /**
@@ -7,26 +8,33 @@ const authService = {
    */
   async login(email, senha) {
     try {
-      console.log('🔄 authService.login chamado:', { email })
-      
+      logger.debug({ email }, 'authService.login chamado')
+
       const response = await api.post('/auth/login', {
         email,
         senha
       })
 
-      console.log('📦 Resposta da API:', response.data)
+      logger.debug({ hasToken: !!response.data.token }, 'Resposta da API recebida')
 
-      // Tratar diferentes formatos de resposta
       const data = response.data
-      
+
       // Formato 1: { token, user: { nome, email, ... } }
       if (data.token && data.user) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
+
+        // ✨ NOVO: Armazenar timestamp de expiração
+        const expiration = jwtHelper.getTokenExpiration(data.token)
+        if (expiration) {
+          localStorage.setItem('tokenExpiration', expiration.toString())
+          logger.debug({ expiration }, 'Token expiration saved')
+        }
+
         return data
       }
-      
-      // Formato 2: { token, nome, email, ... } (dados do user no mesmo nível)
+
+      // Formato 2: { token, nome, email, ... }
       if (data.token && data.nome) {
         const user = {
           id: data.id,
@@ -34,29 +42,40 @@ const authService = {
           email: data.email,
           tipo: data.tipo
         }
-        
+
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(user))
-        
+
+        // ✨ NOVO: Armazenar timestamp de expiração
+        const expiration = jwtHelper.getTokenExpiration(data.token)
+        if (expiration) {
+          localStorage.setItem('tokenExpiration', expiration.toString())
+          logger.debug({ expiration }, 'Token expiration saved')
+        }
+
         return { token: data.token, user }
       }
-      
-      // Formato 3: Somente token (buscar user depois)
+
+      // Formato 3: Somente token
       if (data.token) {
         localStorage.setItem('token', data.token)
-        
-        // Criar user básico com email
         const user = { email }
         localStorage.setItem('user', JSON.stringify(user))
-        
-        console.warn('⚠️ Backend retornou apenas token, criando user básico')
+
+        // ✨ NOVO: Armazenar timestamp de expiração
+        const expiration = jwtHelper.getTokenExpiration(data.token)
+        if (expiration) {
+          localStorage.setItem('tokenExpiration', expiration.toString())
+          logger.debug({ expiration }, 'Token expiration saved')
+        }
+
+        logger.warn('Backend retornou apenas token, criando user básico')
         return { token: data.token, user }
       }
-      
+
       throw new Error('Resposta do servidor inválida: sem token')
-      
     } catch (error) {
-      console.error('❌ Erro no authService.login:', error)
+      logger.error({ error }, 'Erro no authService.login')
       throw error
     }
   },
@@ -66,25 +85,33 @@ const authService = {
    */
   async register(nome, email, senha) {
     try {
-      console.log('🔄 authService.register chamado:', { nome, email })
-      
+      logger.debug({ nome, email }, 'authService.register chamado')
+
       const response = await api.post('/auth/register', {
         nome,
         email,
         senha
       })
 
-      console.log('📦 Resposta da API:', response.data)
+      logger.debug({ hasToken: !!response.data.token }, 'Resposta da API recebida')
 
       const data = response.data
-      
+
       // Formato 1: { token, user: { nome, email, ... } }
       if (data.token && data.user) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
+
+        // ✨ NOVO: Armazenar timestamp de expiração
+        const expiration = jwtHelper.getTokenExpiration(data.token)
+        if (expiration) {
+          localStorage.setItem('tokenExpiration', expiration.toString())
+          logger.debug({ expiration }, 'Token expiration saved')
+        }
+
         return data
       }
-      
+
       // Formato 2: { token, nome, email, ... }
       if (data.token && data.nome) {
         const user = {
@@ -93,28 +120,40 @@ const authService = {
           email: data.email,
           tipo: data.tipo
         }
-        
+
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(user))
-        
+
+        // ✨ NOVO: Armazenar timestamp de expiração
+        const expiration = jwtHelper.getTokenExpiration(data.token)
+        if (expiration) {
+          localStorage.setItem('tokenExpiration', expiration.toString())
+          logger.debug({ expiration }, 'Token expiration saved')
+        }
+
         return { token: data.token, user }
       }
-      
+
       // Formato 3: Somente token
       if (data.token) {
         localStorage.setItem('token', data.token)
-        
         const user = { nome, email }
         localStorage.setItem('user', JSON.stringify(user))
-        
-        console.warn('⚠️ Backend retornou apenas token, criando user básico')
+
+        // ✨ NOVO: Armazenar timestamp de expiração
+        const expiration = jwtHelper.getTokenExpiration(data.token)
+        if (expiration) {
+          localStorage.setItem('tokenExpiration', expiration.toString())
+          logger.debug({ expiration }, 'Token expiration saved')
+        }
+
+        logger.warn('Backend retornou apenas token, criando user básico')
         return { token: data.token, user }
       }
-      
+
       throw new Error('Resposta do servidor inválida: sem token')
-      
     } catch (error) {
-      console.error('❌ Erro no authService.register:', error)
+      logger.error({ error }, 'Erro no authService.register')
       throw error
     }
   },
@@ -125,15 +164,60 @@ const authService = {
   logout() {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    console.log('🔄 localStorage limpo')
+    localStorage.removeItem('tokenExpiration') // ✨ NOVO
+    logger.info('localStorage limpo')
   },
 
   /**
-   * Verificar se usuário está autenticado
+   * Verificar se usuário está autenticado (✨ MODIFICADO)
    */
   isAuthenticated() {
-    const token = localStorage.getItem('token')
-    return !!token
+    const token = this.getToken()
+    if (!token) return false
+
+    // Verificar se token está expirado
+    return !jwtHelper.isTokenExpired(token)
+  },
+
+  /**
+   * ✨ NOVO: Verificar se token é válido
+   */
+  isTokenValid() {
+    const token = this.getToken()
+    if (!token) return false
+
+    return !jwtHelper.isTokenExpired(token)
+  },
+
+  /**
+   * ✨ NOVO: Obter tempo até expiração
+   */
+  getTokenExpirationTime() {
+    const token = this.getToken()
+    if (!token) return null
+
+    return jwtHelper.getTimeUntilExpiration(token)
+  },
+
+  /**
+   * ✨ NOVO: Obter timestamp de expiração
+   */
+  getTokenExpiration() {
+    const token = this.getToken()
+    if (!token) return null
+
+    return jwtHelper.getTokenExpiration(token)
+  },
+
+  /**
+   * ✨ NOVO: Verificar se deve mostrar aviso de expiração (5 min antes)
+   */
+  shouldShowExpirationWarning() {
+    const timeLeft = this.getTokenExpirationTime()
+    if (!timeLeft) return false
+
+    const fiveMinutes = 5 * 60 * 1000
+    return timeLeft <= fiveMinutes && timeLeft > 0
   },
 
   /**
@@ -144,7 +228,7 @@ const authService = {
       const user = localStorage.getItem('user')
       return user ? JSON.parse(user) : null
     } catch (error) {
-      console.error('❌ Erro ao parsear user do localStorage:', error)
+      logger.error({ error }, 'Erro ao parsear user do localStorage')
       return null
     }
   },
@@ -162,9 +246,9 @@ const authService = {
   updateCurrentUser(updatedUser) {
     try {
       localStorage.setItem('user', JSON.stringify(updatedUser))
-      console.log('✅ User atualizado no localStorage')
+      logger.info({ userId: updatedUser.id }, 'User atualizado no localStorage')
     } catch (error) {
-      console.error('❌ Erro ao atualizar usuário:', error)
+      logger.error({ error }, 'Erro ao atualizar usuário')
     }
   }
 }

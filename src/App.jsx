@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ToastProvider } from './components/common/Toast'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
+
+import ScrollToTop from './components/common/ScrollToTop'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Cart from './pages/Cart'
@@ -35,6 +37,7 @@ function App() {
     // 1. ToastProvider (notificações) - mais externo
     <ToastProvider>
       <BrowserRouter>
+        <ScrollToTop />
         {/* 2. AuthProvider (autenticação) */}
         <AuthProvider>
           {/* 3. CartProvider (carrinho) */}
