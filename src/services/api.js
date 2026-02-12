@@ -14,25 +14,6 @@ const api = axios.create({
   },
 })
 
-// Interceptor para adicionar token em todas requisições
-api.interceptors.request.use(
-  (config) => {
-    // Pegar token do localStorage
-    const token = localStorage.getItem('token')
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-
-    logger.debug({ method: config.method, url: config.url }, 'Requisição enviada')
-    return config
-  },
-  (error) => {
-    logger.error({ error }, 'Erro ao interceptar requisição')
-    return Promise.reject(error)
-  }
-)
-
 // Interceptor de RESPOSTA (tratar erros globalmente)
 api.interceptors.response.use(
   (response) => {
@@ -59,21 +40,25 @@ api.interceptors.response.use(
     // Tratamento de erros específicos
     switch (status) {
       case 401:
+        // Verificar se é um endpoint de autenticação
+        const isAuthEndpoint = url?.includes('/auth/login') || url?.includes('/auth/register')
         
-        logger.warn({ url }, 'Token inválido ou expirado - disparando evento')
+        if (isAuthEndpoint) {
+          // 401 em login/register = credenciais inválidas
+          logger.debug({ url }, '401 em endpoint de autenticação - credenciais inválidas')
+        } else {
+          // 401 em rota protegida = token expirado/inválido
+          // Fazer logout automático
+          logger.warn({ url }, 'Token inválido ou expirado - disparando evento')
+          
+          // Limpar localStorage
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          localStorage.removeItem('tokenExpiration')
 
-        // Limpar localStorage
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        localStorage.removeItem('tokenExpiration')
-
-        // Disparar evento para AuthContext escutar
-        window.dispatchEvent(new CustomEvent('auth:unauthorized'))
-
-        // OPCIONAL: Redirecionar apenas se não estiver na página de login
-        // if (window.location.pathname !== '/login') {
-        //   window.location.href = '/login'
-        // }
+          // Disparar evento para AuthContext escutar
+          window.dispatchEvent(new CustomEvent('auth:unauthorized'))
+        }
         break
 
       case 403:
@@ -107,6 +92,7 @@ api.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
 
 // Funções auxiliares para chamadas comuns
 

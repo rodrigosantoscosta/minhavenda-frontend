@@ -1,286 +1,259 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import Button from '../components/common/Button'
-import Input from '../components/common/Input'
-import { 
-  FiMail, 
-  FiLock, 
-  FiEye, 
-  FiEyeOff,
-  FiShoppingBag,
-  FiAlertCircle
-} from 'react-icons/fi'
+import { FiMail, FiLock, FiEye, FiEyeOff, FiShoppingBag, FiAlertCircle } from 'react-icons/fi'
+import logger from '../utils/logger'
 
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login, loading } = useAuth()
 
-  // Estado do formulário
-  const [formData, setFormData] = useState({
-    email: '',
-    senha: ''
-  })
+  useEffect(() => {
+    logger.info('🔵 Login component MOUNTED')
+    return () => {
+      logger.info('🔴 Login component UNMOUNTED')
+    }
+  }, [])
 
-  // Estado de validação
+  const [formData, setFormData] = useState({ email: '', senha: '' })
   const [errors, setErrors] = useState({})
-  
-  // Estado para mostrar/ocultar senha
   const [showPassword, setShowPassword] = useState(false)
-
-  // Estado para erro geral
   const [serverError, setServerError] = useState('')
 
-  // Página de redirect (após login)
   const from = location.state?.from?.pathname || '/'
 
-  // Handle input change
+  // ✅ Carregar erro do sessionStorage ao montar componente
+  useEffect(() => {
+    const savedError = sessionStorage.getItem('loginError')
+    if (savedError) {
+      setServerError(savedError)
+      sessionStorage.removeItem('loginError')
+    }
+  }, [])
+
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-    
-    // Limpar erro do campo ao digitar
+    setFormData(prev => ({ ...prev, [name]: value }))
+
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }))
+      setErrors(prev => ({ ...prev, [name]: '' }))
     }
-    
-    // Limpar erro do servidor
+
     if (serverError) {
       setServerError('')
+      sessionStorage.removeItem('loginError')
     }
   }
 
-  // Validar formulário
   const validateForm = () => {
     const newErrors = {}
 
-    // Validar email
     if (!formData.email) {
       newErrors.email = 'Email é obrigatório'
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email inválido'
     }
 
-    // Validar senha
     if (!formData.senha) {
       newErrors.senha = 'Senha é obrigatória'
-    } else if (formData.senha.length < 6) {
-      newErrors.senha = 'Senha deve ter no mínimo 6 caracteres'
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  // Handle submit
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setServerError('')
-
-    // Validar formulário
-    if (!validateForm()) {
-      return
-    }
-
-    // Fazer login
-    const result = await login(formData.email, formData.senha)
-
-    if (result.success) {
-      // Redirecionar para a página de origem ou home
-      navigate(from, { replace: true })
-    } else {
-      // Mostrar erro do servidor
-      setServerError(result.error || 'Erro ao fazer login. Verifique suas credenciais.')
-    }
-  }
-
-  // Handle demo login 
   const handleDemoLogin = async (tipo) => {
-    const credentials = tipo === 'admin' 
+    const credentials = tipo === 'admin'
       ? { email: 'admin@minhavenda.com', senha: 'admin123' }
       : { email: 'maria@email.com', senha: 'senha123' }
 
     setFormData(credentials)
-    
+
     const result = await login(credentials.email, credentials.senha)
+
     if (result.success) {
       navigate(from, { replace: true })
+    } else {
+      const error = result.error || 'Erro ao fazer login'
+      sessionStorage.setItem('loginError', error)
+      setServerError(error)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          
-          {/* Logo e Título */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
-              <FiShoppingBag className="text-primary-600" size={32} />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900">
-              Bem-vindo de volta!
-            </h2>
-            <p className="mt-2 text-gray-600">
-              Faça login para continuar
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
 
-          {/* Erro do Servidor */}
-          {serverError && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-              <FiAlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
+        {/* Logo e título */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-full mb-4">
+            <FiShoppingBag className="text-white" size={32} />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Bem-vindo!</h1>
+          <p className="text-gray-600">Faça login para continuar</p>
+        </div>
+
+        {/* ✅ ALERTA DE ERRO */}
+        {serverError && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-start">
+              <FiAlertCircle className="text-red-500 mt-0.5 mr-3 flex-shrink-0" size={20} />
               <div className="flex-1">
-                <p className="text-sm text-red-800 font-medium">
-                  {serverError}
-                </p>
+                <h3 className="text-sm font-semibold text-red-800 mb-1">
+                  Falha na autenticação
+                </h3>
+                <p className="text-sm text-red-700">{serverError}</p>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Formulário */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <Input
-                id="email"
-                name="email"
+        {/* Formulário */}
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+
+            setServerError('')
+            sessionStorage.removeItem('loginError')
+
+            if (!validateForm()) return
+
+            const startTime = Date.now()
+
+            const result = await login(formData.email, formData.senha)
+
+
+            if (result.success) {
+              logger.info('✅ Login success - navigating')
+              navigate(from, { replace: true })
+              return false
+            }
+
+            const error = result.error || 'Erro ao fazer login. Verifique suas credenciais.'
+
+            // Wait a tick to ensure component is stable
+            await new Promise(resolve => setTimeout(resolve, 10))
+
+            sessionStorage.setItem('loginError', error)
+            setServerError(error)
+
+            logger.info('🔴 Login failed - error set')
+
+            return false
+          }}
+
+          className="space-y-6"
+        >
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email *
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiMail className="text-gray-400" size={20} />
+              </div>
+              <input
                 type="email"
-                placeholder="seu@email.com"
+                name="email"
                 value={formData.email}
                 onChange={handleChange}
-                error={errors.email}
-                leftIcon={<FiMail />}
+                placeholder="seu@email.com"
                 autoComplete="email"
-                autoFocus
+                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
               />
             </div>
-
-            {/* Senha */}
-            <div>
-              <label htmlFor="senha" className="block text-sm font-medium text-gray-700 mb-2">
-                Senha
-              </label>
-              <div className="relative">
-                <Input
-                  id="senha"
-                  name="senha"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={formData.senha}
-                  onChange={handleChange}
-                  error={errors.senha}
-                  leftIcon={<FiLock />}
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                >
-                  {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Esqueci a senha */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember"
-                  name="remember"
-                  type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
-                  Lembrar de mim
-                </label>
-              </div>
-
-              <Link 
-                to="/esqueci-senha" 
-                className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
-              >
-                Esqueceu a senha?
-              </Link>
-            </div>
-
-            {/* Botão Submit */}
-            <Button
-              type="submit"
-              className="w-full"
-              size="lg"
-              loading={loading}
-              disabled={loading}
-            >
-              {loading ? 'Entrando...' : 'Entrar'}
-            </Button>
-          </form>
-
-          {/* Divider */}
-          <div className="mt-6 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Ou</span>
-            </div>
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
           </div>
 
-          {/* Login Demo  */}
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('admin')}
-              className="inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-            >
-              Demo Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('user')}
-              className="inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-            >
-              Demo Usuário
-            </button>
+          {/* Senha */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Senha *
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiLock className="text-gray-400" size={20} />
+              </div>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="senha"
+                value={formData.senha}
+                onChange={handleChange}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.senha ? 'border-red-500' : 'border-gray-300'
+                  }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              </button>
+            </div>
+            {errors.senha && (
+              <p className="mt-1 text-sm text-red-600">{errors.senha}</p>
+            )}
           </div>
 
-          {/* Link para Cadastro */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Não tem uma conta?{' '}
-              <Link 
-                to="/cadastro" 
-                className="font-medium text-primary-600 hover:text-primary-700 transition-colors"
-              >
-                Cadastre-se gratuitamente
-              </Link>
-            </p>
+          {/* Botão de Login */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-500 text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Entrando...' : 'Entrar'}
+          </button>
+        </form>
+
+        {/* Link de Cadastro */}
+        <div className="mt-6 text-center">
+          <p className="text-gray-600 text-sm">
+            Não tem uma conta?{' '}
+            <Link
+              to="/register"
+              className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+            >
+              Cadastre-se gratuitamente
+            </Link>
+          </p>
+        </div>
+
+        {/* Divisor */}
+        <div className="relative mt-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-500">Ou teste com:</span>
           </div>
         </div>
 
-        {/* Link para Home */}
-        <div className="mt-6 text-center">
-          <Link 
-            to="/" 
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        {/* Botões Demo */}
+        <div className="mt-6 space-y-3">
+          <button
+            type="button"
+            onClick={() => handleDemoLogin('admin')}
+            disabled={loading}
+            className="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
-            ← Voltar para a loja
-          </Link>
+            🔑 Login como Admin
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDemoLogin('cliente')}
+            disabled={loading}
+            className="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            👤 Login como Cliente
+          </button>
         </div>
       </div>
     </div>
