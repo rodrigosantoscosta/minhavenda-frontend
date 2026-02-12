@@ -1,4 +1,5 @@
 import api from './api'
+import logger from '../utils/logger'
 
 const cartService = {
   /**
@@ -9,7 +10,7 @@ const cartService = {
       const response = await api.get('/carrinho')
       return response.data
     } catch (error) {
-      console.error('Erro ao buscar carrinho:', error)
+      logger.error({ err: error }, 'Erro ao buscar carrinho')
       throw error
     }
   },
@@ -25,7 +26,7 @@ const cartService = {
       })
       return response.data
     } catch (error) {
-      console.error('Erro ao adicionar item:', error)
+      logger.error({ err: error, produtoId, quantidade }, 'Erro ao adicionar item')
       throw error
     }
   },
@@ -40,7 +41,7 @@ const cartService = {
       })
       return response.data
     } catch (error) {
-      console.error('Erro ao atualizar item:', error)
+      logger.error({ err: error, itemId, quantidade }, 'Erro ao atualizar item')
       throw error
     }
   },
@@ -53,7 +54,7 @@ const cartService = {
       const response = await api.delete(`/carrinho/itens/${itemId}`)
       return response.data
     } catch (error) {
-      console.error('Erro ao remover item:', error)
+      logger.error({ err: error, itemId }, 'Erro ao remover item')
       throw error
     }
   },
@@ -66,7 +67,7 @@ const cartService = {
       const response = await api.delete('/carrinho')
       return response.data
     } catch (error) {
-      console.error('Erro ao limpar carrinho:', error)
+      logger.error({ err: error }, 'Erro ao limpar carrinho')
       throw error
     }
   },
@@ -82,7 +83,7 @@ const cartService = {
       })
       return response.data
     } catch (error) {
-      console.error('Erro ao sincronizar carrinho:', error)
+      logger.error({ err: error, itemsLength: Array.isArray(items) ? items.length : 0 }, 'Erro ao sincronizar carrinho')
       throw error
     }
   },
@@ -95,7 +96,7 @@ const cartService = {
       const response = await api.get('/carrinho/resumo')
       return response.data
     } catch (error) {
-      console.error('Erro ao buscar resumo:', error)
+      logger.error({ err: error }, 'Erro ao buscar resumo')
       throw error
     }
   }
