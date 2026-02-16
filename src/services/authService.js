@@ -24,7 +24,7 @@ const authService = {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
 
-        // ✨ NOVO: Armazenar timestamp de expiração
+        
         const expiration = jwtHelper.getTokenExpiration(data.token)
         if (expiration) {
           localStorage.setItem('tokenExpiration', expiration.toString())
@@ -46,7 +46,7 @@ const authService = {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(user))
 
-        // ✨ NOVO: Armazenar timestamp de expiração
+        
         const expiration = jwtHelper.getTokenExpiration(data.token)
         if (expiration) {
           localStorage.setItem('tokenExpiration', expiration.toString())
@@ -62,7 +62,7 @@ const authService = {
         const user = { email }
         localStorage.setItem('user', JSON.stringify(user))
 
-        // ✨ NOVO: Armazenar timestamp de expiração
+      
         const expiration = jwtHelper.getTokenExpiration(data.token)
         if (expiration) {
           localStorage.setItem('tokenExpiration', expiration.toString())
@@ -76,8 +76,25 @@ const authService = {
       throw new Error('Resposta do servidor inválida: sem token')
     } catch (error) {
       logger.error({ error }, 'Erro no authService.login')
-      throw error
-    }
+
+        if(error.response?.data?.mensagem) {
+          // Backend retornou mensagem em português
+          const errorMsg = error.response.data.mensagem
+          logger.debug({ errorMsg }, 'Extracted error message from response')
+          throw new Error(errorMsg)
+        } else if (error.response?.data?.message) {
+          // Backend retornou mensagem em inglês
+          throw new Error(error.response.data.message)
+        } else if (error.response?.status === 401) {
+          throw new Error('Email ou senha inválidos')
+        } else if (error.response?.status) {
+          throw new Error(`Erro do servidor: ${error.response.status}`)
+        } else if (error.message) {
+          throw new Error(error.message)
+        } else {
+          throw new Error('Erro ao fazer login')
+        }
+    }    
   },
 
   /**
@@ -124,7 +141,7 @@ const authService = {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(user))
 
-        // ✨ NOVO: Armazenar timestamp de expiração
+        
         const expiration = jwtHelper.getTokenExpiration(data.token)
         if (expiration) {
           localStorage.setItem('tokenExpiration', expiration.toString())
@@ -140,7 +157,7 @@ const authService = {
         const user = { nome, email }
         localStorage.setItem('user', JSON.stringify(user))
 
-        // ✨ NOVO: Armazenar timestamp de expiração
+
         const expiration = jwtHelper.getTokenExpiration(data.token)
         if (expiration) {
           localStorage.setItem('tokenExpiration', expiration.toString())
@@ -164,12 +181,12 @@ const authService = {
   logout() {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    localStorage.removeItem('tokenExpiration') // ✨ NOVO
+    localStorage.removeItem('tokenExpiration') 
     logger.info('localStorage limpo')
   },
 
   /**
-   * Verificar se usuário está autenticado (✨ MODIFICADO)
+   * Verificar se usuário está autenticado 
    */
   isAuthenticated() {
     const token = this.getToken()
@@ -189,9 +206,6 @@ const authService = {
     return !jwtHelper.isTokenExpired(token)
   },
 
-  /**
-   * ✨ NOVO: Obter tempo até expiração
-   */
   getTokenExpirationTime() {
     const token = this.getToken()
     if (!token) return null
@@ -199,9 +213,7 @@ const authService = {
     return jwtHelper.getTimeUntilExpiration(token)
   },
 
-  /**
-   * ✨ NOVO: Obter timestamp de expiração
-   */
+
   getTokenExpiration() {
     const token = this.getToken()
     if (!token) return null
@@ -209,9 +221,6 @@ const authService = {
     return jwtHelper.getTokenExpiration(token)
   },
 
-  /**
-   * ✨ NOVO: Verificar se deve mostrar aviso de expiração (5 min antes)
-   */
   shouldShowExpirationWarning() {
     const timeLeft = this.getTokenExpirationTime()
     if (!timeLeft) return false

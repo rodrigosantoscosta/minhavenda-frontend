@@ -54,7 +54,7 @@ export const createOrder = async (orderData) => {
           throw apiError
         }
         
-        console.warn('⚠️ API de checkout indisponível. Usando modo mock como fallback.')
+        logger.warn('⚠️ API de checkout indisponível. Usando modo mock como fallback.')
         return await createOrderMock(orderData)
       }
     }
@@ -73,7 +73,7 @@ export const createOrder = async (orderData) => {
  * Implementação Mock para criação de pedido
  */
 async function createOrderMock(orderData) {
-  console.warn('🔄 Usando modo MOCK para criação de pedido (fallback)')
+  logger.warn('🔄 Usando modo MOCK para criação de pedido (fallback)')
   
   // Simular delay de rede
   await new Promise(resolve => setTimeout(resolve, 1500))

@@ -1,12 +1,8 @@
-
 import axios from 'axios'
 import logger from '../utils/logger'
 
-// URL base da API (backend)
-
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 
-// Criar instância do Axios
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -14,26 +10,27 @@ const api = axios.create({
   },
 })
 
-// Interceptor para adicionar token em todas requisições
+// Interceptor de REQUEST - Adicionar token
 api.interceptors.request.use(
   (config) => {
-    // Pegar token do localStorage
     const token = localStorage.getItem('token')
-
-    if (token) {
+    
+    if (token && token !== 'null' && token !== 'undefined') {
       config.headers.Authorization = `Bearer ${token}`
+      logger.debug({ url: config.url, method: config.method }, 'Request with token')
+    } else {
+      logger.debug({ url: config.url, method: config.method }, 'Request without token')
     }
-
-    logger.debug({ method: config.method, url: config.url }, 'Requisição enviada')
+    
     return config
   },
   (error) => {
-    logger.error({ error }, 'Erro ao interceptar requisição')
+    logger.error({ error }, 'Request interceptor error')
     return Promise.reject(error)
   }
 )
 
-// Interceptor de RESPOSTA (tratar erros globalmente)
+// Interceptor de RESPOSTA 
 api.interceptors.response.use(
   (response) => {
     logger.info({
@@ -44,11 +41,10 @@ api.interceptors.response.use(
     return response
   },
   (error) => {
-    // Pegar informações do erro
     const status = error.response?.status
     const message = error.response?.data?.message || error.message
     const url = error.config?.url
-
+    
     logger.error({
       status,
       message,
@@ -56,118 +52,45 @@ api.interceptors.response.use(
       method: error.config?.method,
     }, 'Erro na resposta da API')
 
-    // Tratamento de erros específicos
     switch (status) {
       case 401:
+        const isAuthEndpoint = url?.includes('/auth/login') || url?.includes('/auth/register')
         
-        logger.warn({ url }, 'Token inválido ou expirado - disparando evento')
-
-        // Limpar localStorage
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        localStorage.removeItem('tokenExpiration')
-
-        // Disparar evento para AuthContext escutar
-        window.dispatchEvent(new CustomEvent('auth:unauthorized'))
-
-        // OPCIONAL: Redirecionar apenas se não estiver na página de login
-        // if (window.location.pathname !== '/login') {
-        //   window.location.href = '/login'
-        // }
+        if (isAuthEndpoint) {
+          logger.debug({ url }, '401 em endpoint de autenticacao - credenciais invalidas')
+        } else {
+          logger.warn({ url }, 'Token invalido ou expirado - disparando evento')
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          localStorage.removeItem('tokenExpiration')
+          window.dispatchEvent(new CustomEvent('auth:unauthorized'))
+        }
         break
-
+        
       case 403:
-        // Proibido - Sem permissão
-        logger.warn({ url }, 'Sem permissão para acessar este recurso')
+        logger.warn({ url }, 'Sem permissao para acessar este recurso')
         break
-
+        
       case 404:
-        // Não encontrado
-        logger.warn({ url }, 'Recurso não encontrado')
+        logger.warn({ url }, 'Recurso nao encontrado')
         break
-
+        
       case 500:
-        // Erro interno do servidor
         logger.error('Erro interno do servidor')
         break
-
+        
       case 503:
-        // Serviço indisponível
-        logger.error('Serviço temporariamente indisponível')
+        logger.error('Servico temporariamente indisponivel')
         break
-
+        
       default:
-        // Outros erros
         if (!error.response) {
-          // Erro de rede (sem resposta do servidor)
-          logger.error('Erro de rede - Servidor inacessível')
+          logger.error('Erro de rede - Servidor inacessivel')
         }
     }
-
+    
     return Promise.reject(error)
   }
 )
-
-// Funções auxiliares para chamadas comuns
-
-/**
- * GET - Buscar dados
- */
-export const get = async (url, config = {}) => {
-  try {
-    const response = await api.get(url, config)
-    return response.data
-  } catch (error) {
-    throw error
-  }
-}
-
-/**
- * POST - Criar dados
- */
-export const post = async (url, data = {}, config = {}) => {
-  try {
-    const response = await api.post(url, data, config)
-    return response.data
-  } catch (error) {
-    throw error
-  }
-}
-
-/**
- * PUT - Atualizar dados completos
- */
-export const put = async (url, data = {}, config = {}) => {
-  try {
-    const response = await api.put(url, data, config)
-    return response.data
-  } catch (error) {
-    throw error
-  }
-}
-
-/**
- * PATCH - Atualizar dados parciais
- */
-export const patch = async (url, data = {}, config = {}) => {
-  try {
-    const response = await api.patch(url, data, config)
-    return response.data
-  } catch (error) {
-    throw error
-  }
-}
-
-/**
- * DELETE - Deletar dados
- */
-export const del = async (url, config = {}) => {
-  try {
-    const response = await api.delete(url, config)
-    return response.data
-  } catch (error) {
-    throw error
-  }
-}
 
 export default api

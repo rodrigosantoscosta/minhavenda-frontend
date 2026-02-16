@@ -1,20 +1,18 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
-import { useAuth } from './AuthContext'
+import useAuthToken from '../hooks/useAuthToken'
 import { useToast } from '../components/common/Toast'
 import storageUtil from '../utils/storageUtil'
 import api from '../services/api'
 import logger from '../utils/logger'
 
-// 1. Criar o Context
 const CartContext = createContext(null)
 
-// 2. Provider Component
 export function CartProvider({ children }) {
   const [items, setItems] = useState([])
   const [cart, setCart] = useState(null)
   const [loading, setLoading] = useState(false)
   const toast = useToast()
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated } = useAuthToken()
 
   // Flag para evitar múltiplas inicializações
   const isInitialized = useRef(false)
@@ -36,7 +34,7 @@ export function CartProvider({ children }) {
     }
   }, [isAuthenticated]) // 
 
-  // ✅ FIX: loadCart sem dependências problemáticas
+  // loadCart sem dependências problemáticas
   const loadCart = useCallback(async () => {
     try {
       if (isAuthenticated) {

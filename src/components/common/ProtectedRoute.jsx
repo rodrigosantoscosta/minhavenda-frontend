@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { Spinner } from './Loading'
@@ -63,19 +64,31 @@ export function AdminRoute({ children }) {
 export function PublicRoute({ children, redirectTo = '/' }) {
   const { isAuthenticated, loading } = useAuth()
 
-  if (loading) {
+  // Only show spinner on initial auth check, not during login
+  const [initialCheck, setInitialCheck] = useState(true)
+
+  useEffect(() => {
+    if (!loading) {
+      setInitialCheck(false)
+    }
+  }, [loading])
+
+  // Only show spinner during first mount check
+  if (loading && initialCheck) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Spinner size="lg" />
+        <Spinner />
       </div>
     )
   }
 
+  // If already authenticated, redirect to home
   if (isAuthenticated) {
     return <Navigate to={redirectTo} replace />
   }
 
   return children
 }
+
 
 export default ProtectedRoute

@@ -2,6 +2,8 @@
  * Utilitário para manipulação segura do localStorage
  * Adiciona tratamento de erros e serialização automática
  */
+import logger from './logger'
+
 const storageUtil = {
   /**
    * SET ITEM - Salvar item no localStorage
@@ -15,14 +17,14 @@ const storageUtil = {
       localStorage.setItem(key, serializedValue)
       return true
     } catch (error) {
-      console.error(`Erro ao salvar ${key} no localStorage:`, error)
-      
+      logger.error({ err: error, key }, `Erro ao salvar ${key} no localStorage`)
+
       // Verificar se é erro de quota excedida
       if (error.name === 'QuotaExceededError') {
-        console.warn('localStorage cheio! Limpando itens antigos...')
+        logger.warn('localStorage cheio! Limpando itens antigos...')
         this.clearOldItems()
       }
-      
+
       return false
     }
   },
@@ -43,7 +45,7 @@ const storageUtil = {
       
       return JSON.parse(item)
     } catch (error) {
-      console.error(`Erro ao ler ${key} do localStorage:`, error)
+      logger.error({ err: error, key }, `Erro ao ler ${key} do localStorage`)
       return defaultValue
     }
   },
@@ -58,7 +60,7 @@ const storageUtil = {
       localStorage.removeItem(key)
       return true
     } catch (error) {
-      console.error(`Erro ao remover ${key} do localStorage:`, error)
+      logger.error({ err: error, key }, `Erro ao remover ${key} do localStorage`)
       return false
     }
   },
@@ -72,7 +74,7 @@ const storageUtil = {
       localStorage.clear()
       return true
     } catch (error) {
-      console.error('Erro ao limpar localStorage:', error)
+      logger.error({ err: error }, 'Erro ao limpar localStorage')
       return false
     }
   },
@@ -94,7 +96,7 @@ const storageUtil = {
     try {
       return Object.keys(localStorage)
     } catch (error) {
-      console.error('Erro ao obter chaves:', error)
+      logger.error({ err: error }, 'Erro ao obter chaves')
       return []
     }
   },
@@ -113,7 +115,7 @@ const storageUtil = {
       }
       return total
     } catch (error) {
-      console.error('Erro ao calcular tamanho:', error)
+      logger.error({ err: error }, 'Erro ao calcular tamanho')
       return 0
     }
   },
@@ -133,7 +135,7 @@ const storageUtil = {
       }
       this.setItem(key, item)
     } catch (error) {
-      console.error(`Erro ao salvar ${key} com expiração:`, error)
+      logger.error({ err: error, key }, `Erro ao salvar ${key} com expiração`)
     }
   },
 
@@ -160,7 +162,7 @@ const storageUtil = {
       
       return item.value
     } catch (error) {
-      console.error(`Erro ao obter ${key} com expiração:`, error)
+      logger.error({ err: error, key }, `Erro ao obter ${key} com expiração`)
       return null
     }
   },
@@ -183,7 +185,7 @@ const storageUtil = {
         }
       })
     } catch (error) {
-      console.error('Erro ao limpar itens antigos:', error)
+      logger.error({ err: error }, 'Erro ao limpar itens antigos')
     }
   },
 
@@ -202,7 +204,7 @@ const storageUtil = {
       
       return data
     } catch (error) {
-      console.error('Erro ao exportar dados:', error)
+      logger.error({ err: error }, 'Erro ao exportar dados')
       return {}
     }
   },
@@ -224,7 +226,7 @@ const storageUtil = {
       
       return true
     } catch (error) {
-      console.error('Erro ao importar dados:', error)
+      logger.error({ err: error }, 'Erro ao importar dados')
       return false
     }
   },
@@ -240,6 +242,7 @@ const storageUtil = {
       localStorage.removeItem(test)
       return true
     } catch (error) {
+      logger.warn({ err: error }, 'localStorage não disponível')
       return false
     }
   },
@@ -255,7 +258,7 @@ const storageUtil = {
       const currentSize = this.getSize()
       return maxSize - currentSize
     } catch (error) {
-      console.error('Erro ao calcular espaço restante:', error)
+      logger.error({ err: error }, 'Erro ao calcular espaço restante')
       return 0
     }
   },

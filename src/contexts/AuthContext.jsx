@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 import authService from '../services/authService'
 import jwtHelper from '../utils/jwtHelper'
 import logger from '../utils/logger'
-
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
@@ -24,8 +23,8 @@ export function AuthProvider({ children }) {
 
   // Remover 'user' das dependências
   const handleTokenExpiration = useCallback((reason = 'expired') => {
-    logger.warn({ 
-      userId: userRef.current?.id, 
+    logger.warn({
+      userId: userRef.current?.id,
       reason,
       timestamp: new Date().toISOString()
     }, 'Token expired - automatic logout')
@@ -42,7 +41,7 @@ export function AuthProvider({ children }) {
 
     // Redirecionar para login
     // navigate('/login')
-  }, []) // ✅ Array vazio - função estável
+  }, []) //  Array vazio - função estável
 
   // checkAuth com validação de expiração
   const checkAuth = useCallback(() => {
@@ -70,8 +69,8 @@ export function AuthProvider({ children }) {
         const timeLeft = expiration - Date.now()
         const minutesLeft = Math.floor(timeLeft / 1000 / 60)
 
-        logger.info({ 
-          userId: savedUser.id, 
+        logger.info({
+          userId: savedUser.id,
           email: savedUser.email,
           expiresIn: `${minutesLeft} minutes`
         }, 'User authenticated from storage')
@@ -104,8 +103,8 @@ export function AuthProvider({ children }) {
       const now = Date.now()
       const timeLeft = tokenExpiresAt - now
 
-      logger.debug({ 
-        timeLeftMinutes: Math.floor(timeLeft / 1000 / 60) 
+      logger.debug({
+        timeLeftMinutes: Math.floor(timeLeft / 1000 / 60)
       }, 'Token expiration check')
 
       // Token expirado
@@ -185,8 +184,8 @@ export function AuthProvider({ children }) {
       const timeLeft = expiration - Date.now()
       const minutesLeft = Math.floor(timeLeft / 1000 / 60)
 
-      logger.info({ 
-        userId: userData.id, 
+      logger.info({
+        userId: userData.id,
         email: userData.email,
         tipo: userData.tipo,
         tokenExpiresIn: `${minutesLeft} minutes`
@@ -204,22 +203,14 @@ export function AuthProvider({ children }) {
         data: error.response?.data
       }, 'Login failed')
 
-      let message = 'Erro ao fazer login'
 
-      if (error.response) {
-        message = error.response.data?.message ||
-                 error.response.data?.error ||
-                 `Erro ${error.response.status}: ${error.response.statusText}`
-      } else if (error.request) {
-        message = 'Servidor não respondeu. Verifique se o backend está rodando.'
-      } else {
-        message = error.message
-      }
+      let message = error.message || 'Erro ao fazer login'
 
       return { success: false, error: message }
     } finally {
       setLoading(false)
     }
+
   }, [])
 
   // register com timestamp de expiração
@@ -262,8 +253,8 @@ export function AuthProvider({ children }) {
       const timeLeft = expiration - Date.now()
       const minutesLeft = Math.floor(timeLeft / 1000 / 60)
 
-      logger.info({ 
-        userId: userData.id, 
+      logger.info({
+        userId: userData.id,
         email: userData.email,
         tipo: userData.tipo,
         tokenExpiresIn: `${minutesLeft} minutes`
@@ -284,9 +275,10 @@ export function AuthProvider({ children }) {
       let message = 'Erro ao criar conta'
 
       if (error.response) {
-        message = error.response.data?.message ||
-                 error.response.data?.error ||
-                 `Erro ${error.response.status}: ${error.response.statusText}`
+        message = error.response.data?.mensagem ||
+          error.response.data?.message ||
+          error.response.data?.error ||
+          `Erro ${error.response.status}: ${error.response.statusText}`
       } else if (error.request) {
         message = 'Servidor não respondeu.'
       } else {

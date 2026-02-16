@@ -11,6 +11,7 @@ remain fast and reliable.
 - **Styling:** `tailwindcss` (configured in `tailwind.config.js`).
 - **Routing:** `react-router-dom`.
 - **HTTP client:** `axios`.
+- **Logger:** `pino` (use for all logging, not console.log).
 - **Build output:** `dist` (configured in `vite.config.js`).
 
 **1. Use the Development Server, _not_ `npm run build` during agent sessions**
@@ -65,18 +66,61 @@ remain fast and reliable.
 **10. Quick PowerShell commands**
 Start dev server (PowerShell):
 ```
+
 npm install; npm run dev
+
 ```
 
 Build & preview (outside agent sessions):
 ```
+
 npm run build; npm run preview
+
 ```
 
 ---
 
+## Authentication & Error Handling
+
+**Form Submissions**
+- Always use inline `e.preventDefault()` in form `onSubmit` handlers
+
+**Auth State Management**
+- `AuthContext` `loading` state changes can trigger component remounts
+- `PublicRoute` and `ProtectedRoute` should only show loading spinners during initial auth check
+- Never show spinners during active login/register operations (causes component remount)
+
+**Error Display Pattern**
+```javascript
+// Save to sessionStorage before setting state
+sessionStorage.setItem('loginError', errorMessage)
+setServerError(errorMessage)
+
+// Load from sessionStorage on mount
+useEffect(() => {
+  const savedError = sessionStorage.getItem('loginError')
+  if (savedError) {
+    setServerError(savedError)
+    sessionStorage.removeItem('loginError')
+  }
+}, [])
+```
+
+
+## Code Style Rules
+
+**General**
+
+- Use `logger` from `../utils/logger` (pino) for all logging, not `console.log`
+- No emojis in production code (comments, variable names, or strings shown to users)
+- Emojis are acceptable only in debug/development logging that will be removed
+
+**Components**
+
+- Functional components with hooks
+- Keep components under 300 lines; extract smaller components if needed
+- Co-locate related state management
+---
+
 Following these guidelines keeps the development loop fast and predictable. Actions
 an agent can take (ask before doing):
-- Add a `CONTRIBUTING.md` with these rules.
-- Start the dev server and confirm HMR is active.
-- Create or update documented `.env.example` if new env vars are required.
