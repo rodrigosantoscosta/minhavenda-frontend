@@ -1,3 +1,4 @@
+
 import axios from 'axios'
 import logger from '../utils/logger'
 
@@ -30,7 +31,7 @@ api.interceptors.request.use(
   }
 )
 
-// Interceptor de RESPOSTA 
+// Interceptor de RESPOSTA (keep existing code...)
 api.interceptors.response.use(
   (response) => {
     logger.info({
@@ -92,5 +93,66 @@ api.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+
+/**
+ * GET - Buscar dados
+ */
+export const get = async (url, config = {}) => {
+  try {
+    const response = await api.get(url, config)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * POST - Criar dados
+ */
+export const post = async (url, data = {}, config = {}) => {
+  try {
+    const response = await api.post(url, data, config)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * PUT - Atualizar dados completos
+ */
+export const put = async (url, data = {}, config = {}) => {
+  try {
+    const response = await api.put(url, data, config)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * PATCH - Atualizar dados parciais
+ */
+export const patch = async (url, data = {}, config = {}) => {
+  try {
+    const response = await api.patch(url, data, config)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+/**
+ * DELETE - Deletar dados
+ */
+export const del = async (url, config = {}) => {
+  try {
+    const response = await api.delete(url, config)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
 
 export default api

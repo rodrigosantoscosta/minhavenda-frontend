@@ -23,7 +23,6 @@ export default function Login() {
 
   const from = location.state?.from?.pathname || '/'
 
-  // ✅ Carregar erro do sessionStorage ao montar componente
   useEffect(() => {
     const savedError = sessionStorage.getItem('loginError')
     if (savedError) {
@@ -94,7 +93,7 @@ export default function Login() {
           <p className="text-gray-600">Faça login para continuar</p>
         </div>
 
-        {/* ✅ ALERTA DE ERRO */}
+        {/* ALERTA DE ERRO */}
         {serverError && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-start">
@@ -224,36 +223,6 @@ export default function Login() {
               Cadastre-se gratuitamente
             </Link>
           </p>
-        </div>
-
-        {/* Divisor */}
-        <div className="relative mt-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Ou teste com:</span>
-          </div>
-        </div>
-
-        {/* Botões Demo */}
-        <div className="mt-6 space-y-3">
-          <button
-            type="button"
-            onClick={() => handleDemoLogin('admin')}
-            disabled={loading}
-            className="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
-          >
-            🔑 Login como Admin
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoLogin('cliente')}
-            disabled={loading}
-            className="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
-          >
-            👤 Login como Cliente
-          </button>
         </div>
       </div>
     </div>
