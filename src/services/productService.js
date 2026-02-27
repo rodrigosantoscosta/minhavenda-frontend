@@ -1,14 +1,15 @@
 // src/services/productService.js
 import api from './api'
+import logger from '../utils/logger'
 
 const productService = {
   // Listar produtos com filtros e paginação
   async getProdutos(params = {}) {
     try {
-      const response = await api.get('/produtos', { params })
+      const response = await api.get('/produtos/buscar', { params })
       return response.data
     } catch (error) {
-      console.error('Erro ao buscar produtos:', error)
+      logger.error({ error, params }, 'Erro ao buscar produtos')
       throw error
     }
   },

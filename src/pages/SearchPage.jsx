@@ -89,24 +89,11 @@ const SearchPage = () => {
       const validation = searchService.validarParamsBusca(params)
       if (!validation.isValid) {
         logger.warn({ errors: validation.errors }, 'Parâmetros de busca inválidos')
-        // Não mostra erro de validação para usuário, apenas ignora valores inválidos
       }
       
-      let response
-      
-      // Se tem termo de busca, usa endpoint de busca
-      if (params.termo || params.q) {
-        const searchTerm = params.termo || params.q
-        const options = {
-          page: params.page,
-          size: params.size,
-          sort: params.sort
-        }
-        response = await searchService.buscarPorTermo(searchTerm, options)
-      } else {
-        // Senão, usa endpoint de filtros avançados
-        response = await searchService.buscarProdutos(params)
-      }
+      // Sempre usa endpoint de filtros avançados (/produtos/buscar)
+      // que suporta termo, categoria, preço, ordenação e paginação
+      let response = await searchService.buscarProdutos(params)
       
       // Atualizar estado
       setProdutos(response.content || [])

@@ -98,20 +98,20 @@ export default function Products() {
         ativo: true,
       }
 
-      if (searchTerm) params.nome = searchTerm
+      if (searchTerm) params.termo = searchTerm
       if (selectedCategory) params.categoriaId = selectedCategory
       if (minPrice) params.precoMin = parseFloat(minPrice)
       if (maxPrice) params.precoMax = parseFloat(maxPrice)
 
-      // Ordenação
+      // Ordenação - formato: campo:direção
       const sortMapping = {
-        'recentes': 'dataCriacao,desc',
-        'preco_asc': 'preco.valor,asc',
-        'preco_desc': 'preco.valor,desc',
-        'nome_asc': 'nome,asc',
-        'nome_desc': 'nome,desc',
+        'recentes': 'dataCadastro:desc',
+        'preco_asc': 'preco:asc',
+        'preco_desc': 'preco:desc',
+        'nome_asc': 'nome:asc',
+        'nome_desc': 'nome:desc',
       }
-      params.sort = sortMapping[sortBy] || 'dataCriacao,desc'
+      params.sort = sortMapping[sortBy] || 'dataCadastro:desc'
 
       logger.info('Buscando produtos com parametros', { page, sortBy })
       const data = await productService.getProdutos(params)

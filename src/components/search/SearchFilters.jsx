@@ -29,7 +29,7 @@ const SearchFilters = ({
     ...filters
   })
 
-  // Carregar categorias
+  // Carregar categorias quando componente é visível
   useEffect(() => {
     const carregarCategorias = async () => {
       try {
@@ -44,10 +44,8 @@ const SearchFilters = ({
       }
     }
 
-    if (isOpen) {
-      carregarCategorias()
-    }
-  }, [isOpen])
+    carregarCategorias()
+  }, [])
 
   // Sincronizar filtros locais com props
   useEffect(() => {
@@ -69,11 +67,8 @@ const SearchFilters = ({
     }
     
     setLocalFilters(newFilters)
-    
-    // Notificar componente pai
-    if (onFiltersChange) {
-      onFiltersChange(newFilters)
-    }
+    // Não notifica o componente pai imediatamente - apenas atualiza o estado local
+    // A busca só será executada quando o usuário clicar em "Aplicar Filtros"
   }
 
   /**
@@ -113,12 +108,30 @@ const SearchFilters = ({
 
   /**
    * Handle change de preço (validação)
+   * Suporta formato brasileiro: 1.234,56
    * @param {string} field - Campo (precoMin ou precoMax)
    * @param {string} value - Valor do input
    */
   const handlePrecoChange = (field, value) => {
-    // Permitir apenas números e ponto decimal
-    const numericValue = value.replace(/[^0-9.]/g, '')
+    // Permitir números, ponto e vírgula
+    // Formato brasileiro: 1.234,56 -> convertemos para: 1234.56
+    let numericValue = value.replace(/[^0-9.,]/g, '')
+    
+    // Se tem vírgula como separador decimal (formato brasileiro)
+    if (numericValue.includes(',')) {
+      // Se a vírgula está depois do último ponto, é decimal
+      const lastCommaIndex = numericValue.lastIndexOf(',')
+      const lastDotIndex = numericValue.lastIndexOf('.')
+      
+      if (lastCommaIndex > lastDotIndex) {
+        // Formato brasileiro: 1.234,56 ou 100,00
+        // Remove pontos (milhar) e troca vírgula por ponto
+        numericValue = numericValue.replace(/\./g, '').replace(',', '.')
+      } else {
+        // Remove apenas pontos de milhar
+        numericValue = numericValue.replace(/\./g, '')
+      }
+    }
     
     // Validar que tem apenas um ponto decimal
     const parts = numericValue.split('.')
@@ -126,7 +139,7 @@ const SearchFilters = ({
       return
     }
     
-    // Limitar casas decimais
+    // Limitar casas decimais a 2
     if (parts[1] && parts[1].length > 2) {
       return
     }

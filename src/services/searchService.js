@@ -45,7 +45,7 @@ class SearchService {
 
       const url = `/produtos/buscar?${queryParams.toString()}`
       
-      logger.info({ params, url }, 'Buscando produtos com filtros')
+      logger.info({ params: { termo, categoriaId, precoMin, precoMax, ativo, sort, page, size }, url }, 'Buscando produtos com filtros')
       
       const response = await get(url)
       
@@ -190,15 +190,15 @@ class SearchService {
     if (searchParams.has('termo')) params.termo = searchParams.get('termo')
     if (searchParams.has('categoriaId')) {
       const categoriaId = searchParams.get('categoriaId')
-      params.categoriaId = categoriaId ? parseInt(categoriaId) : undefined
+      params.categoriaId = categoriaId && categoriaId.trim() !== '' ? parseInt(categoriaId) : undefined
     }
     if (searchParams.has('precoMin')) {
       const precoMin = searchParams.get('precoMin')
-      params.precoMin = precoMin ? parseFloat(precoMin) : undefined
+      params.precoMin = precoMin && precoMin.trim() !== '' ? parseFloat(precoMin) : undefined
     }
     if (searchParams.has('precoMax')) {
       const precoMax = searchParams.get('precoMax')
-      params.precoMax = precoMax ? parseFloat(precoMax) : undefined
+      params.precoMax = precoMax && precoMax.trim() !== '' ? parseFloat(precoMax) : undefined
     }
     if (searchParams.has('ativo')) {
       const ativo = searchParams.get('ativo')
@@ -207,11 +207,11 @@ class SearchService {
     if (searchParams.has('sort')) params.sort = searchParams.get('sort')
     if (searchParams.has('page')) {
       const page = searchParams.get('page')
-      params.page = page ? parseInt(page) : 0
+      params.page = page && page.trim() !== '' ? parseInt(page) : 0
     }
     if (searchParams.has('size')) {
       const size = searchParams.get('size')
-      params.size = size ? parseInt(size) : 20
+      params.size = size && size.trim() !== '' ? parseInt(size) : 20
     }
     
     return params
