@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
+import { useNotificationContext } from '../contexts/NotificationContext'
+import { registerOrderStatus } from '../services/notificationService'
 import AddressForm from '../components/checkout/AddressForm'
 import OrderSummary from '../components/checkout/OrderSummary'
 import SuccessModal from '../components/common/SuccessModal'
@@ -16,6 +18,7 @@ import {
   FiAlertCircle,
   FiCheck
 } from 'react-icons/fi'
+import logger from '../utils/logger'
 
 /**
  * Checkout Page
@@ -27,6 +30,7 @@ export default function Checkout() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { items: cartItems, setItems } = useCart()
+  const { addNotification } = useNotificationContext()
   
   // Garantir que items seja sempre um array
   const items = useMemo(() => Array.isArray(cartItems) ? cartItems : [], [cartItems])
@@ -45,12 +49,6 @@ export default function Checkout() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [createdOrder, setCreatedOrder] = useState(null)
   const [error, setError] = useState('')
-
-
-
-
-
-
 
   // Função segura para formatar valores
   const formatarValor = (valor) => {
@@ -200,6 +198,18 @@ export default function Checkout() {
       // Criar pedido
       const order = await createOrder(orderData)
       
+      // Registrar status inicial no serviço de polling para evitar falso-positivo
+      registerOrderStatus(order.id, order.status || 'PENDENTE')
+
+      // Disparar notificação de novo pedido
+      const shortId = order.id?.slice(-6) || order.id
+      addNotification({
+        type: 'new_order',
+        title: 'Pedido realizado com sucesso',
+        message: `Pedido #${shortId} foi criado. Acompanhe o status pelo sino.`,
+        orderId: order.id,
+      })
+      
       // Salvar pedido criado
       setCreatedOrder(order)
       
@@ -255,7 +265,7 @@ export default function Checkout() {
                 Finalizar Compra
               </h1>
               <p className="text-gray-600">
-                Ambiente 100% seguro • Página criptografada
+                Ambiente 100% seguro - Página criptografada
               </p>
             </div>
           </div>
@@ -424,9 +434,9 @@ export default function Checkout() {
                   <div className="text-sm text-amber-800">
                     <p className="font-medium mb-1">Importante:</p>
                     <ul className="space-y-1 text-amber-700">
-                      <li>• Verifique se o endereço está correto</li>
-                      <li>• O pedido será processado após confirmação</li>
-                      <li>• Você receberá um e-mail com os detalhes</li>
+                      <li>Verifique se o endereço está correto</li>
+                      <li>O pedido será processado após confirmação</li>
+                      <li>Você receberá um e-mail com os detalhes</li>
                     </ul>
                   </div>
                 </div>

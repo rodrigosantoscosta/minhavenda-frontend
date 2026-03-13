@@ -6,7 +6,7 @@ const productService = {
   // Listar produtos com filtros e paginação
   async getProdutos(params = {}) {
     try {
-      const response = await api.get('/produtos/buscar', { params })
+      const response = await api.get('/produtos', { params })
       return response.data
     } catch (error) {
       logger.error({ error, params }, 'Erro ao buscar produtos')

@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { ToastProvider } from './components/common/Toast'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
+import { NotificationProvider } from './contexts/NotificationContext'
 
 import ScrollToTop from './components/common/ScrollToTop'
 import Header from './components/layout/Header'
@@ -18,171 +19,86 @@ import ProductDetail from './pages/ProductDetail'
 import SearchPage from './pages/SearchPage'
 import NotFound from './pages/NotFound'
 
-// ========== PÁGINAS DE TESTE ==========
-// import TestApi from './pages/TestApi'
-// import TestComponents from './pages/TestComponents'
-
-// ========== PÁGINAS PROTEGIDAS ==========             
+// ========== PÁGINAS PROTEGIDAS ==========
 import Checkout from './pages/Checkout'
 import Profile from './pages/Profile'
 import Orders from './pages/Orders'
 import OrderDetail from './pages/OrderDetail'
-// import Unauthorized from './pages/Unauthorized'
 
-// ========== PÁGINAS ADMIN  ==========
-// import AdminPanel from './pages/AdminPanel'   
+// ========== PÁGINAS ADMIN ==========
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminPedidos from './pages/admin/AdminPedidos'
+import AdminPedidoDetail from './pages/admin/AdminPedidoDetail'
+import AdminProdutos from './pages/admin/AdminProdutos'
+import AdminEditProduto from './pages/admin/AdminEditProduto'
+import AdminEstoque from './pages/admin/AdminEstoque'
+import AdminCategorias from './pages/admin/AdminCategorias'
+import AdminDLQ from './pages/admin/AdminDLQ'
+
+/**
+ * Inner component — needs to be inside BrowserRouter to call useLocation.
+ * Hides the storefront Header/Footer for all /admin/* routes so AdminLayout
+ * can render its own sidebar without conflict.
+ */
+function AppInner() {
+  const location = useLocation()
+  const isAdmin = location.pathname.startsWith('/admin')
+
+  return (
+    <AuthProvider>
+      <CartProvider>
+        <NotificationProvider>
+          <div className="min-h-screen bg-gray-50 flex flex-col">
+            {!isAdmin && <Header />}
+
+            <main className="flex-1">
+              <ScrollToTop />
+              <Routes>
+                {/* ── Públicas ── */}
+                <Route path="/" element={<Home />} />
+                <Route path="/produtos" element={<Products />} />
+                <Route path="/produto/:id" element={<ProductDetail />} />
+                <Route path="/busca" element={<SearchPage />} />
+
+                {/* ── Autenticação ── */}
+                <Route path="/login"    element={<PublicRoute redirectTo="/"><Login /></PublicRoute>} />
+                <Route path="/cadastro" element={<PublicRoute redirectTo="/"><Register /></PublicRoute>} />
+
+                {/* ── Protegidas (cliente) ── */}
+                <Route path="/carrinho"    element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+                <Route path="/checkout"   element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+                <Route path="/perfil"     element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/pedidos"    element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                <Route path="/pedido/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+
+                {/* ── Admin (requer role ADMIN) ── */}
+                <Route path="/admin/dashboard"   element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                <Route path="/admin/pedidos"     element={<AdminRoute><AdminPedidos /></AdminRoute>} />
+                <Route path="/admin/pedidos/:id" element={<AdminRoute><AdminPedidoDetail /></AdminRoute>} />
+                <Route path="/admin/produtos"    element={<AdminRoute><AdminProdutos /></AdminRoute>} />
+                <Route path="/admin/produtos/:id" element={<AdminRoute><AdminEditProduto /></AdminRoute>} />
+                <Route path="/admin/estoque"     element={<AdminRoute><AdminEstoque /></AdminRoute>} />
+                <Route path="/admin/categorias"  element={<AdminRoute><AdminCategorias /></AdminRoute>} />
+                <Route path="/admin/dlq"         element={<AdminRoute><AdminDLQ /></AdminRoute>} />
+
+                {/* ── 404 ── */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+
+            {!isAdmin && <Footer />}
+          </div>
+        </NotificationProvider>
+      </CartProvider>
+    </AuthProvider>
+  )
+}
 
 function App() {
   return (
-    // 1. ToastProvider (notificações) - mais externo
     <ToastProvider>
       <BrowserRouter>
-        
-        {/* 2. AuthProvider (autenticação) */}
-        <AuthProvider>
-          {/* 3. CartProvider (carrinho) */}
-          <CartProvider>
-            <div className="min-h-screen bg-gray-50 flex flex-col">
-              {/* Header em todas as páginas */}
-              <Header />
-
-              {/* Conteúdo principal */}
-              <main className="flex-1">
-                <ScrollToTop />
-                <Routes>
-                  {/* ========================================
-                      ROTAS PÚBLICAS (Não precisa login)
-                  ======================================== */}
-
-                  {/* Home - Catálogo Principal */}
-                  <Route path="/" element={<Home />} />
-
-                  {/* Produtos - Listagem com Filtros */}
-                  <Route path="/produtos" element={<Products />} />
-
-                  {/* Detalhes do Produto */}
-                  <Route path="/produto/:id" element={<ProductDetail />} />
-
-                  {/* Busca de Produtos */}
-                  <Route path="/busca" element={<SearchPage />} />
-
-                  {/* ========================================
-                      ROTAS DE AUTENTICAÇÃO
-                      (Redireciona para / se já logado)
-                  ======================================== */}
-
-                  <Route
-                    path="/login"
-                    element={
-                      <PublicRoute redirectTo="/">
-                        <Login />
-                      </PublicRoute>
-                    }
-                  />
-
-                  <Route
-                    path="/cadastro"
-                    element={
-                      <PublicRoute redirectTo="/">
-                        <Register />
-                      </PublicRoute>
-                    }
-                  />
-
-                  {/* ========================================
-                      ROTAS PROTEGIDAS (Requer Login)
-                      Descomente quando criar as páginas
-                  ======================================== */}
-
-                  {/* Carrinho */}
-                  <Route
-                    path="/carrinho"
-                    element={
-                      <ProtectedRoute>
-                        <Cart />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* Checkout */}
-                  <Route
-                    path="/checkout"
-                    element={
-                      <ProtectedRoute>
-                        <Checkout />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* Perfil - DIA 5 */}
-                  <Route
-                    path="/perfil"
-                    element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* Pedidos */}
-                  <Route
-                    path="/pedidos"
-                    element={
-                      <ProtectedRoute>
-                        <Orders />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* Detalhes do Pedido */}
-                  <Route
-                    path="/pedido/:id"
-                    element={
-                      <ProtectedRoute>
-                        <OrderDetail />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* ========================================
-                      ROTAS ADMIN (Requer Role ADMIN)
-                      Descomente quando criar as páginas
-                  ======================================== */}
-
-                  {/* Painel Admin - DIA 6+ */}
-                  {/* <Route 
-                    path="/admin/*" 
-                    element={
-                      <AdminRoute>
-                        <AdminPanel />
-                      </AdminRoute>
-                    } 
-                  /> */}
-
-                  {/* ========================================
-                      ROTAS DE TESTE (Desenvolvimento)
-                      Remover em produção
-                  ======================================== */}
-
-                  {/* <Route path="/test-components" element={<TestComponents />} /> */}
-
-                  {/* ========================================
-                      ROTAS DE ERRO
-                  ======================================== */}
-
-                  {/* Sem Autorização - DIA 5 */}
-                  {/* <Route path="/unauthorized" element={<Unauthorized />} /> */}
-
-                  {/* 404 - Página Não Encontrada */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-
-              {/* Footer em todas as páginas */}
-              <Footer />
-            </div>
-          </CartProvider>
-        </AuthProvider>
+        <AppInner />
       </BrowserRouter>
     </ToastProvider>
   )

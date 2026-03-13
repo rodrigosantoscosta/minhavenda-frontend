@@ -2,6 +2,24 @@ import api from './api'
 import jwtHelper from '../utils/jwtHelper'
 import logger from '../utils/logger'
 
+/**
+ * Decodes the JWT and returns a fully-enriched user object.
+ * The NestJS backend embeds { sub, email, role } in the JWT payload.
+ * AuthResponseDto only returns { token, email, nome } — role must come from the payload.
+ * AdminRoute checks user.role === 'ADMIN', so this field is mandatory.
+ */
+function buildUser(token, overrides = {}) {
+  const payload = jwtHelper.decodeToken(token)
+  return {
+    id: payload?.sub ?? null,
+    nome: overrides.nome ?? null,
+    email: overrides.email ?? payload?.email ?? null,
+    role: payload?.role ?? null,  // 'ADMIN' | 'CLIENTE'
+    tipo: payload?.role ?? null,  // alias for compatibility
+    ...overrides,
+  }
+}
+
 const authService = {
   /**
    * Login do usuário
@@ -19,57 +37,24 @@ const authService = {
 
       const data = response.data
 
-      // Formato 1: { token, user: { nome, email, ... } }
-      if (data.token && data.user) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-
-        
-        const expiration = jwtHelper.getTokenExpiration(data.token)
-        if (expiration) {
-          localStorage.setItem('tokenExpiration', expiration.toString())
-          logger.debug({ expiration }, 'Token expiration saved')
-        }
-
-        return data
-      }
-
-      // Formato 2: { token, nome, email, ... }
-      if (data.token && data.nome) {
-        const user = {
-          id: data.id,
-          nome: data.nome,
-          email: data.email,
-          tipo: data.tipo
-        }
-
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(user))
-
-        
-        const expiration = jwtHelper.getTokenExpiration(data.token)
-        if (expiration) {
-          localStorage.setItem('tokenExpiration', expiration.toString())
-          logger.debug({ expiration }, 'Token expiration saved')
-        }
-
-        return { token: data.token, user }
-      }
-
-      // Formato 3: Somente token
+      // All response formats — build user from JWT payload to get role
       if (data.token) {
+        const user = buildUser(data.token, {
+          nome: data.user?.nome ?? data.nome ?? null,
+          email: data.user?.email ?? data.email ?? email,
+          id: data.user?.id ?? data.id ?? null,
+        })
+
         localStorage.setItem('token', data.token)
-        const user = { email }
         localStorage.setItem('user', JSON.stringify(user))
 
-      
         const expiration = jwtHelper.getTokenExpiration(data.token)
         if (expiration) {
           localStorage.setItem('tokenExpiration', expiration.toString())
           logger.debug({ expiration }, 'Token expiration saved')
         }
 
-        logger.warn('Backend retornou apenas token, criando user básico')
+        logger.info({ role: user.role }, 'Login: user role extracted from JWT')
         return { token: data.token, user }
       }
 
@@ -114,49 +99,16 @@ const authService = {
 
       const data = response.data
 
-      // Formato 1: { token, user: { nome, email, ... } }
-      if (data.token && data.user) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-
-        // ✨ NOVO: Armazenar timestamp de expiração
-        const expiration = jwtHelper.getTokenExpiration(data.token)
-        if (expiration) {
-          localStorage.setItem('tokenExpiration', expiration.toString())
-          logger.debug({ expiration }, 'Token expiration saved')
-        }
-
-        return data
-      }
-
-      // Formato 2: { token, nome, email, ... }
-      if (data.token && data.nome) {
-        const user = {
-          id: data.id,
-          nome: data.nome,
-          email: data.email,
-          tipo: data.tipo
-        }
-
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(user))
-
-        
-        const expiration = jwtHelper.getTokenExpiration(data.token)
-        if (expiration) {
-          localStorage.setItem('tokenExpiration', expiration.toString())
-          logger.debug({ expiration }, 'Token expiration saved')
-        }
-
-        return { token: data.token, user }
-      }
-
-      // Formato 3: Somente token
+      // All response formats — build user from JWT payload to get role
       if (data.token) {
-        localStorage.setItem('token', data.token)
-        const user = { nome, email }
-        localStorage.setItem('user', JSON.stringify(user))
+        const user = buildUser(data.token, {
+          nome: data.user?.nome ?? data.nome ?? nome ?? null,
+          email: data.user?.email ?? data.email ?? email,
+          id: data.user?.id ?? data.id ?? null,
+        })
 
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(user))
 
         const expiration = jwtHelper.getTokenExpiration(data.token)
         if (expiration) {
@@ -164,7 +116,7 @@ const authService = {
           logger.debug({ expiration }, 'Token expiration saved')
         }
 
-        logger.warn('Backend retornou apenas token, criando user básico')
+        logger.info({ role: user.role }, 'Register: user role extracted from JWT')
         return { token: data.token, user }
       }
 

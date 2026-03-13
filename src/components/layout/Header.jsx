@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCart } from '../../contexts/CartContext'
+import { useNotificationContext } from '../../contexts/NotificationContext'
+import { startPolling, stopPolling } from '../../services/notificationService'
 import SearchBar from '../search/SearchBar'
+import NotificationBell from '../common/NotificationBell'
 import { 
   FiShoppingCart, 
   FiUser, 
@@ -22,6 +25,20 @@ export default function Header() {
   // Contexts
   const { user, isAuthenticated, logout } = useAuth()
   const { getTotalItems } = useCart()
+  const { addNotification } = useNotificationContext()
+
+  // Iniciar/parar polling de status de pedidos junto com autenticação
+  useEffect(() => {
+    if (isAuthenticated) {
+      startPolling(addNotification)
+    } else {
+      stopPolling()
+    }
+    return () => {
+      // Limpar ao desmontar (ex.: hot reload)
+      stopPolling()
+    }
+  }, [isAuthenticated, addNotification])
 
   // Pegar primeiro nome do usuário
   const getFirstName = () => {
@@ -46,7 +63,7 @@ const handleSearch = (term) => {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center text-sm">
             <p className="hidden md:block">
-              📦 Frete grátis para compras acima de R$ 200
+              Frete grátis para compras acima de R$ 200
             </p>
             <div className="flex items-center space-x-4">
               <Link to="/ajuda" className="hover:underline">
@@ -84,7 +101,10 @@ const handleSearch = (term) => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            {/* Notification Bell - apenas autenticado */}
+            {isAuthenticated && <NotificationBell />}
+
             {/* Cart */}
             <Link
               to="/carrinho"

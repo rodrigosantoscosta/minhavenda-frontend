@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { useCart } from '../../../contexts/CartContext'
 import Button from '../Button'
 import Badge from '../Badge'
-import { 
-  FiShoppingCart, 
-  FiHeart, 
+import {
+  FiShoppingCart,
+  FiHeart,
   FiEye,
   FiStar,
   FiTrendingUp
@@ -28,30 +28,36 @@ export default function ProductCard({ produto, viewMode = 'grid' }) {
     setIsFavorite(!isFavorite)
   }
 
+  // NestJS returns preco as a plain number; guard against legacy { valor } shape
+  const precoBase = typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco
+  const precoPromocional = produto.precoPromocional ?? null
+  const quantidadeEstoque = produto.quantidadeEstoque ?? 1  // not in DTO → assume in stock
+
   const calcularDesconto = () => {
-    if (!produto.precoPromocional) return 0
-    const desconto = ((produto.preco.valor - produto.precoPromocional) / produto.preco.valor) * 100
-    return Math.round(desconto)
+    if (!precoPromocional || !precoBase) return 0
+    return Math.round(((precoBase - precoPromocional) / precoBase) * 100)
   }
 
   const desconto = calcularDesconto()
-  const precoFinal = produto.precoPromocional || produto.preco.valor
-  const temEstoque = produto.quantidadeEstoque > 0
-  const estoqueMinimo = produto.quantidadeEstoque <= 5 && produto.quantidadeEstoque > 0
+  const precoFinal = precoPromocional ?? precoBase ?? 0
+  const temEstoque = quantidadeEstoque > 0
+  const estoqueMinimo = quantidadeEstoque <= 5 && quantidadeEstoque > 0
 
   return (
-    <Link 
+    <Link
       to={`/produto/${produto.id}`}
       className="group block bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden"
     >
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img
-          src={imageError ? 'https://placehold.co/600x400/transparent/F00' : produto.urlImagem}
+          src={imageError || !produto.urlImagem
+            ? 'https://placehold.co/600x400/e5e7eb/9ca3af?text=Sem+imagem'
+            : produto.urlImagem}
           alt={produto.nome}
           onError={() => setImageError(true)}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
         />
-        
+
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {desconto > 0 && (
             <Badge variant="danger" size="sm">
@@ -113,18 +119,18 @@ export default function ProductCard({ produto, viewMode = 'grid' }) {
         </div>
 
         <div className="mb-4">
-          {desconto > 0 && (
+          {desconto > 0 && precoBase != null && (
             <p className="text-sm text-gray-500 line-through">
-              R$ {produto.preco.valor.toFixed(2)}
+              R$ {precoBase.toFixed(2)}
             </p>
           )}
           <div className="flex items-baseline gap-2">
             <p className="text-2xl font-bold text-primary-600">
               R$ {precoFinal.toFixed(2)}
             </p>
-            {desconto > 0 && (
+            {desconto > 0 && precoBase != null && (
               <span className="text-xs text-green-600 font-medium">
-                Economize R$ {(produto.preco.valor - precoFinal).toFixed(2)}
+                Economize R$ {(precoBase - precoFinal).toFixed(2)}
               </span>
             )}
           </div>
@@ -132,7 +138,7 @@ export default function ProductCard({ produto, viewMode = 'grid' }) {
 
         {estoqueMinimo && (
           <p className="text-xs text-orange-600 mb-3 font-medium">
-            ⚠️ Últimas {produto.quantidadeEstoque} unidades!
+            ⚠️ Últimas {quantidadeEstoque} unidades!
           </p>
         )}
 

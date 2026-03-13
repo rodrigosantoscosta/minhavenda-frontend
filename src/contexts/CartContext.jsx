@@ -275,8 +275,8 @@ export function CartProvider({ children }) {
           const newItem = {
             id: produto.id,
             nome: produto.nome,
-            preco: produto.precoPromocional || produto.preco.valor,
-            precoOriginal: produto.preco.valor,
+            preco: produto.precoPromocional ?? (typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco),
+            precoOriginal: typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco,
             quantidade: quantidade,
             estoque: produto.quantidadeEstoque,
             imagem: produto.urlImagem,

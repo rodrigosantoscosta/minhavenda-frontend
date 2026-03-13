@@ -80,6 +80,76 @@ npm run build; npm run preview
 
 ---
 
+## 11. Project Tracking Documents (MANDATORY)
+
+After **every** agent session that makes code changes, the agent **must** update or
+create the following two files at the project root. This is not optional — it is
+required before the session is considered complete.
+
+### `LAST_CHANGES.md`
+
+**Purpose:** A running log of what was changed, added, or removed in each agent
+session. Allows any developer or future agent to instantly understand what was
+done last without reading the full git diff.
+
+**Rules:**
+- Always prepend a new entry at the top of the file (newest first).
+- Each entry must include: date (YYYY-MM-DD), a one-line summary, and a bullet
+  list of every file created, modified, or deleted.
+- Never delete old entries — the file is a cumulative changelog.
+- If the file does not exist yet, create it.
+
+**Format:**
+```markdown
+## YYYY-MM-DD — <one-line summary of the session>
+
+### Files changed
+- `path/to/file.jsx` — created / modified / deleted: <why>
+- `path/to/other.js` — created / modified / deleted: <why>
+
+### Notes
+<Any relevant context, decisions made, or caveats the next developer should know.>
+
+---
+```
+
+### `NEXT_STEPS.md` (or `TODO.md` if it already exists)
+
+**Purpose:** A living document of pending work, known issues, and recommended
+improvements. Keeps the project roadmap visible to developers and future agents.
+
+**Rules:**
+- If `NEXT_STEPS.md` already exists, update it — do not create a duplicate `TODO.md`.
+- If neither file exists, create `NEXT_STEPS.md`.
+- After each session, add new items discovered during the work and mark completed
+  items with `[x]` or remove them if fully resolved.
+- Group items by priority: **High**, **Medium**, **Low**.
+- Each item should be a single, actionable sentence.
+
+**Format:**
+```markdown
+## High Priority
+- [ ] <actionable task>
+
+## Medium Priority
+- [ ] <actionable task>
+
+## Low Priority / Nice to Have
+- [ ] <actionable task>
+
+## Completed
+- [x] <task> — done YYYY-MM-DD
+```
+
+### Summary rule for agents
+
+> At the end of every session involving code changes:
+> 1. Write or update `LAST_CHANGES.md` with what was done.
+> 2. Write or update `NEXT_STEPS.md` (or `TODO.md`) with pending work.
+> Skipping these steps is a guideline violation.
+
+---
+
 ## Authentication & Error Handling
 
 **Form Submissions**

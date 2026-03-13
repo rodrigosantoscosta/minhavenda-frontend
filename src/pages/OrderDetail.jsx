@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useNotificationContext } from '../contexts/NotificationContext'
 import Loading from '../components/common/Loading'
 import Button from '../components/common/Button'
+import logger from '../utils/logger'
 import { 
   FiArrowLeft, 
   FiPackage, 
@@ -11,9 +13,10 @@ import {
   FiCheckCircle,
   FiMapPin,
   FiCreditCard,
-  FiBox
+  FiBox,
+  FiXCircle
 } from 'react-icons/fi'
-import { getOrderDetails, payOrder } from '../services/orderService'
+import { getOrderDetails, payOrder, cancelOrder } from '../services/orderService'
 
 /**
  * OrderDetail Page
@@ -25,11 +28,13 @@ export default function OrderDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { addNotification } = useNotificationContext()
   
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [paying, setPaying] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
 
   // Verificar se usuário está logado
   useEffect(() => {
@@ -76,6 +81,31 @@ export default function OrderDetail() {
     }
   }
 
+  // Cancelar pedido
+  const handleCancelOrder = async () => {
+    if (!window.confirm('Tem certeza que deseja cancelar este pedido?')) {
+      return
+    }
+
+    setCancelling(true)
+    try {
+      await cancelOrder(id)
+      const shortId = id?.slice(-6) || id
+      addNotification({
+        type: 'cancelled',
+        title: 'Pedido cancelado',
+        message: `Pedido #${shortId} foi cancelado com sucesso.`,
+        orderId: id,
+      })
+      await loadOrderDetails()
+    } catch (err) {
+      logger.error('Erro ao cancelar pedido', { error: err.message, orderId: id })
+      setError(err.message || 'Não foi possível cancelar o pedido.')
+    } finally {
+      setCancelling(false)
+    }
+  }
+
   // Format date
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('pt-BR', {
@@ -85,18 +115,6 @@ export default function OrderDetail() {
       hour: '2-digit',
       minute: '2-digit'
     })
-  }
-
-  // Get status variant
-  const getStatusVariant = (status) => {
-    const variants = {
-      PENDENTE: 'warning',
-      PAGO: 'info',
-      ENVIADO: 'info',
-      ENTREGUE: 'success',
-      CANCELADO: 'danger',
-    }
-    return variants[status] || 'secondary'
   }
 
   // Get status label
@@ -271,7 +289,7 @@ export default function OrderDetail() {
                         }
                       `}>
                         {item.status === 'ENTREGUE' ? <FiCheckCircle /> :
-                         item.status === 'CANCELADO' ? null :
+                         item.status === 'CANCELADO' ? <FiXCircle /> :
                          item.status === 'ENVIADO' ? <FiTruck /> :
                          item.status === 'PAGO' ? <FiCheckCircle /> :
                          <FiClock />}
@@ -353,11 +371,24 @@ export default function OrderDetail() {
                 <Button
                   onClick={handlePayOrder}
                   loading={paying}
-                  disabled={paying}
+                  disabled={paying || cancelling}
                   className="w-full"
                 >
                   <FiCreditCard className="mr-2" />
                   {paying ? 'Processando...' : 'Pagar Agora'}
+                </Button>
+              )}
+
+              {(order.status === 'PENDENTE' || order.status === 'PAGO') && (
+                <Button
+                  variant="outline"
+                  onClick={handleCancelOrder}
+                  loading={cancelling}
+                  disabled={paying || cancelling}
+                  className="w-full border-red-300 text-red-600 hover:bg-red-50"
+                >
+                  <FiXCircle className="mr-2" />
+                  {cancelling ? 'Cancelando...' : 'Cancelar Pedido'}
                 </Button>
               )}
               

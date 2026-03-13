@@ -76,27 +76,27 @@ const cartService = {
    * Sincronizar carrinho local com backend
    * Usado após login para transferir itens do localStorage
    */
-  async sincronizarCarrinho(items) {
-    try {
-      const response = await api.post('/carrinho/sincronizar', {
-        items
-      })
-      return response.data
-    } catch (error) {
-      logger.error({ err: error, itemsLength: Array.isArray(items) ? items.length : 0 }, 'Erro ao sincronizar carrinho')
-      throw error
-    }
+  async sincronizarCarrinho(_items) {
+    // /carrinho/sincronizar não existe no NestJS — o carrinho é persistido por usuário no backend.
+    // Stub para não quebrar chamadores existentes após login.
+    logger.warn('sincronizarCarrinho: endpoint não implementado no backend NestJS — ignorado')
+    return { sincronizado: false }
   },
 
   /**
    * Obter resumo do carrinho (totais)
    */
   async getResumo() {
+    // /carrinho/resumo não existe no NestJS — os totais vêm do próprio GET /carrinho.
     try {
-      const response = await api.get('/carrinho/resumo')
-      return response.data
+      const carrinho = await this.getCarrinho()
+      return {
+        quantidadeItens: carrinho.quantidadeItens ?? carrinho.itens?.length ?? 0,
+        valorTotal:      carrinho.valorTotal ?? 0,
+        valorDesconto:   carrinho.valorDesconto ?? 0,
+      }
     } catch (error) {
-      logger.error({ err: error }, 'Erro ao buscar resumo')
+      logger.error({ err: error }, 'Erro ao buscar resumo do carrinho')
       throw error
     }
   }

@@ -1,5 +1,31 @@
+# ============================================================
+# Dependencies
+# ============================================================
+node_modules/
+.pnp
+.pnp.js
+
+# ============================================================
+# Build output
+# ============================================================
+dist/
+dist-ssr/
+build/
+out/
+
+# ============================================================
+# Environment variables — never commit secrets
+# Keep .env.example committed as a template
+# ============================================================
+.env
+.env.*
+!.env.example
+*.local
+
+# ============================================================
 # Logs
-logs
+# ============================================================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,29 +33,63 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# ============================================================
+# Testing & coverage
+# ============================================================
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+playwright/.cache/
 
-# Editor directories and files
+# ============================================================
+# Vite cache
+# ============================================================
+.vite/
+
+# ============================================================
+# Vercel
+# ============================================================
+.vercel/
+
+# ============================================================
+# Serena AI agent — project.local.yml holds machine-specific
+# config; cache is regenerated automatically.
+# Memories (.serena/memories/) SHOULD be committed so agents
+# share project context across sessions.
+# ============================================================
+.serena/cache/
+.serena/project.local.yml
+
+# ============================================================
+# Editor & IDE
+# ============================================================
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+!.vscode/settings.json
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
 
-# Environment variables
-src/.env
-.env.*
-.env.local
-.env.development
-.env.test
-.env.production
-.env.staging
-*.env
-!.env.example
+# ============================================================
+# OS generated files
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# Misc
+# ============================================================
+*.pem
+*.tsbuildinfo

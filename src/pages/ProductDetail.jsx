@@ -153,14 +153,19 @@ export default function ProductDetail() {
     )
   }
 
+  // Normalise preco — NestJS returns a plain number; guard against legacy { valor } shape
+  const precoBase = typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco
+  const precoPromocional = produto.precoPromocional ?? null
+  const quantidadeEstoque = produto.quantidadeEstoque ?? 1
+
   // Calcular desconto
-  const desconto = produto.precoPromocional 
-    ? Math.round(((produto.preco.valor - produto.precoPromocional) / produto.preco.valor) * 100)
+  const desconto = precoPromocional && precoBase
+    ? Math.round(((precoBase - precoPromocional) / precoBase) * 100)
     : 0
-  
-  const precoFinal = produto.precoPromocional || produto.preco.valor
-  const temEstoque = produto.quantidadeEstoque > 0
-  const estoqueMinimo = produto.quantidadeEstoque <= 5 && produto.quantidadeEstoque > 0
+
+  const precoFinal = precoPromocional ?? precoBase ?? 0
+  const temEstoque = quantidadeEstoque > 0
+  const estoqueMinimo = quantidadeEstoque <= 5 && quantidadeEstoque > 0
 
   // Breadcrumb
   const breadcrumbItems = [
@@ -239,7 +244,7 @@ export default function ProductDetail() {
             <div className="mb-6">
               {desconto > 0 && (
                 <p className="text-lg text-gray-500 line-through mb-1">
-                  R$ {produto.preco.valor.toFixed(2)}
+                  R$ {precoBase?.toFixed(2)}
                 </p>
               )}
               <div className="flex items-baseline gap-3">
@@ -248,7 +253,7 @@ export default function ProductDetail() {
                 </p>
                 {desconto > 0 && (
                   <span className="text-lg text-green-600 font-medium">
-                    Economize R$ {(produto.preco.valor - precoFinal).toFixed(2)}
+                    Economize R$ {(precoBase - precoFinal).toFixed(2)}
                   </span>
                 )}
               </div>
