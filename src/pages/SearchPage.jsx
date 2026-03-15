@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline'
-
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { FiFilter } from 'react-icons/fi'
 
 import SearchFilters from '../components/search/SearchFilters'
 import SortOptions from '../components/search/SortOptions'
@@ -20,182 +20,100 @@ import logger from '../utils/logger'
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
-  
-  // Estado dos dados
+
   const [produtos, setProdutos] = useState([])
   const [pagination, setPagination] = useState({
     page: 0,
-    size: 20,
+    size: 24,
     totalElements: 0,
     totalPages: 0,
     first: true,
-    last: true
+    last: true,
   })
-  
-  // Estado da UI
+
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showFilters, setShowFilters] = useState(false)
-  
-  // Parsear parâmetros da URL
+
   const getParamsFromURL = useCallback(() => {
     return searchService.parsearParamsBusca(searchParams)
   }, [searchParams])
-  
-  // Atualizar URL com novos parâmetros
+
   const updateURL = useCallback((newParams) => {
-    const params = new URLSearchParams()
-    
-    // Adicionar apenas parâmetros não vazios
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '' && value !== 'nome:asc') {
-        params.append(key, value.toString())
-      }
-    })
-    
-    // Manter o termo de busca (q ou termo)
-    const searchTerm = newParams.termo || newParams.q
-    if (searchTerm) {
-      params.set('q', searchTerm)
-    }
-    
-    // Remover duplicados e ordenar
-    const orderedParams = new URLSearchParams()
-    const priorityOrder = ['q', 'termo', 'categoriaId', 'precoMin', 'precoMax', 'sort', 'page', 'size']
-    
-    priorityOrder.forEach(key => {
-      if (params.has(key)) {
-        orderedParams.set(key, params.get(key))
-      }
-    })
-    
-    // Adicionar outros parâmetros
-    params.forEach((value, key) => {
-      if (!orderedParams.has(key)) {
-        orderedParams.set(key, value)
-      }
-    })
-    
-    setSearchParams(orderedParams)
+    setSearchParams(searchService.toURLSearchParams(newParams))
   }, [setSearchParams])
-  
-  // Buscar produtos
+
   const buscarProdutos = useCallback(async (params) => {
     try {
       setIsLoading(true)
       setError(null)
-      
-      // Validar parâmetros
-      const validation = searchService.validarParamsBusca(params)
-      if (!validation.isValid) {
-        logger.warn({ errors: validation.errors }, 'Parâmetros de busca inválidos')
+
+      const response = await searchService.buscarProdutos(params)
+
+      if (response?.content !== undefined) {
+        setProdutos(response.content || [])
+        setPagination({
+          page: response.number ?? 0,
+          size: response.size ?? 24,
+          totalElements: response.totalElements ?? 0,
+          totalPages: response.totalPages ?? 0,
+          first: response.first ?? true,
+          last: response.last ?? true,
+        })
+      } else if (Array.isArray(response)) {
+        setProdutos(response)
+        setPagination({ page: 0, size: 24, totalElements: response.length, totalPages: 1, first: true, last: true })
+      } else {
+        setProdutos([])
       }
-      
-      // Sempre usa endpoint de filtros avançados (/produtos/buscar)
-      // que suporta termo, categoria, preço, ordenação e paginação
-      let response = await searchService.buscarProdutos(params)
-      
-      // Atualizar estado
-      setProdutos(response.content || [])
-      setPagination({
-        page: response.number || 0,
-        size: response.size || 20,
-        totalElements: response.totalElements || 0,
-        totalPages: response.totalPages || 0,
-        first: response.first || true,
-        last: response.last || true
-      })
-      
-      logger.info({ 
-        totalProdutos: response.totalElements,
-        pagina: response.number,
-        termo: params.termo || params.q
-      }, 'Busca concluída com sucesso')
-      
+
+      logger.info({ totalProdutos: response?.totalElements, termo: params.termo }, 'Busca concluída')
     } catch (err) {
       logger.error({ error: err, params }, 'Erro ao buscar produtos')
       setError(err.message || 'Erro ao carregar produtos')
       setProdutos([])
-      setPagination({
-        page: 0,
-        size: 20,
-        totalElements: 0,
-        totalPages: 0,
-        first: true,
-        last: true
-      })
+      setPagination({ page: 0, size: 24, totalElements: 0, totalPages: 0, first: true, last: true })
     } finally {
       setIsLoading(false)
     }
   }, [])
-  
-  // Handle mudança de busca
-  const handleSearch = useCallback((termo) => {
-    const newParams = {
-      ...getParamsFromURL(),
-      termo,
-      page: 0 // Resetar página ao buscar
-    }
-    updateURL(newParams)
-  }, [getParamsFromURL, updateURL])
-  
-  // Handle mudança de filtros
+
   const handleFiltersChange = useCallback((filters) => {
-    const newParams = {
-      ...getParamsFromURL(),
-      ...filters,
-      page: 0 // Resetar página ao filtrar
-    }
-    updateURL(newParams)
+    updateURL({ ...getParamsFromURL(), ...filters, page: 0 })
   }, [getParamsFromURL, updateURL])
-  
-  // Handle mudança de ordenação
+
   const handleSortChange = useCallback((sort) => {
-    const newParams = {
-      ...getParamsFromURL(),
-      sort,
-      page: 0 // Resetar página ao ordenar
-    }
-    updateURL(newParams)
+    updateURL({ ...getParamsFromURL(), sort, page: 0 })
   }, [getParamsFromURL, updateURL])
-  
-  // Handle mudança de página
+
   const handlePageChange = useCallback((newPage) => {
-    const newParams = {
-      ...getParamsFromURL(),
-      page: newPage
-    }
-    updateURL(newParams)
+    updateURL({ ...getParamsFromURL(), page: newPage - 1 })
   }, [getParamsFromURL, updateURL])
-  
-  // Efeito principal: buscar produtos quando parâmetros mudam
+
   useEffect(() => {
     const params = getParamsFromURL()
     buscarProdutos(params)
-  }, [getParamsFromURL, buscarProdutos])
-  
-  // Obter parâmetros atuais
+  }, [searchParams])
+
   const currentParams = getParamsFromURL()
-  const searchTerm = currentParams.termo || currentParams.q || ''
-  
-  // Renderizar estado vazio
+  const searchTerm = currentParams.termo || ''
+
   if (!isLoading && produtos.length === 0 && !error) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 mb-1">
               {searchTerm ? `Resultados para "${searchTerm}"` : 'Buscar Produtos'}
             </h1>
+            <p className="text-gray-600">0 produtos encontrados</p>
           </div>
-          
-          {/* Estado vazio */}
           <EmptyState
             title="Nenhum produto encontrado"
-            description={searchTerm 
-              ? `Não encontramos resultados para "${searchTerm}". Use a barra de busca no header para tentar outros termos.`
-              : "Use a barra de busca no header para encontrar produtos."
+            description={
+              searchTerm
+                ? `Não encontramos resultados para "${searchTerm}". Use a barra de busca no header para tentar outros termos.`
+                : 'Use a barra de busca no header para encontrar produtos.'
             }
             icon={<MagnifyingGlassIcon className="h-12 w-12 text-gray-400" />}
             actionLabel="Limpar busca"
@@ -205,72 +123,66 @@ const SearchPage = () => {
       </div>
     )
   }
-  
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-1">
             {searchTerm ? `Resultados para "${searchTerm}"` : 'Buscar Produtos'}
           </h1>
-          
-          {/* Controles (filtros e ordenação) */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            {/* Info de resultados */}
-            <div className="flex items-center space-x-4">
-              <p className="text-sm text-gray-600">
-                {pagination.totalElements > 0 
-                  ? `${pagination.totalElements} produto${pagination.totalElements !== 1 ? 's' : ''} encontrado${pagination.totalElements !== 1 ? 's' : ''}`
-                  : 'Nenhum produto encontrado'
-                }
-              </p>
-              
-              {/* Botão de filtros (mobile) */}
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                <FunnelIcon className="h-4 w-4" />
-                <span className="text-sm">Filtros</span>
-              </button>
-            </div>
-            
+          <p className="text-gray-600">
+            {pagination.totalElements > 0
+              ? `${pagination.totalElements} produto${pagination.totalElements !== 1 ? 's' : ''} encontrado${pagination.totalElements !== 1 ? 's' : ''}`
+              : '\u00a0'}
+          </p>
+        </div>
+
+        {/* Botão filtros — mobile apenas */}
+        <div className="mb-4 lg:hidden">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-gray-700"
+          >
+            <FiFilter size={16} />
+            Filtros
+          </button>
+        </div>
+
+        {/* Layout: sidebar + grid */}
+        <div className="flex gap-8 items-start">
+
+          {/* Sidebar */}
+          <aside className={`w-64 flex-shrink-0 lg:block ${showFilters ? 'block' : 'hidden'}`}>
             {/* Ordenação */}
-            <div className="w-full lg:w-auto">
+            <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
               <SortOptions
                 value={currentParams.sort || 'nome:asc'}
                 onChange={handleSortChange}
-                showLabel={false}
-                className="w-full lg:w-auto"
+                showLabel={true}
+                className="w-full"
               />
             </div>
-          </div>
-        </div>
-        
-        {/* Conteúdo principal */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Painel de filtros */}
-          <div className={`
-            ${showFilters ? 'block' : 'hidden'}
-            lg:block lg:w-80 lg:flex-shrink-0
-          `}>
+
+            {/* Filtros */}
             <SearchFilters
               filters={currentParams}
               onFiltersChange={handleFiltersChange}
               isOpen={showFilters}
               onToggle={() => setShowFilters(!showFilters)}
             />
-          </div>
-          
-          {/* Lista de produtos */}
-          <div className="flex-1">
+          </aside>
+
+          {/* Conteúdo */}
+          <div className="flex-1 min-w-0">
             {isLoading ? (
-              <div className="py-12">
+              <div className="py-16">
                 <Loading message="Buscando produtos..." />
               </div>
             ) : error ? (
-              <div className="py-12">
+              <div className="py-16">
                 <EmptyState
                   title="Erro na busca"
                   description={error}
@@ -281,27 +193,25 @@ const SearchPage = () => {
               </div>
             ) : (
               <>
-                {/* Grid de produtos */}
-                <ProductsGrid 
+                <ProductsGrid
                   produtos={produtos}
                   loading={isLoading}
                   className="mb-8"
                 />
-                
-                {/* Paginação */}
+
                 {pagination.totalPages > 1 && (
-                  <div className="flex justify-center">
+                  <div className="mt-12">
                     <Pagination
-                      currentPage={pagination.page}
+                      currentPage={pagination.page + 1}
                       totalPages={pagination.totalPages}
                       onPageChange={handlePageChange}
-                      className="mt-8"
                     />
                   </div>
                 )}
               </>
             )}
           </div>
+
         </div>
       </div>
     </div>

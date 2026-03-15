@@ -6,6 +6,7 @@ import { useToast } from '../components/common/Toast'
 import { LoadingContainer } from '../components/common/Loading'
 import Button from '../components/common/Button'
 import { FiFilter, FiGrid, FiList, FiRefreshCw } from 'react-icons/fi'
+import { useScrollOnPageChange } from '../hooks/useScrollOnPageChange'
 
 /**
  * ProductPage - Página de Listagem de Produtos
@@ -23,6 +24,7 @@ export default function ProductPage() {
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const pageSize = 12
+  useScrollOnPageChange(currentPage)
 
   const toast = useToast()
   const navigate = useNavigate()
@@ -79,7 +81,6 @@ export default function ProductPage() {
   const handlePageChange = (newPage) => {
     if (newPage >= 0 && newPage < totalPages) {
       setCurrentPage(newPage)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 

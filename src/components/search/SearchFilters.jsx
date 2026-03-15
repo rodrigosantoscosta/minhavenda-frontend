@@ -12,10 +12,10 @@ import logger from '../../utils/logger'
  * @param {function} props.onToggle - Callback para alternar painel
  * @param {string} props.className - Classes CSS adicionais
  */
-const SearchFilters = ({ 
-  filters = {}, 
-  onFiltersChange, 
-  isOpen = false, 
+const SearchFilters = ({
+  filters = {},
+  onFiltersChange,
+  isOpen = false,
   onToggle,
   className = ""
 }) => {
@@ -29,7 +29,6 @@ const SearchFilters = ({
     ...filters
   })
 
-  // Carregar categorias quando componente é visível
   useEffect(() => {
     const carregarCategorias = async () => {
       try {
@@ -43,119 +42,58 @@ const SearchFilters = ({
         setIsLoadingCategorias(false)
       }
     }
-
     carregarCategorias()
   }, [])
 
-  // Sincronizar filtros locais com props
   useEffect(() => {
-    setLocalFilters(prev => ({
-      ...prev,
-      ...filters
-    }))
+    setLocalFilters(prev => ({ ...prev, ...filters }))
   }, [filters])
 
-  /**
-   * Handle change dos filtros
-   * @param {string} field - Campo do filtro
-   * @param {any} value - Novo valor
-   */
   const handleFilterChange = (field, value) => {
-    const newFilters = {
-      ...localFilters,
-      [field]: value
-    }
-    
-    setLocalFilters(newFilters)
-    // Não notifica o componente pai imediatamente - apenas atualiza o estado local
-    // A busca só será executada quando o usuário clicar em "Aplicar Filtros"
+    setLocalFilters(prev => ({ ...prev, [field]: value }))
   }
 
-  /**
-   * Aplicar filtros
-   */
   const handleApplyFilters = () => {
-    // Limpar valores vazios
     const cleanedFilters = {}
     Object.entries(localFilters).forEach(([key, value]) => {
       if (value !== '' && value !== null && value !== undefined) {
         cleanedFilters[key] = value
       }
     })
-    
-    if (onFiltersChange) {
-      onFiltersChange(cleanedFilters)
-    }
+    if (onFiltersChange) onFiltersChange(cleanedFilters)
   }
 
-  /**
-   * Limpar todos os filtros
-   */
   const handleClearFilters = () => {
-    const clearedFilters = {
-      categoriaId: '',
-      precoMin: '',
-      precoMax: '',
-      ativo: true
-    }
-    
+    const clearedFilters = { categoriaId: '', precoMin: '', precoMax: '', ativo: true }
     setLocalFilters(clearedFilters)
-    
-    if (onFiltersChange) {
-      onFiltersChange(clearedFilters)
-    }
+    if (onFiltersChange) onFiltersChange(clearedFilters)
   }
 
-  /**
-   * Handle change de preço (validação)
-   * Suporta formato brasileiro: 1.234,56
-   * @param {string} field - Campo (precoMin ou precoMax)
-   * @param {string} value - Valor do input
-   */
   const handlePrecoChange = (field, value) => {
-    // Permitir números, ponto e vírgula
-    // Formato brasileiro: 1.234,56 -> convertemos para: 1234.56
     let numericValue = value.replace(/[^0-9.,]/g, '')
-    
-    // Se tem vírgula como separador decimal (formato brasileiro)
     if (numericValue.includes(',')) {
-      // Se a vírgula está depois do último ponto, é decimal
       const lastCommaIndex = numericValue.lastIndexOf(',')
       const lastDotIndex = numericValue.lastIndexOf('.')
-      
       if (lastCommaIndex > lastDotIndex) {
-        // Formato brasileiro: 1.234,56 ou 100,00
-        // Remove pontos (milhar) e troca vírgula por ponto
         numericValue = numericValue.replace(/\./g, '').replace(',', '.')
       } else {
-        // Remove apenas pontos de milhar
         numericValue = numericValue.replace(/\./g, '')
       }
     }
-    
-    // Validar que tem apenas um ponto decimal
     const parts = numericValue.split('.')
-    if (parts.length > 2) {
-      return
-    }
-    
-    // Limitar casas decimais a 2
-    if (parts[1] && parts[1].length > 2) {
-      return
-    }
-    
+    if (parts.length > 2) return
+    if (parts[1] && parts[1].length > 2) return
     handleFilterChange(field, numericValue)
   }
 
   return (
     <div className={`bg-white rounded-lg border border-gray-200 ${className}`}>
-      {/* Header do painel de filtros */}
+      {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center space-x-2">
           <FunnelIcon className="h-5 w-5 text-gray-500" />
           <h3 className="text-lg font-medium text-gray-900">Filtros</h3>
         </div>
-        
         <button
           onClick={onToggle}
           className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
@@ -165,13 +103,11 @@ const SearchFilters = ({
         </button>
       </div>
 
-      {/* Conteúdo dos filtros */}
+      {/* Conteúdo */}
       <div className="p-4 space-y-6">
-        {/* Filtro de Categoria */}
+        {/* Categoria */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Categoria
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
           <select
             value={localFilters.categoriaId || ''}
             onChange={(e) => handleFilterChange('categoriaId', e.target.value)}
@@ -180,9 +116,7 @@ const SearchFilters = ({
           >
             <option value="">Todas as categorias</option>
             {categorias.map((categoria) => (
-              <option key={categoria.id} value={categoria.id}>
-                {categoria.nome}
-              </option>
+              <option key={categoria.id} value={categoria.id}>{categoria.nome}</option>
             ))}
           </select>
           {isLoadingCategorias && (
@@ -190,22 +124,14 @@ const SearchFilters = ({
           )}
         </div>
 
-        {/* Filtro de Preço */}
+        {/* Faixa de Preço */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Faixa de Preço
-          </label>
-          
+          <label className="block text-sm font-medium text-gray-700 mb-2">Faixa de Preço</label>
           <div className="space-y-3">
-            {/* Preço Mínimo */}
             <div>
-              <label className="block text-xs text-gray-600 mb-1">
-                Preço Mínimo
-              </label>
+              <label className="block text-xs text-gray-600 mb-1">Preço Mínimo</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  R$
-                </span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                 <input
                   type="text"
                   value={localFilters.precoMin || ''}
@@ -215,16 +141,10 @@ const SearchFilters = ({
                 />
               </div>
             </div>
-
-            {/* Preço Máximo */}
             <div>
-              <label className="block text-xs text-gray-600 mb-1">
-                Preço Máximo
-              </label>
+              <label className="block text-xs text-gray-600 mb-1">Preço Máximo</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  R$
-                </span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                 <input
                   type="text"
                   value={localFilters.precoMax || ''}
@@ -237,50 +157,6 @@ const SearchFilters = ({
           </div>
         </div>
 
-        {/* Filtro de Status (se for admin) */}
-        {false && ( // Desabilitado por enquanto - só para admin
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Status do Produto
-            </label>
-            <div className="space-y-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="ativo"
-                  value="true"
-                  checked={localFilters.ativo === true}
-                  onChange={() => handleFilterChange('ativo', true)}
-                  className="mr-2"
-                />
-                <span className="text-sm text-gray-700">Ativos</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="ativo"
-                  value="false"
-                  checked={localFilters.ativo === false}
-                  onChange={() => handleFilterChange('ativo', false)}
-                  className="mr-2"
-                />
-                <span className="text-sm text-gray-700">Inativos</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="ativo"
-                  value=""
-                  checked={localFilters.ativo === undefined || localFilters.ativo === ''}
-                  onChange={() => handleFilterChange('ativo', undefined)}
-                  className="mr-2"
-                />
-                <span className="text-sm text-gray-700">Todos</span>
-              </label>
-            </div>
-          </div>
-        )}
-
         {/* Botões de Ação */}
         <div className="flex space-x-3 pt-4 border-t border-gray-200">
           <button
@@ -289,7 +165,6 @@ const SearchFilters = ({
           >
             Aplicar Filtros
           </button>
-          
           <button
             onClick={handleClearFilters}
             className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
@@ -299,7 +174,7 @@ const SearchFilters = ({
         </div>
 
         {/* Filtros ativos (resumo) */}
-        {Object.entries(localFilters).some(([key, value]) => 
+        {Object.entries(localFilters).some(([key, value]) =>
           value !== '' && value !== null && value !== undefined && key !== 'ativo'
         ) && (
           <div className="pt-4 border-t border-gray-200">

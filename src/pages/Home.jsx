@@ -9,6 +9,7 @@ import FeaturedCategories from '../components/home/FeaturedCategories'
 import ProductsGrid from '../components/product/ProductsGrid'
 import Pagination from '../components/common/Pagination'
 import Loading from '../components/common/Loading'
+import { useScrollOnPageChange } from '../hooks/useScrollOnPageChange'
 import EmptyState from '../components/common/EmptyState'
 import Button from '../components/common/Button'
 import logger from '../utils/logger'
@@ -29,10 +30,11 @@ export default function Home() {
   const [loadingMore, setLoadingMore] = useState(false)
   
   // Paginação
-  const [page, setPage] = useState(0) // Backend usa 0-indexed
+  const [page, setPage] = useState(0) // Backend usa 0-indexed // Backend usa 0-indexed
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const pageSize = 12
+  useScrollOnPageChange(page)
 
   // Filtros
   const [selectedCategory, setSelectedCategory] = useState(null)
@@ -164,7 +166,6 @@ export default function Home() {
   const handlePageChange = (newPage) => {
     logger.info({ newPage }, 'Mudando página')
     setPage(newPage - 1) // Converter para 0-indexed
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   if (loading && page === 0) {

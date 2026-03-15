@@ -1,4 +1,4 @@
-// src/pages/Products.jsx - COM DEBUG E TRATAMENTO CORRETO
+// src/pages/Products.jsx - LAYOUT COM SIDEBAR DE FILTROS
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
@@ -10,9 +10,10 @@ import Loading from '../components/common/Loading'
 import EmptyState from '../components/common/EmptyState'
 import Button from '../components/common/Button'
 import logger from '../utils/logger'
-import { 
-  FiSearch, 
-  FiX, 
+import { useScrollOnPageChange } from '../hooks/useScrollOnPageChange'
+import {
+  FiSearch,
+  FiX,
   FiFilter,
   FiShoppingBag,
 } from 'react-icons/fi'
@@ -29,7 +30,8 @@ export default function Products() {
   const [loadingMore, setLoadingMore] = useState(false)
 
   // Paginação
-  const [page, setPage] = useState(0) // Backend usa 0-indexed
+  const [page, setPage] = useState(0)
+  useScrollOnPageChange(page)
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const pageSize = 12
@@ -41,7 +43,7 @@ export default function Products() {
   const [maxPrice, setMaxPrice] = useState(searchParams.get('precoMax') || '')
   const [sortBy, setSortBy] = useState(searchParams.get('ordem') || 'recentes')
 
-  // UI
+  // UI — sidebar visível por padrão em desktop, colapsável em mobile
   const [showFilters, setShowFilters] = useState(false)
 
   // Carregar categorias
@@ -62,22 +64,13 @@ export default function Products() {
     if (minPrice) params.precoMin = minPrice
     if (maxPrice) params.precoMax = maxPrice
     if (sortBy && sortBy !== 'recentes') params.ordem = sortBy
-    
     setSearchParams(params)
   }, [searchTerm, selectedCategory, minPrice, maxPrice, sortBy])
 
   const loadCategorias = async () => {
     try {
-      logger.info('Buscando categorias')
       const data = await productService.getCategorias()
-      logger.info('Categorias recebidas', { categoriaCount: Array.isArray(data) ? data.length : 0 })
-      
-      if (Array.isArray(data)) {
-        setCategorias(data)
-      } else {
-        logger.warn('Categorias não é array', { dataType: typeof data })
-        setCategorias([])
-      }
+      setCategorias(Array.isArray(data) ? data : [])
     } catch (error) {
       logger.error('Erro ao carregar categorias', { error: error.message })
       toast.error('Erro ao carregar categorias')
@@ -86,71 +79,43 @@ export default function Products() {
 
   const loadProdutos = async () => {
     try {
-      if (page === 0) {
-        setLoading(true)
-      } else {
-        setLoadingMore(true)
-      }
+      page === 0 ? setLoading(true) : setLoadingMore(true)
 
-      const params = {
-        page: page,
-        size: pageSize,
-        ativo: true,
-      }
-
+      const params = { page, size: pageSize, ativo: true }
       if (searchTerm) params.termo = searchTerm
       if (selectedCategory) params.categoriaId = selectedCategory
       if (minPrice) params.precoMin = parseFloat(minPrice)
       if (maxPrice) params.precoMax = parseFloat(maxPrice)
 
-      // Ordenação - formato: campo:direção
       const sortMapping = {
-        'recentes': 'dataCadastro:desc',
-        'preco_asc': 'preco:asc',
-        'preco_desc': 'preco:desc',
-        'nome_asc': 'nome:asc',
-        'nome_desc': 'nome:desc',
+        recentes: 'dataCadastro:desc',
+        preco_asc: 'preco:asc',
+        preco_desc: 'preco:desc',
+        nome_asc: 'nome:asc',
+        nome_desc: 'nome:desc',
       }
       params.sort = sortMapping[sortBy] || 'dataCadastro:desc'
 
-      logger.info('Buscando produtos com parametros', { page, sortBy })
       const data = await productService.getProdutos(params)
-      logger.debug('Resposta do backend recebida', { hasContent: !!data?.content, isArray: Array.isArray(data) })
 
-      // TRATAMENTO CORRETO DOS DADOS
       let produtosArray = []
-      
-      // Resposta paginada (Spring Page)
-      if (data && data.content && Array.isArray(data.content)) {
-        logger.debug('Formato: resposta paginada Spring Page')
+      if (data?.content && Array.isArray(data.content)) {
         produtosArray = data.content
         setTotalPages(data.totalPages || 0)
         setTotalElements(data.totalElements || 0)
-      }
-      // Array direto
-      else if (Array.isArray(data)) {
-        logger.debug('Formato: array direto')
+      } else if (Array.isArray(data)) {
         produtosArray = data
         setTotalPages(1)
         setTotalElements(data.length)
-      }
-      // Objeto com produtos
-      else if (data && data.produtos && Array.isArray(data.produtos)) {
-        logger.debug('Formato: objeto com propriedade produtos')
+      } else if (data?.produtos && Array.isArray(data.produtos)) {
         produtosArray = data.produtos
         setTotalPages(data.totalPages || 1)
         setTotalElements(data.total || data.produtos.length)
       }
-      else {
-        logger.warn('Formato de resposta desconhecido', { dataType: typeof data })
-        produtosArray = []
-      }
 
-      logger.info('Produtos processados com sucesso', { count: produtosArray.length, page, totalPages })
       setProdutos(produtosArray)
-      
     } catch (error) {
-      logger.error('Erro ao carregar produtos', { error: error.message, status: error.response?.status })
+      logger.error('Erro ao carregar produtos', { error: error.message })
       toast.error('Erro ao carregar produtos')
       setProdutos([])
     } finally {
@@ -179,30 +144,20 @@ export default function Products() {
   }
 
   const handlePageChange = (newPage) => {
-    setPage(newPage - 1) // Converter para 0-indexed
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setPage(newPage - 1)
   }
 
-  const activeFiltersCount = [
-    searchTerm,
-    selectedCategory,
-    minPrice,
-    maxPrice,
-  ].filter(Boolean).length
+  const activeFiltersCount = [searchTerm, selectedCategory, minPrice, maxPrice].filter(Boolean).length
 
-  if (loading && page === 0) {
-    return <Loading />
-  }
+  if (loading && page === 0) return <Loading />
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Produtos
-          </h1>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-1">Produtos</h1>
           <p className="text-gray-600">
             {totalElements} {totalElements === 1 ? 'produto encontrado' : 'produtos encontrados'}
           </p>
@@ -223,10 +178,7 @@ export default function Products() {
               {searchTerm && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearchTerm('')
-                    setPage(0)
-                  }}
+                  onClick={() => { setSearchTerm(''); setPage(0) }}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <FiX size={20} />
@@ -237,11 +189,12 @@ export default function Products() {
               <FiSearch className="mr-2" />
               Buscar
             </Button>
+            {/* Botão de filtros visível apenas em mobile */}
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
-              className="relative"
+              className="relative lg:hidden"
             >
               <FiFilter className="mr-2" />
               Filtros
@@ -254,11 +207,32 @@ export default function Products() {
           </div>
         </form>
 
-        {/* Painel de Filtros */}
-        {showFilters && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              
+        {/* Layout principal: sidebar + grid */}
+        <div className="flex gap-8 items-start">
+
+          {/* ── SIDEBAR DE FILTROS ── */}
+          <aside className={`
+            w-64 flex-shrink-0 bg-white rounded-lg shadow-sm border border-gray-200 p-6
+            lg:block
+            ${showFilters ? 'block' : 'hidden'}
+          `}>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                <FiFilter size={16} />
+                Filtros
+              </h2>
+              {activeFiltersCount > 0 && (
+                <button
+                  onClick={handleClearFilters}
+                  className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+                >
+                  <FiX size={14} />
+                  Limpar
+                </button>
+              )}
+            </div>
+
+            <div className="space-y-6">
               {/* Categoria */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -267,13 +241,11 @@ export default function Products() {
                 <select
                   value={selectedCategory || ''}
                   onChange={(e) => handleCategoryChange(e.target.value || null)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                 >
                   <option value="">Todas</option>
                   {categorias.map(cat => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.nome}
-                    </option>
+                    <option key={cat.id} value={cat.id}>{cat.nome}</option>
                   ))}
                 </select>
               </div>
@@ -288,7 +260,7 @@ export default function Products() {
                   placeholder="R$ 0,00"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                 />
               </div>
 
@@ -302,7 +274,7 @@ export default function Products() {
                   placeholder="R$ 9999,99"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                 />
               </div>
 
@@ -314,7 +286,7 @@ export default function Products() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                 >
                   <option value="recentes">Mais Recentes</option>
                   <option value="preco_asc">Menor Preço</option>
@@ -324,52 +296,44 @@ export default function Products() {
                 </select>
               </div>
             </div>
+          </aside>
 
-            {activeFiltersCount > 0 && (
-              <div className="mt-4 flex justify-end">
-                <Button variant="ghost" onClick={handleClearFilters}>
-                  <FiX className="mr-2" />
-                  Limpar Filtros
-                </Button>
-              </div>
+          {/* ── CONTEÚDO: GRID + PAGINAÇÃO ── */}
+          <div className="flex-1 min-w-0">
+            {produtos.length === 0 ? (
+              <EmptyState
+                icon={<FiShoppingBag size={64} />}
+                title="Nenhum produto encontrado"
+                description="Tente ajustar os filtros"
+                action={
+                  activeFiltersCount > 0 && (
+                    <Button onClick={handleClearFilters}>Limpar Filtros</Button>
+                  )
+                }
+              />
+            ) : (
+              <>
+                <ProductsGrid
+                  produtos={produtos}
+                  onAddToCart={addItem}
+                  loading={loadingMore}
+                  columns={3}
+                />
+
+                {totalPages > 1 && (
+                  <div className="mt-12">
+                    <Pagination
+                      currentPage={page + 1}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
-        )}
+        </div>
 
-        {/* Grid de Produtos */}
-        {produtos.length === 0 ? (
-          <EmptyState
-            icon={<FiShoppingBag size={64} />}
-            title="Nenhum produto encontrado"
-            description="Tente ajustar os filtros"
-            action={
-              activeFiltersCount > 0 && (
-                <Button onClick={handleClearFilters}>
-                  Limpar Filtros
-                </Button>
-              )
-            }
-          />
-        ) : (
-          <>
-            <ProductsGrid
-              produtos={produtos}
-              onAddToCart={addItem}
-              loading={loadingMore}
-              columns={3}
-            />
-
-            {totalPages > 1 && (
-              <div className="mt-12">
-                <Pagination
-                  currentPage={page + 1}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            )}
-          </>
-        )}
       </div>
     </div>
   )
