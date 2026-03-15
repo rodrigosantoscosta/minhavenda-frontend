@@ -19,7 +19,7 @@ function CreateModal({ open, onClose, categorias, onCreated }) {
     if (!form.nome || !form.descricao || !form.preco) { toast.error('Preencha os campos obrigatórios'); return }
     setLoading(true)
     try {
-      const body = { nome: form.nome, descricao: form.descricao, preco: parseFloat(form.preco), moeda: 'BRL' }
+      const body = { nome: form.nome, descricao: form.descricao, preco: parseFloat(form.preco) }
       if (form.urlImagem)     body.urlImagem     = form.urlImagem
       if (form.categoriaId)   body.categoriaId   = parseInt(form.categoriaId)
       if (form.pesoKg)        body.pesoKg        = parseFloat(form.pesoKg)

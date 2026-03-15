@@ -351,8 +351,7 @@ async function cancelOrderMock(orderId, motivo) {
  * Implementação API para cancelar pedido
  */
 async function cancelOrderAPI(orderId, motivo) {
-  // Backend não espera corpo, usa path param apenas
-  const response = await post(`/pedidos/${orderId}/cancelar`)
+  const response = await post(`/pedidos/${orderId}/cancelar`, { motivo: motivo || 'Cancelado pelo cliente' })
   
   // Converter resposta para formato esperado
   return {
