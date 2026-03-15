@@ -93,3 +93,9 @@ desktop.ini
 # ============================================================
 *.pem
 *.tsbuildinfo
+
+# Playwright
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
