@@ -20,21 +20,16 @@ export function CartProvider({ children }) {
 
   // Carregar carrinho apenas quando auth muda de false para true
   useEffect(() => {
-    // Detectar mudança de estado de autenticação
     const authChanged = previousAuthState.current !== isAuthenticated
     previousAuthState.current = isAuthenticated
 
-    // Carregar apenas se:
-    // 1. Não foi inicializado ainda, OU
-    // 2. Estado de auth mudou
     if (!isInitialized.current || authChanged) {
       logger.info({ isAuthenticated, userId: user?.id, authChanged }, 'Auth state changed - loading cart')
       isInitialized.current = true
       loadCart()
     }
-  }, [isAuthenticated]) // 
+  }, [isAuthenticated])
 
-  // loadCart sem dependências problemáticas
   const loadCart = useCallback(async () => {
     try {
       if (isAuthenticated) {
@@ -48,9 +43,8 @@ export function CartProvider({ children }) {
       logger.error({ error }, 'Error loading cart')
       loadCartFromLocalStorage()
     }
-  }, [isAuthenticated]) // 
+  }, [isAuthenticated])
 
-  // Carregar do localStorage
   const loadCartFromLocalStorage = () => {
     try {
       const savedCart = storageUtil.getItem('cart')
@@ -67,7 +61,6 @@ export function CartProvider({ children }) {
     }
   }
 
-  // Buscar estoque atual de múltiplos produtos
   const fetchProductsStock = async (produtoIds) => {
     try {
       const stockPromises = produtoIds.map(async (id) => {
@@ -82,10 +75,7 @@ export function CartProvider({ children }) {
 
       const stocks = await Promise.all(stockPromises)
       const stockMap = {}
-      stocks.forEach(({ id, estoque }) => {
-        stockMap[id] = estoque
-      })
-
+      stocks.forEach(({ id, estoque }) => { stockMap[id] = estoque })
       logger.debug({ stockMap }, 'Product stocks fetched')
       return stockMap
     } catch (error) {
@@ -94,9 +84,7 @@ export function CartProvider({ children }) {
     }
   }
 
-  // Carregar do backend (quando logado)
   const loadCartFromBackend = async () => {
-    // Prevenir múltiplas chamadas simultâneas
     if (loading) {
       logger.debug('loadCartFromBackend already in progress, skipping')
       return
@@ -115,13 +103,9 @@ export function CartProvider({ children }) {
         valorTotal: backendCart.valorTotal
       }, 'Cart loaded from backend')
 
-      // Extrair IDs dos produtos para buscar estoques
       const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
-
-      // Buscar estoques atuais
       const stockMap = await fetchProductsStock(produtoIds)
 
-      // Transformar itens do backend para formato local
       const backendItems = (backendCart.itens || []).map(item => ({
         id: item.produtoId,
         nome: item.produtoNome,
@@ -131,13 +115,12 @@ export function CartProvider({ children }) {
         estoque: stockMap[item.produtoId] || 0,
         imagem: item.produtoImagem || '',
         categoria: item.categoriaNome || 'Sem categoria',
-        itemId: item.id // ID do item no carrinho
+        itemId: item.id
       }))
 
       setCart(backendCart)
       setItems(backendItems)
 
-      // Sincronizar items locais se existirem
       const localItems = storageUtil.getItem('cart') || []
       if (localItems.length > 0 && backendItems.length === 0) {
         logger.info({ localItemCount: localItems.length }, 'Syncing local cart to backend')
@@ -166,7 +149,7 @@ export function CartProvider({ children }) {
     }
   }
 
-  // Sincronizar carrinho local com backend
+  // FIX: toast fired once after loop, not once per item
   const syncCartWithBackend = async (localItems) => {
     try {
       logger.info({ itemCount: localItems.length }, 'Starting cart sync to backend')
@@ -183,26 +166,22 @@ export function CartProvider({ children }) {
         }
       }
 
-      await loadCartFromBackend()
       storageUtil.removeItem('cart')
-      logger.info('Cart sync completed successfully')
+      await loadCartFromBackend()
+      // Single toast after all items are synced
       toast.success('Carrinho sincronizado com sucesso!')
+      logger.info('Cart sync completed successfully')
     } catch (error) {
       logger.error({ error }, 'Error syncing cart to backend')
     }
   }
 
-  // 5. Adicionar item ao carrinho
   const addItem = async (produto, quantidade = 1) => {
     try {
       setLoading(true)
 
       if (isAuthenticated) {
-        logger.info({
-          produtoId: produto.id,
-          nome: produto.nome,
-          quantidade
-        }, 'Adding item via API')
+        logger.info({ produtoId: produto.id, nome: produto.nome, quantidade }, 'Adding item via API')
 
         const response = await api.post('/carrinho/itens', {
           produtoId: produto.id,
@@ -217,7 +196,6 @@ export function CartProvider({ children }) {
           valorTotal: backendCart.valorTotal
         }, 'Item added - cart updated')
 
-        // Buscar estoques atualizados
         const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
         const stockMap = await fetchProductsStock(produtoIds)
 
@@ -237,8 +215,10 @@ export function CartProvider({ children }) {
         setItems(backendItems)
         toast.success(`${produto.nome} adicionado ao carrinho!`)
       } else {
-        // Não autenticado - adicionar localmente
         logger.info({ produtoId: produto.id, nome: produto.nome, quantidade }, 'Adding item to localStorage')
+
+        // FIX: normalise stock value — accept quantidadeEstoque, estoque, or null (= no limit)
+        const estoqueDisponivel = produto.quantidadeEstoque ?? produto.estoque ?? null
 
         const existingItemIndex = items.findIndex(item => item.id === produto.id)
 
@@ -246,12 +226,8 @@ export function CartProvider({ children }) {
           const updatedItems = [...items]
           const novaQuantidade = updatedItems[existingItemIndex].quantidade + quantidade
 
-          if (produto.quantidadeEstoque && novaQuantidade > produto.quantidadeEstoque) {
-            logger.warn({
-              produtoId: produto.id,
-              solicitado: novaQuantidade,
-              estoque: produto.quantidadeEstoque
-            }, 'Insufficient stock')
+          if (estoqueDisponivel !== null && novaQuantidade > estoqueDisponivel) {
+            logger.warn({ produtoId: produto.id, solicitado: novaQuantidade, estoque: estoqueDisponivel }, 'Insufficient stock')
             toast.warning('Quantidade solicitada maior que o estoque disponível')
             return
           }
@@ -262,13 +238,16 @@ export function CartProvider({ children }) {
           logger.info({ produtoId: produto.id, novaQuantidade }, 'Item quantity updated in localStorage')
           toast.success('Quantidade atualizada no carrinho')
         } else {
-          if (produto.quantidadeEstoque && quantidade > produto.quantidadeEstoque) {
-            logger.warn({
-              produtoId: produto.id,
-              solicitado: quantidade,
-              estoque: produto.quantidadeEstoque
-            }, 'Insufficient stock for new item')
+          if (estoqueDisponivel !== null && quantidade > estoqueDisponivel) {
+            logger.warn({ produtoId: produto.id, solicitado: quantidade, estoque: estoqueDisponivel }, 'Insufficient stock for new item')
             toast.warning('Quantidade solicitada maior que o estoque disponível')
+            return
+          }
+
+          // FIX: guard against estoqueDisponivel === 0 explicitly
+          if (estoqueDisponivel === 0) {
+            logger.warn({ produtoId: produto.id }, 'Product out of stock')
+            toast.warning('Produto sem estoque disponível')
             return
           }
 
@@ -278,9 +257,9 @@ export function CartProvider({ children }) {
             preco: produto.precoPromocional ?? (typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco),
             precoOriginal: typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco,
             quantidade: quantidade,
-            estoque: produto.quantidadeEstoque,
+            estoque: estoqueDisponivel,
             imagem: produto.urlImagem,
-            categoria: produto.categoria?.nome || 'Sem categoria',
+            categoria: produto.categoria?.nome || produto.categoriaNome || 'Sem categoria',
           }
 
           const updatedItems = [...items, newItem]
@@ -299,8 +278,6 @@ export function CartProvider({ children }) {
     }
   }
 
-
-  // 6. Remover item do carrinho
   const removeItem = async (produtoId) => {
     try {
       setLoading(true)
@@ -319,7 +296,6 @@ export function CartProvider({ children }) {
         const response = await api.delete(`/carrinho/itens/${item.itemId}`)
         const backendCart = response.data
 
-        // Buscar estoques atualizados
         const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
         const stockMap = await fetchProductsStock(produtoIds)
 
@@ -341,7 +317,6 @@ export function CartProvider({ children }) {
         toast.info('Item removido do carrinho')
       } else {
         logger.info({ produtoId }, 'Removing item from localStorage')
-
         const updatedItems = items.filter(item => item.id !== produtoId)
         setItems(updatedItems)
 
@@ -363,7 +338,6 @@ export function CartProvider({ children }) {
     }
   }
 
-  // 7. Atualizar quantidade de um item
   const updateQuantity = async (produtoId, novaQuantidade) => {
     try {
       if (novaQuantidade <= 0) {
@@ -382,20 +356,11 @@ export function CartProvider({ children }) {
           return
         }
 
-        logger.info({
-          itemId: item.itemId,
-          produtoId,
-          oldQuantity: item.quantidade,
-          newQuantity: novaQuantidade
-        }, 'Updating quantity via API')
+        logger.info({ itemId: item.itemId, produtoId, oldQuantity: item.quantidade, newQuantity: novaQuantidade }, 'Updating quantity via API')
 
-        const response = await api.put(`/carrinho/itens/${item.itemId}`, {
-          quantidade: novaQuantidade
-        })
-
+        const response = await api.put(`/carrinho/itens/${item.itemId}`, { quantidade: novaQuantidade })
         const backendCart = response.data
 
-        // Buscar estoques atualizados
         const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
         const stockMap = await fetchProductsStock(produtoIds)
 
@@ -419,19 +384,13 @@ export function CartProvider({ children }) {
 
         const updatedItems = items.map(item => {
           if (item.id === produtoId) {
-            if (novaQuantidade > item.estoque) {
-              logger.warn({
-                produtoId,
-                solicitado: novaQuantidade,
-                estoque: item.estoque
-              }, 'Quantity exceeds stock')
+            if (item.estoque !== null && novaQuantidade > item.estoque) {
+              logger.warn({ produtoId, solicitado: novaQuantidade, estoque: item.estoque }, 'Quantity exceeds stock')
               toast.warning('Quantidade maior que o estoque disponível')
               return item
             }
-
             return { ...item, quantidade: novaQuantidade }
           }
-
           return item
         })
 
@@ -452,7 +411,6 @@ export function CartProvider({ children }) {
     }
   }
 
-  // 8. Limpar carrinho completamente
   const clearCart = async () => {
     try {
       setLoading(true)
@@ -461,7 +419,6 @@ export function CartProvider({ children }) {
         logger.info('Clearing cart via API')
         const response = await api.delete('/carrinho')
         const backendCart = response.data
-
         setCart(backendCart)
         setItems([])
         logger.info('Cart cleared successfully')
@@ -483,41 +440,13 @@ export function CartProvider({ children }) {
     }
   }
 
-  // 9. Verificar se produto está no carrinho
-  const isInCart = (produtoId) => {
-    return items.some(item => item.id === produtoId)
-  }
+  const isInCart = (produtoId) => items.some(item => item.id === produtoId)
+  const getItemQuantity = (produtoId) => { const item = items.find(item => item.id === produtoId); return item ? item.quantidade : 0 }
+  const getTotalItems = () => items.reduce((total, item) => total + item.quantidade, 0)
+  const getSubtotal = () => items.reduce((total, item) => total + (item.preco * item.quantidade), 0)
+  const getTotalDiscount = () => items.reduce((total, item) => { const desconto = (item.precoOriginal - item.preco) * item.quantidade; return total + desconto }, 0)
+  const getTotal = (frete = 0) => getSubtotal() + frete
 
-  // 10. Obter quantidade de um produto no carrinho
-  const getItemQuantity = (produtoId) => {
-    const item = items.find(item => item.id === produtoId)
-    return item ? item.quantidade : 0
-  }
-
-  // 11. Calcular total de itens (quantidade)
-  const getTotalItems = () => {
-    return items.reduce((total, item) => total + item.quantidade, 0)
-  }
-
-  // 12. Calcular subtotal (sem descontos/frete)
-  const getSubtotal = () => {
-    return items.reduce((total, item) => total + (item.preco * item.quantidade), 0)
-  }
-
-  // 13. Calcular desconto total
-  const getTotalDiscount = () => {
-    return items.reduce((total, item) => {
-      const desconto = (item.precoOriginal - item.preco) * item.quantidade
-      return total + desconto
-    }, 0)
-  }
-
-  // 14. Calcular total final
-  const getTotal = (frete = 0) => {
-    return getSubtotal() + frete
-  }
-
-  // 15. Transferir carrinho após login
   const transferLocalCartToBackend = async () => {
     try {
       const localItems = storageUtil.getItem('cart')
@@ -530,7 +459,6 @@ export function CartProvider({ children }) {
     }
   }
 
-  // 16. Atualizar carrinho do backend
   const refreshCart = async () => {
     if (isAuthenticated) {
       logger.info('Manual cart refresh requested')
@@ -538,10 +466,9 @@ export function CartProvider({ children }) {
     }
   }
 
-  // 17. Valor que será compartilhado
   const value = {
     items,
-    setItems, // Export setItems for direct manipulation
+    setItems,
     cart,
     loading,
     addItem,
@@ -556,14 +483,12 @@ export function CartProvider({ children }) {
     getTotal,
     transferLocalCartToBackend,
     refreshCart,
-    // Aliases para compatibilidade
     itemCount: getTotalItems(),
     total: getTotal(),
     subtotal: getSubtotal(),
     isEmpty: items.length === 0,
   }
 
-  // 18. Retornar Provider
   return (
     <CartContext.Provider value={value}>
       {children}
@@ -571,12 +496,9 @@ export function CartProvider({ children }) {
   )
 }
 
-// 19. Hook customizado
 export function useCart() {
   const context = useContext(CartContext)
-  if (!context) {
-    throw new Error('useCart deve ser usado dentro de CartProvider')
-  }
+  if (!context) throw new Error('useCart deve ser usado dentro de CartProvider')
   return context
 }
 
