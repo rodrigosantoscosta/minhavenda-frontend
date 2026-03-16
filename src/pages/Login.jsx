@@ -10,10 +10,8 @@ export default function Login() {
   const { login, loading } = useAuth()
 
   useEffect(() => {
-    logger.info('🔵 Login component MOUNTED')
-    return () => {
-      logger.info('🔴 Login component UNMOUNTED')
-    }
+    logger.info('Login component mounted')
+    return () => { logger.info('Login component unmounted') }
   }, [])
 
   const [formData, setFormData] = useState({ email: '', senha: '' })
@@ -34,11 +32,7 @@ export default function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
-    }
-
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
     if (serverError) {
       setServerError('')
       sessionStorage.removeItem('loginError')
@@ -47,37 +41,25 @@ export default function Login() {
 
   const validateForm = () => {
     const newErrors = {}
-
     if (!formData.email) {
       newErrors.email = 'Email é obrigatório'
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email inválido'
     }
-
-    if (!formData.senha) {
-      newErrors.senha = 'Senha é obrigatória'
-    }
-
+    if (!formData.senha) newErrors.senha = 'Senha é obrigatória'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleDemoLogin = async (tipo) => {
+  // FIX: prefill form with correct seeded credentials instead of auto-logging in
+  // with wrong credentials (admin@minhavenda.com / admin123 never existed)
+  const handleDemoLogin = (tipo) => {
     const credentials = tipo === 'admin'
-      ? { email: 'admin@minhavenda.com', senha: 'admin123' }
-      : { email: 'maria@email.com', senha: 'senha123' }
-
+      ? { email: 'admin@loja.com', senha: '' }
+      : { email: 'joao.silva@email.com', senha: '' }
     setFormData(credentials)
-
-    const result = await login(credentials.email, credentials.senha)
-
-    if (result.success) {
-      navigate(from, { replace: true })
-    } else {
-      const error = result.error || 'Erro ao fazer login'
-      sessionStorage.setItem('loginError', error)
-      setServerError(error)
-    }
+    setServerError('')
+    setErrors({})
   }
 
   return (
@@ -93,15 +75,31 @@ export default function Login() {
           <p className="text-gray-600">Faça login para continuar</p>
         </div>
 
+        {/* Demo login shortcuts */}
+        <div className="mb-6 flex gap-2">
+          <button
+            type="button"
+            onClick={() => handleDemoLogin('admin')}
+            className="flex-1 py-2 px-3 text-xs font-medium border border-blue-200 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+          >
+            Preencher Admin
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDemoLogin('cliente')}
+            className="flex-1 py-2 px-3 text-xs font-medium border border-gray-200 rounded-lg text-gray-700 bg-gray-50 hover:bg-gray-100 transition-colors"
+          >
+            Preencher Cliente
+          </button>
+        </div>
+
         {/* ALERTA DE ERRO */}
         {serverError && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-start">
               <FiAlertCircle className="text-red-500 mt-0.5 mr-3 flex-shrink-0" size={20} />
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-red-800 mb-1">
-                  Falha na autenticação
-                </h3>
+                <h3 className="text-sm font-semibold text-red-800 mb-1">Falha na autenticação</h3>
                 <p className="text-sm text-red-700">{serverError}</p>
               </div>
             </div>
@@ -113,43 +111,30 @@ export default function Login() {
           onSubmit={async (e) => {
             e.preventDefault()
             e.stopPropagation()
-
             setServerError('')
             sessionStorage.removeItem('loginError')
-
             if (!validateForm()) return
 
-            const startTime = Date.now()
-
+            // FIX: removed dead `const startTime = Date.now()` that was never used
             const result = await login(formData.email, formData.senha)
 
-
             if (result.success) {
-              logger.info('✅ Login success - navigating')
+              logger.info('Login success - navigating')
               navigate(from, { replace: true })
-              return false
+              return
             }
 
             const error = result.error || 'Erro ao fazer login. Verifique suas credenciais.'
-
-            // Wait a tick to ensure component is stable
             await new Promise(resolve => setTimeout(resolve, 10))
-
             sessionStorage.setItem('loginError', error)
             setServerError(error)
-
-            logger.info('🔴 Login failed - error set')
-
-            return false
+            logger.info('Login failed - error set')
           }}
-
           className="space-y-6"
         >
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FiMail className="text-gray-400" size={20} />
@@ -161,20 +146,15 @@ export default function Login() {
                 onChange={handleChange}
                 placeholder="seu@email.com"
                 autoComplete="email"
-                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.email ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
               />
             </div>
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-            )}
+            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
           </div>
 
           {/* Senha */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Senha *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Senha *</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FiLock className="text-gray-400" size={20} />
@@ -186,8 +166,7 @@ export default function Login() {
                 onChange={handleChange}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.senha ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.senha ? 'border-red-500' : 'border-gray-300'}`}
               />
               <button
                 type="button"
@@ -197,9 +176,7 @@ export default function Login() {
                 {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
               </button>
             </div>
-            {errors.senha && (
-              <p className="mt-1 text-sm text-red-600">{errors.senha}</p>
-            )}
+            {errors.senha && <p className="mt-1 text-sm text-red-600">{errors.senha}</p>}
           </div>
 
           {/* Botão de Login */}
@@ -216,10 +193,7 @@ export default function Login() {
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
             Não tem uma conta?{' '}
-            <Link
-              to="/register"
-              className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
-            >
+            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold transition-colors">
               Cadastre-se gratuitamente
             </Link>
           </p>
