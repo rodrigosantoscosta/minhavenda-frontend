@@ -17,22 +17,7 @@ function mapStatus(status) {
   return statusMap[status] || status
 }
 
-/**
- * OrderService
- *
- * Serviço para gerenciamento de pedidos do usuário
- * Implementação híbrida: mock local + estrutura para API real
- *
- * Endpoints disponíveis no backend:
- * - GET /api/meus-pedidos - Listar pedidos do usuário
- * - GET /api/pedidos/{id} - Buscar detalhes do pedido
- * - POST /api/pedidos/{id}/pagar - Simular pagamento
- * - POST /api/pedidos/{id}/cancelar - Cancelar pedido
- * - POST /api/checkout/finalizar - Finalizar checkout
- */
-
-// Mock data para desenvolvimento
-const USE_MOCK = false // Mudar para false quando usar API real
+const USE_MOCK = false
 
 export const setOrderServiceMode = (useMock) => {
   logger.info({ useMock }, 'Modo do orderService alterado')
@@ -53,99 +38,53 @@ export const getMyOrders = async (options = {}) => {
 
 async function getMyOrdersMock(options = {}) {
   await new Promise(resolve => setTimeout(resolve, 800))
-
   const stored = localStorage.getItem('mockOrders')
   if (stored) mockUserOrders = JSON.parse(stored)
-
   if (mockUserOrders.length === 0) {
     mockUserOrders = generateMockOrders()
     localStorage.setItem('mockOrders', JSON.stringify(mockUserOrders))
   }
-
   let filteredOrders = [...mockUserOrders]
   if (options.status) {
     filteredOrders = filteredOrders.filter(order => order.status === options.status)
   }
-
   filteredOrders.sort((a, b) => new Date(b.dataCriacao) - new Date(a.dataCriacao))
-
   const page = options.page || 1
   const limit = options.limit || 10
   const startIndex = (page - 1) * limit
   const endIndex = startIndex + limit
   const paginatedOrders = filteredOrders.slice(startIndex, endIndex)
-
   return {
     orders: paginatedOrders,
-    pagination: {
-      page, limit,
-      total: filteredOrders.length,
-      totalPages: Math.ceil(filteredOrders.length / limit),
-      hasNext: endIndex < filteredOrders.length,
-      hasPrev: page > 1
-    }
+    pagination: { page, limit, total: filteredOrders.length, totalPages: Math.ceil(filteredOrders.length / limit), hasNext: endIndex < filteredOrders.length, hasPrev: page > 1 }
   }
 }
 
 async function getMyOrdersAPI(options = {}) {
   const response = await get('/meus-pedidos')
-
-  // FIX: apply mapStatus BEFORE filtering so the 'PENDENTE' filter
-  // correctly matches raw 'CRIADO' orders returned by the backend.
-  // Previously the filter ran on raw status values, so filtering by
-  // 'PENDENTE' always returned 0 results (backend sends 'CRIADO').
+  // FIX: apply mapStatus BEFORE filtering — backend sends 'CRIADO', frontend filters by 'PENDENTE'
   const mappedOrders = response.map(order => ({
     id: order.id,
     dataCriacao: order.dataCriacao,
     status: mapStatus(order.status),
     itens: [],
-    endereco: order.enderecoEntrega ? {
-      rua: order.enderecoEntrega,
-      numero: '',
-      bairro: '',
-      cidade: '',
-      estado: '',
-      cep: ''
-    } : null,
-    pagamento: {
-      metodo: 'PIX',
-      status: order.dataPagamento ? 'PAGO' : 'PENDENTE'
-    },
-    valores: {
-      subtotal: order.subtotal || 0,
-      desconto: order.valorDesconto || 0,
-      frete: order.valorFrete || 0,
-      total: order.valorTotal || 0
-    },
+    endereco: order.enderecoEntrega ? { rua: order.enderecoEntrega, numero: '', bairro: '', cidade: '', estado: '', cep: '' } : null,
+    pagamento: { metodo: 'PIX', status: order.dataPagamento ? 'PAGO' : 'PENDENTE' },
+    valores: { subtotal: order.subtotal || 0, desconto: order.valorDesconto || 0, frete: order.valorFrete || 0, total: order.valorTotal || 0 },
     quantidadeItens: order.quantidadeItens || 0,
-    usuario: {
-      id: '1',
-      nome: 'Usuário Logado',
-      email: 'usuario@exemplo.com'
-    }
+    usuario: { id: '1', nome: 'Usuário Logado', email: 'usuario@exemplo.com' }
   }))
-
-  // Filter AFTER mapping so PENDENTE matches CRIADO→PENDENTE conversions
   let filteredOrders = mappedOrders
   if (options.status) {
     filteredOrders = mappedOrders.filter(order => order.status === options.status)
   }
-
   const page = options.page || 1
   const limit = options.limit || 10
   const startIndex = (page - 1) * limit
   const endIndex = startIndex + limit
-  const paginatedOrders = filteredOrders.slice(startIndex, endIndex)
-
   return {
-    orders: paginatedOrders,
-    pagination: {
-      page, limit,
-      total: filteredOrders.length,
-      totalPages: Math.ceil(filteredOrders.length / limit),
-      hasNext: endIndex < filteredOrders.length,
-      hasPrev: page > 1
-    }
+    orders: filteredOrders.slice(startIndex, endIndex),
+    pagination: { page, limit, total: filteredOrders.length, totalPages: Math.ceil(filteredOrders.length / limit), hasNext: endIndex < filteredOrders.length, hasPrev: page > 1 }
   }
 }
 
@@ -165,12 +104,7 @@ async function getOrderDetailsMock(orderId) {
   if (stored) mockUserOrders = JSON.parse(stored)
   const order = mockUserOrders.find(o => o.id === orderId)
   if (!order) throw new Error('Pedido não encontrado')
-  return {
-    ...order,
-    rastreamento: generateTrackingInfo(order.status),
-    historico: generateOrderHistory(order),
-    estimativaEntrega: calculateDeliveryEstimate(order)
-  }
+  return { ...order, rastreamento: generateTrackingInfo(order.status), historico: generateOrderHistory(order), estimativaEntrega: calculateDeliveryEstimate(order) }
 }
 
 async function getOrderDetailsAPI(orderId) {
@@ -181,34 +115,15 @@ async function getOrderDetailsAPI(orderId) {
     status: mapStatus(response.status),
     itens: response.itens ? response.itens.map(item => ({
       id: item.id,
-      produto: {
-        id: item.produtoId,
-        nome: item.produtoNome,
-        imagem: 'https://placehold.co/600x400/e5e7eb/9ca3af?text=Sem+imagem'
-      },
+      produto: { id: item.produtoId, nome: item.produtoNome, imagem: 'https://placehold.co/600x400/e5e7eb/9ca3af?text=Sem+imagem' },
       quantidade: item.quantidade,
       precoUnitario: item.precoUnitario,
       precoOriginal: item.precoUnitario,
       subtotal: item.subtotal
     })) : [],
-    endereco: response.enderecoEntrega ? {
-      rua: response.enderecoEntrega,
-      numero: '',
-      bairro: '',
-      cidade: '',
-      estado: '',
-      cep: ''
-    } : null,
-    pagamento: {
-      metodo: 'PIX',
-      status: response.dataPagamento ? 'PAGO' : 'PENDENTE'
-    },
-    valores: {
-      subtotal: response.subtotal || 0,
-      desconto: response.valorDesconto || 0,
-      frete: response.valorFrete || 0,
-      total: response.valorTotal || 0
-    },
+    endereco: response.enderecoEntrega ? { rua: response.enderecoEntrega, numero: '', bairro: '', cidade: '', estado: '', cep: '' } : null,
+    pagamento: { metodo: 'PIX', status: response.dataPagamento ? 'PAGO' : 'PENDENTE' },
+    valores: { subtotal: response.subtotal || 0, desconto: response.valorDesconto || 0, frete: response.valorFrete || 0, total: response.valorTotal || 0 },
     quantidadeItens: response.quantidadeItens || 0,
     usuario: { id: '1', nome: 'Usuário Logado', email: 'usuario@exemplo.com' },
     rastreamento: generateTrackingInfo(response.status),
@@ -235,15 +150,8 @@ async function cancelOrderMock(orderId, motivo) {
   const orderIndex = mockUserOrders.findIndex(o => o.id === orderId)
   if (orderIndex === -1) throw new Error('Pedido não encontrado')
   const order = mockUserOrders[orderIndex]
-  if (order.status === 'ENVIADO' || order.status === 'ENTREGUE') {
-    throw new Error('Este pedido não pode mais ser cancelado')
-  }
-  mockUserOrders[orderIndex] = {
-    ...order,
-    status: 'CANCELADO',
-    dataCancelamento: new Date().toISOString(),
-    motivoCancelamento: motivo
-  }
+  if (order.status === 'ENVIADO' || order.status === 'ENTREGUE') throw new Error('Este pedido não pode mais ser cancelado')
+  mockUserOrders[orderIndex] = { ...order, status: 'CANCELADO', dataCancelamento: new Date().toISOString(), motivoCancelamento: motivo }
   localStorage.setItem('mockOrders', JSON.stringify(mockUserOrders))
   return mockUserOrders[orderIndex]
 }
@@ -263,6 +171,45 @@ async function cancelOrderAPI(orderId, motivo) {
     dataCancelamento: new Date().toISOString(),
     motivoCancelamento: motivo
   }
+}
+
+// FIX: accept optional metodoPagamento so callers can specify payment method
+// Default is 'PIX' — the client pay button has no payment method selector
+export const payOrder = async (orderId, metodoPagamento = 'PIX') => {
+  try {
+    logger.info({ orderId, metodoPagamento }, 'Simulando pagamento do pedido')
+    if (USE_MOCK) return await payOrderMock(orderId)
+    return await payOrderAPI(orderId, metodoPagamento)
+  } catch (error) {
+    logger.error({ error, orderId }, 'Erro ao simular pagamento')
+    throw error
+  }
+}
+
+async function payOrderAPI(orderId, metodoPagamento = 'PIX') {
+  // FIX: backend requires { metodoPagamento } — was sending empty body → 400
+  const response = await post(`/pedidos/${orderId}/pagar`, { metodoPagamento })
+  return response
+}
+
+async function payOrderMock(orderId) {
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  const stored = localStorage.getItem('mockOrders')
+  if (!stored) throw new Error('Pedido não encontrado')
+  let orders = JSON.parse(stored)
+  const orderIndex = orders.findIndex(o => o.id === orderId)
+  if (orderIndex === -1) throw new Error('Pedido não encontrado')
+  const order = orders[orderIndex]
+  if (order.status !== 'CRIADO') throw new Error('Este pedido não pode ser pago')
+  orders[orderIndex] = { ...order, status: 'PAGO', dataPagamento: new Date().toISOString(), pagamento: { ...order.pagamento, status: 'PAGO' } }
+  localStorage.setItem('mockOrders', JSON.stringify(orders))
+  return orders[orderIndex]
+}
+
+export const clearOrderMockData = () => {
+  mockUserOrders = []
+  localStorage.removeItem('mockOrders')
+  localStorage.removeItem('lastOrder')
 }
 
 function generateMockOrders() {
@@ -309,11 +256,7 @@ function generateMockOrders() {
 function generateTrackingInfo(status) {
   if (status === 'PENDENTE' || status === 'CANCELADO') return null
   const codigos = { 'PAGO': 'AGUARDANDO_ENVIO', 'ENVIADO': 'BR123456789BR', 'ENTREGUE': 'BR123456789BR' }
-  return {
-    codigo: codigos[status] || null,
-    status: status === 'ENTREGUE' ? 'Entregue' : 'Em trânsito',
-    ultimaAtualizacao: new Date().toISOString()
-  }
+  return { codigo: codigos[status] || null, status: status === 'ENTREGUE' ? 'Entregue' : 'Em trânsito', ultimaAtualizacao: new Date().toISOString() }
 }
 
 function generateOrderHistory(order) {
@@ -335,8 +278,7 @@ function generateOrderHistory(order) {
 
 function calculateDeliveryEstimate(order) {
   if (order.status === 'ENTREGUE' || order.status === 'CANCELADO') return null
-  const dataCriacao = new Date(order.dataCriacao)
-  let dataEstimada = new Date(dataCriacao)
+  let dataEstimada = new Date(order.dataCriacao)
   let diasAdicionados = 0
   while (diasAdicionados < 7) {
     dataEstimada.setDate(dataEstimada.getDate() + 1)
@@ -391,45 +333,4 @@ async function finalizeCheckoutMock(checkoutData) {
   orders.push(mockOrder)
   localStorage.setItem('mockOrders', JSON.stringify(orders))
   return mockOrder
-}
-
-export const payOrder = async (orderId) => {
-  try {
-    logger.info({ orderId }, 'Simulando pagamento do pedido')
-    if (USE_MOCK) return await payOrderMock(orderId)
-    return await payOrderAPI(orderId)
-  } catch (error) {
-    logger.error({ error, orderId }, 'Erro ao simular pagamento')
-    throw error
-  }
-}
-
-async function payOrderAPI(orderId) {
-  const response = await post(`/pedidos/${orderId}/pagar`)
-  return response
-}
-
-async function payOrderMock(orderId) {
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  const stored = localStorage.getItem('mockOrders')
-  if (!stored) throw new Error('Pedido não encontrado')
-  let orders = JSON.parse(stored)
-  const orderIndex = orders.findIndex(o => o.id === orderId)
-  if (orderIndex === -1) throw new Error('Pedido não encontrado')
-  const order = orders[orderIndex]
-  if (order.status !== 'CRIADO') throw new Error('Este pedido não pode ser pago')
-  orders[orderIndex] = {
-    ...order,
-    status: 'PAGO',
-    dataPagamento: new Date().toISOString(),
-    pagamento: { ...order.pagamento, status: 'PAGO' }
-  }
-  localStorage.setItem('mockOrders', JSON.stringify(orders))
-  return orders[orderIndex]
-}
-
-export const clearOrderMockData = () => {
-  mockUserOrders = []
-  localStorage.removeItem('mockOrders')
-  localStorage.removeItem('lastOrder')
 }
