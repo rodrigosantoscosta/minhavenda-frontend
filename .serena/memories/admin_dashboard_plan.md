@@ -1,7 +1,7 @@
 # Admin Dashboard MVP — Implementation Plan
 # VERIFIED AGAINST NESTJS SOURCE — all endpoints, DTOs and field names confirmed
 
-## Status: PLANNED — not yet implemented
+## Status: COMPLETE — committed on branch dev-nestjs (commit 2761834)
 
 ## Core Reality
 The existing project is a customer-facing storefront (JSX, Tailwind, react-icons, react-router-dom v6).
