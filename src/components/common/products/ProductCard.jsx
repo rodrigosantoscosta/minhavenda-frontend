@@ -31,7 +31,9 @@ export default function ProductCard({ produto, viewMode = 'grid' }) {
   // NestJS returns preco as a plain number; guard against legacy { valor } shape
   const precoBase = typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco
   const precoPromocional = produto.precoPromocional ?? null
-  const quantidadeEstoque = produto.quantidadeEstoque ?? 1  // not in DTO → assume in stock
+
+  // FIX: do NOT default to 1 — use null to mean "unknown/no limit", 0 means out of stock
+  const quantidadeEstoque = produto.quantidadeEstoque ?? null
 
   const calcularDesconto = () => {
     if (!precoPromocional || !precoBase) return 0
@@ -40,8 +42,10 @@ export default function ProductCard({ produto, viewMode = 'grid' }) {
 
   const desconto = calcularDesconto()
   const precoFinal = precoPromocional ?? precoBase ?? 0
-  const temEstoque = quantidadeEstoque > 0
-  const estoqueMinimo = quantidadeEstoque <= 5 && quantidadeEstoque > 0
+
+  // Out of stock only when we explicitly know qty === 0; null = assume available
+  const temEstoque = quantidadeEstoque === null || quantidadeEstoque > 0
+  const estoqueMinimo = quantidadeEstoque !== null && quantidadeEstoque <= 5 && quantidadeEstoque > 0
 
   return (
     <Link
