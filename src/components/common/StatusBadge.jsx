@@ -8,21 +8,25 @@ import {
   FiRefreshCw
 } from 'react-icons/fi'
 
-/**
- * StatusBadge Component
- * 
- * Badge colorido para exibir status de pedidos
- * Com ícones e cores específicas para cada status
- */
 export default function StatusBadge({ 
   status, 
   size = 'md',
   showIcon = true,
   className = '',
-  variant = 'default' // default | pill | square
+  variant = 'default'
 }) {
-  // Configurações de status
   const statusConfig = {
+    // FIX: CRIADO is the raw backend initial status — alias to PENDENTE styling
+    // so it renders correctly if it leaks through before mapStatus() is applied
+    CRIADO: {
+      label: 'Pendente',
+      description: 'Aguardando confirmação',
+      color: 'warning',
+      bgColor: 'bg-amber-50',
+      borderColor: 'border-amber-200',
+      textColor: 'text-amber-800',
+      icon: FiClock
+    },
     PENDENTE: {
       label: 'Pendente',
       description: 'Aguardando confirmação',
@@ -106,41 +110,25 @@ export default function StatusBadge({
     }
   }
 
-  // Obter configuração do status
   const config = statusConfig[status] || statusConfig.PENDENTE
   const Icon = config.icon
 
-  // Configurações de tamanho
   const sizeConfig = {
-    sm: {
-      padding: 'px-2 py-1',
-      fontSize: 'text-xs',
-      iconSize: 'w-3 h-3'
-    },
-    md: {
-      padding: 'px-3 py-1.5',
-      fontSize: 'text-sm',
-      iconSize: 'w-4 h-4'
-    },
-    lg: {
-      padding: 'px-4 py-2',
-      fontSize: 'text-base',
-      iconSize: 'w-5 h-5'
-    }
+    sm: { padding: 'px-2 py-1',   fontSize: 'text-xs',   iconSize: 'w-3 h-3' },
+    md: { padding: 'px-3 py-1.5', fontSize: 'text-sm',   iconSize: 'w-4 h-4' },
+    lg: { padding: 'px-4 py-2',   fontSize: 'text-base', iconSize: 'w-5 h-5' }
   }
 
   const currentSize = sizeConfig[size] || sizeConfig.md
 
-  // Configurações de variante
   const variantConfig = {
     default: 'rounded-lg',
-    pill: 'rounded-full',
-    square: 'rounded-none'
+    pill:    'rounded-full',
+    square:  'rounded-none'
   }
 
   const currentVariant = variantConfig[variant] || variantConfig.default
 
-  // Classes base
   const baseClasses = `
     inline-flex items-center gap-2 font-medium
     ${config.bgColor} ${config.borderColor} ${config.textColor}
@@ -149,7 +137,6 @@ export default function StatusBadge({
     ${className}
   `
 
-  // Renderizar badge simples
   if (variant === 'simple') {
     return (
       <span className={`
@@ -163,22 +150,14 @@ export default function StatusBadge({
     )
   }
 
-  // Renderizar badge completo
   return (
     <div className={baseClasses}>
-      {showIcon && (
-        <Icon className={currentSize.iconSize} />
-      )}
+      {showIcon && <Icon className={currentSize.iconSize} />}
       <span>{config.label}</span>
     </div>
   )
 }
 
-/**
- * StatusBadgeWithTooltip
- * 
- * Badge com tooltip adicional
- */
 export function StatusBadgeWithTooltip({ 
   status, 
   size = 'md',
@@ -187,6 +166,11 @@ export function StatusBadgeWithTooltip({
   ...props 
 }) {
   const config = {
+    // FIX: CRIADO alias
+    CRIADO: {
+      tooltip: 'Seu pedido foi recebido e está aguardando confirmação de pagamento.',
+      details: ['Pedido criado', 'Aguardando pagamento']
+    },
     PENDENTE: {
       tooltip: 'Seu pedido foi recebido e está aguardando confirmação de pagamento.',
       details: ['Pedido criado', 'Aguardando pagamento']
@@ -219,7 +203,6 @@ export function StatusBadgeWithTooltip({
     <div className={`relative group ${className}`}>
       <StatusBadge status={status} size={size} {...props} />
       
-      {/* Tooltip */}
       {showDescription && (
         <div className={`
           absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2
@@ -236,8 +219,6 @@ export function StatusBadgeWithTooltip({
               </div>
             ))}
           </div>
-          
-          {/* Seta do tooltip */}
           <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
             <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
           </div>
@@ -247,25 +228,22 @@ export function StatusBadgeWithTooltip({
   )
 }
 
-/**
- * StatusTimeline
- * 
- * Linha do tempo com múltiplos status
- */
 export function StatusTimeline({ 
   currentStatus, 
   history = [],
   className = ''
 }) {
   const statusOrder = ['PENDENTE', 'PAGO', 'PROCESSANDO', 'ENVIADO', 'ENTREGUE']
-  const currentIndex = statusOrder.indexOf(currentStatus)
+  // FIX: treat CRIADO as PENDENTE for timeline position
+  const normalizedStatus = currentStatus === 'CRIADO' ? 'PENDENTE' : currentStatus
+  const currentIndex = statusOrder.indexOf(normalizedStatus)
 
   const statusConfig = {
-    PENDENTE: { icon: FiClock, label: 'Pendente' },
-    PAGO: { icon: FiCheck, label: 'Pago' },
-    PROCESSANDO: { icon: FiRefreshCw, label: 'Processando' },
-    ENVIADO: { icon: FiTruck, label: 'Enviado' },
-    ENTREGUE: { icon: FiPackage, label: 'Entregue' }
+    PENDENTE:    { icon: FiClock,      label: 'Pendente' },
+    PAGO:        { icon: FiCheck,      label: 'Pago' },
+    PROCESSANDO: { icon: FiRefreshCw,  label: 'Processando' },
+    ENVIADO:     { icon: FiTruck,      label: 'Enviado' },
+    ENTREGUE:    { icon: FiPackage,    label: 'Entregue' }
   }
 
   return (
@@ -273,36 +251,30 @@ export function StatusTimeline({
       {statusOrder.map((status, index) => {
         const config = statusConfig[status]
         const isActive = index <= currentIndex
-        const isCurrent = status === currentStatus
+        const isCurrent = status === normalizedStatus
         const Icon = config.icon
 
         return (
           <div key={status} className="flex items-center gap-3">
             <div className={`
               flex items-center justify-center w-8 h-8 rounded-full border-2
-              ${isActive 
-                ? 'bg-primary-600 border-primary-600 text-white' 
+              ${isActive
+                ? 'bg-primary-600 border-primary-600 text-white'
                 : 'bg-gray-100 border-gray-300 text-gray-400'
               }
             `}>
               <Icon className="w-4 h-4" />
             </div>
-            
             <div className="flex-1">
-              <div className={`
-                font-medium text-sm
-                ${isActive ? 'text-gray-900' : 'text-gray-400'}
-              `}>
+              <div className={`font-medium text-sm ${isActive ? 'text-gray-900' : 'text-gray-400'}`}>
                 {config.label}
               </div>
-              
               {isCurrent && history.length > 0 && (
                 <div className="text-xs text-gray-500 mt-1">
                   {history[history.length - 1]?.descricao}
                 </div>
               )}
             </div>
-            
             {isActive && index < statusOrder.length - 1 && (
               <div className="flex-1 h-0.5 bg-primary-200 ml-2" />
             )}
