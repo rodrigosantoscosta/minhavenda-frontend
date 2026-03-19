@@ -111,7 +111,7 @@ const SearchFilters = ({
           <select
             value={localFilters.categoriaId || ''}
             onChange={(e) => handleFilterChange('categoriaId', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md hover:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             disabled={isLoadingCategorias}
           >
             <option value="">Todas as categorias</option>
@@ -137,7 +137,7 @@ const SearchFilters = ({
                   value={localFilters.precoMin || ''}
                   onChange={(e) => handlePrecoChange('precoMin', e.target.value)}
                   placeholder="0,00"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>
@@ -150,7 +150,7 @@ const SearchFilters = ({
                   value={localFilters.precoMax || ''}
                   onChange={(e) => handlePrecoChange('precoMax', e.target.value)}
                   placeholder="0,00"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>

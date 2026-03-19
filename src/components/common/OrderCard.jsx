@@ -65,7 +65,7 @@ export default function OrderCard({ order, showCancelButton = false, onCancel, c
   return (
     <Link
       to={`/pedido/${id}`}
-      className="block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 p-4 md:p-6"
+      className="block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 p-3 md:p-4"
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 pb-4 border-b border-gray-200">
@@ -123,7 +123,7 @@ export default function OrderCard({ order, showCancelButton = false, onCancel, c
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-200 gap-3">
         <div>
           <p className="text-sm text-gray-600">Total</p>
-          <p className="text-2xl font-bold text-gray-900">{formatarValor(orderTotal)}</p>
+          <p className="text-lg font-bold text-gray-900">{formatarValor(orderTotal)}</p>
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <span className="text-primary-600 font-medium hover:underline text-sm sm:text-base">

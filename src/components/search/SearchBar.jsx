@@ -107,13 +107,13 @@ const SearchBar = ({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={`
-            block w-full pl-4 pr-20 py-2.5
+            block w-full pl-4 pr-20 py-2
             border border-gray-300 rounded-lg
-            bg-white text-gray-900 placeholder-gray-500
-            text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+            bg-white text-gray-900 placeholder-gray-400
+            text-sm hover:border-blue-400
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
             transition-colors duration-200
             ${isLoading ? 'bg-gray-50' : ''}
-            ${className}
           `}
           disabled={isLoading}
           autoComplete="off"

@@ -194,3 +194,42 @@ useEffect(() => {
 
 Following these guidelines keeps the development loop fast and predictable. Actions
 an agent can take (ask before doing):
+
+---
+
+## 12. Mobile-First UI/UX (MANDATORY)
+
+All UI components and pages **must be designed mobile-first**. This means:
+
+**Layout**
+- Always start with the smallest screen (`grid-cols-1`, full-width stacking) and scale up using `sm:`, `md:`, `lg:` breakpoints.
+- Never write desktop-only layout without a mobile fallback. A missing mobile breakpoint is a bug.
+- Product cards on mobile must use a **horizontal list layout** (image left ~30%, content right) — not a tall vertical card. Switch to the vertical grid card at `sm:` and above.
+
+**Tailwind breakpoint order**
+```
+base (mobile) → sm: (≥640px) → md: (≥768px) → lg: (≥1024px) → xl: (≥1280px)
+```
+Always write classes in this order. Never skip breakpoints without a documented reason.
+
+**Touch targets**
+- Minimum tap target size: `44×44px` (use `min-h-[44px] min-w-[44px]` or `p-3` on interactive elements).
+- Avoid hover-only interactions on mobile; always provide a visible active/focus state.
+
+**Typography & spacing**
+- Reduce font sizes and padding on mobile — use `text-sm` / `text-xs` as base, scale up to `sm:text-base` etc.
+- Avoid `text-2xl` or larger as a base size for data like prices in cards.
+
+**Search & inputs**
+- Hover effects on inputs must use `hover:border-blue-400` — never a black/dark border.
+- Focus rings must use `focus:ring-blue-500 focus:border-blue-500`.
+
+**Images in cards**
+- On mobile, product image thumbnails should be fixed-width (`w-28`) and not use `aspect-square` (which makes them tall). Reserve `aspect-square` for `sm:` and above.
+
+**Agent checklist before submitting UI changes**
+- [ ] Does it look correct on a 390px-wide viewport (iPhone 14)?
+- [ ] Are all buttons/links at least 44px tall on mobile?
+- [ ] Are cards horizontal on mobile and vertical on `sm:`+?
+- [ ] Are all hover effects blue (not black/gray-dark)?
+- [ ] Is Tailwind class order mobile-first (`base sm: md: lg:`)?
