@@ -192,6 +192,25 @@ useEffect(() => {
 - Co-locate related state management
 ---
 
+---
+
+## 13. Git Push — Requires Explicit Confirmation (MANDATORY)
+
+**Agents must NEVER run `git push` without first asking the user for confirmation.**
+
+The allowed git workflow for agents is:
+
+1. `git add <files>` — stage changes
+2. `git commit -m "..."` — commit locally
+3. **STOP** — show the commit summary to the user and ask: _"Ready to push to `origin/<branch>`. Confirm?"_
+4. Only run `git push origin <branch>` after receiving an explicit "yes", "push it", "go ahead", or equivalent confirmation.
+
+**This rule applies to all branches**, including `dev-nestjs`, `master`, and any feature branches.
+
+**Why:** Pushing is irreversible in shared repositories. Local commits are safe to make freely; pushes are not.
+
+---
+
 Following these guidelines keeps the development loop fast and predictable. Actions
 an agent can take (ask before doing):
 
