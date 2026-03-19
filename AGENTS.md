@@ -217,6 +217,37 @@ an agent can take (ask before doing):
 
 ---
 
+## 14. Playwright E2E Tests
+
+### Setup
+- `@playwright/test` is installed as a dev dependency.
+- Config: `playwright.config.js` at the project root.
+- Tests live in: `tests/` directory, files named `*.spec.js`.
+- Target browser: **Chromium only** (fast feedback loop).
+- Base URL: `http://localhost:5173` (Vite dev port).
+
+### Running tests
+| Script | What it does |
+|---|---|
+| `pnpm test:e2e` | Run all tests headlessly (Playwright auto-starts Vite) |
+| `pnpm test:e2e:ui` | Open Playwright UI mode (interactive, great for debugging) |
+| `pnpm test:e2e:debug` | Run in debug mode with Playwright Inspector |
+| `pnpm test:e2e:report` | Open the last HTML report |
+
+> **Important:** `pnpm test:e2e` auto-starts the Vite dev server — do NOT run `pnpm dev` first or the port will conflict. Use `pnpm test:e2e:ui` if you want to watch tests run interactively.
+
+### Writing tests (agent rules)
+- Place all test files in `tests/` and name them `<feature>.spec.js`.
+- Always use `baseURL`-relative paths: `page.goto('/busca')` not `page.goto('http://localhost:5173/busca')`.
+- **Never call real backend APIs in tests** — intercept with `page.route('**/api/**', ...)` and return mock data.
+- Use semantic selectors in priority order: `getByRole` → `getByLabel` → `getByText` → `getByTestId`.
+- Add `data-testid` attributes to components only when no semantic selector fits — prefix with `testid-`.
+- Keep each `test()` focused on a single behaviour; share setup in `test.beforeEach`.
+- Do not use `test.only` — it will break the CI build (`forbidOnly: true`).
+- Do not use fixed `page.waitForTimeout(ms)` sleeps — use `expect(...).toBeVisible()` or `waitForSelector` instead.
+
+---
+
 ## 12. Mobile-First UI/UX (MANDATORY)
 
 All UI components and pages **must be designed mobile-first**. This means:

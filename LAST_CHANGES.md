@@ -1,5 +1,17 @@
 # Last Changes
 
+## 2026-03-19 — Playwright E2E setup: config, scripts, AGENTS rules
+
+### Files changed
+- `playwright.config.js` — rewritten: Chromium only, baseURL=http://localhost:5173, webServer auto-starts `pnpm dev`, HTML reporter, screenshot on failure, trace on retry
+- `package.json` — modified: added `test:e2e`, `test:e2e:ui`, `test:e2e:debug`, `test:e2e:report` scripts
+- `AGENTS.md` — modified: added Section 14 — Playwright E2E test rules and script reference
+
+### Notes
+The webServer block means `pnpm test:e2e` is self-contained — no need to start Vite first. Do not run `pnpm dev` before running tests or port 5173 will conflict (unless using `reuseExistingServer`, which is enabled on local but disabled on CI).
+
+---
+
 ## 2026-03-19 — UI/UX overhaul: card sizing, button sizes, blue hover, mobile-first product cards
 
 ### Files changed
