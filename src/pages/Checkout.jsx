@@ -205,7 +205,7 @@ export default function Checkout() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Finalizar Compra</h1>
-              <p className="text-gray-600">Ambiente 100% seguro - Página criptografada</p>
+              {/* <p className="text-gray-600">Ambiente 100% seguro - Página criptografada</p> */}
             </div>
           </div>
         </div>
@@ -295,7 +295,7 @@ export default function Checkout() {
                     {paymentMethod === 'PIX' && (
                       <div className="flex items-center gap-2 text-green-700">
                         <FiCheck className="w-4 h-4" />
-                        <span>5% de desconto no pagamento via PIX</span>
+                        {/* <span>5% de desconto no pagamento via PIX</span> */}
                       </div>
                     )}
                     <div className="flex items-center gap-2 text-gray-600">
