@@ -56,13 +56,13 @@ function AppInner() {
               <Routes>
                 {/* ── Públicas ── */}
                 <Route path="/" element={<Home />} />
-                <Route path="/produtos" element={<Products />} />
+                {/* <Route path="/produtos" element={<Products />} /> */}
                 <Route path="/produto/:id" element={<ProductDetail />} />
                 <Route path="/busca" element={<SearchPage />} />
 
                 {/* ── Autenticação ── */}
                 <Route path="/login"    element={<PublicRoute redirectTo="/"><Login /></PublicRoute>} />
-                <Route path="/cadastro" element={<PublicRoute redirectTo="/"><Register /></PublicRoute>} />
+                <Route path="/register" element={<PublicRoute redirectTo="/"><Register /></PublicRoute>} />
 
                 {/* ── Protegidas (cliente) ── */}
                 <Route path="/carrinho"    element={<ProtectedRoute><Cart /></ProtectedRoute>} />
