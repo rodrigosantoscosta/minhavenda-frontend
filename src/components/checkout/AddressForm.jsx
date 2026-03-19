@@ -375,21 +375,6 @@ export default function AddressForm({
           />
         </div>
       </div>
-
-      {/* Informações de ajuda */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <FiMapPin className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">Dica de preenchimento:</p>
-            <ul className="space-y-1 text-blue-700">
-              <li>• Digite o CEP e clique na 🔍 para auto-preencher</li>
-              <li>• Verifique se todos os campos estão corretos</li>
-              <li>• Use o complemento para apartamentos ou casas</li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
