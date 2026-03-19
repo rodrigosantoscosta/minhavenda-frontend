@@ -194,20 +194,21 @@ useEffect(() => {
 
 ---
 
-## 13. Git Push — Requires Explicit Confirmation (MANDATORY)
+## 13. Git Push — Only on User Request (MANDATORY)
 
-**Agents must NEVER run `git push` without first asking the user for confirmation.**
+**Agents must NEVER run `git push` on their own initiative.**
 
 The allowed git workflow for agents is:
 
 1. `git add <files>` — stage changes
 2. `git commit -m "..."` — commit locally
-3. **STOP** — show the commit summary to the user and ask: _"Ready to push to `origin/<branch>`. Confirm?"_
-4. Only run `git push origin <branch>` after receiving an explicit "yes", "push it", "go ahead", or equivalent confirmation.
+3. **STOP** — report what was committed and wait
+
+The user will explicitly ask to push when they are ready (e.g. "push it", "commit and push"). Agents must not ask "shall I push?" either — just commit and stop.
 
 **This rule applies to all branches**, including `dev-nestjs`, `master`, and any feature branches.
 
-**Why:** Pushing is irreversible in shared repositories. Local commits are safe to make freely; pushes are not.
+**Why:** The user controls when code reaches the remote. Agents only manage local commits.
 
 ---
 
