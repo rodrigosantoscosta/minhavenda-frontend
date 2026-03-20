@@ -2,6 +2,10 @@
 
 ## High Priority
 
+- [ ] **Audit `src/components/common/ProductCard.jsx`** (the older card at `common/`, not `common/products/`) — verify it also has the mobile-first horizontal layout or is no longer used anywhere.
+- [ ] **Test mobile-first product cards on real device / 390px viewport** — confirm image height renders correctly (`minHeight: 7rem`) and button is tappable (≥44px).
+- [ ] **Review `SearchPage.jsx` sidebar on mobile** — sidebar is `hidden lg:block`; the toggle button only shows on `< lg`. Ensure filter panel overlays content correctly on small screens without layout shift.
+
 - [ ] **Wire `startPolling` token argument in `AuthContext.jsx`** — `notificationService.startPolling`
   now requires a second `token` argument. Update the call site in `AuthContext`:
   ```js

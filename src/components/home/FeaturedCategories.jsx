@@ -40,7 +40,7 @@ export default function FeaturedCategories({
             key={categoria.id}
             onClick={() => onCategorySelect(isSelected ? null : categoria.id)}
             className={`
-              group flex flex-col items-center p-6 rounded-xl transition-all duration-300
+              group flex flex-col items-center p-3 rounded-xl transition-all duration-300
               ${isSelected
                 ? 'bg-primary-600 text-white shadow-lg scale-105'
                 : 'bg-white hover:bg-primary-50 border border-gray-200 hover:border-primary-300 hover:shadow-md'
@@ -48,14 +48,14 @@ export default function FeaturedCategories({
             `}
           >
             <div className={`
-              p-4 rounded-full mb-3 transition-colors
+              p-2.5 rounded-full mb-2 transition-colors
               ${isSelected
                 ? 'bg-white bg-opacity-20'
                 : 'bg-primary-100 group-hover:bg-primary-200'
               }
             `}>
               <Icon 
-                size={24} 
+                size={18} 
                 className={isSelected ? 'text-white' : 'text-primary-600'}
               />
             </div>

@@ -7,6 +7,7 @@ import Button from '../components/common/Button'
 import Loading from '../components/common/Loading'
 import EmptyState from '../components/common/EmptyState'
 import { getMyOrders, cancelOrder } from '../services/orderService'
+import logger from '../utils/logger'
 import { 
   FiShoppingBag, 
   FiFilter, 

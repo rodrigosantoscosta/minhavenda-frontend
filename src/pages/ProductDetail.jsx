@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { useToast } from '../components/common/Toast'
 import productService from '../services/productService'
+import logger from '../utils/logger'
 import ImageGallery from '../components/product/ImageGallery'
 import ProductInfo from '../components/product/ProductInfo'
 import QuantitySelector from '../components/product/QuantitySelector'
@@ -23,12 +24,11 @@ import {
 } from 'react-icons/fi'
 
 export default function ProductDetail() {
-  const { id } = useParams() // ID do produto na URL
+  const { id } = useParams()
   const navigate = useNavigate()
   const { addItem, isInCart, getItemQuantity } = useCart()
   const toast = useToast()
 
-  // Estados
   const [produto, setProduto] = useState(null)
   const [produtosRelacionados, setProdutosRelacionados] = useState([])
   const [loading, setLoading] = useState(true)
@@ -36,18 +36,12 @@ export default function ProductDetail() {
   const [imagemSelecionada, setImagemSelecionada] = useState(0)
   const [isFavorite, setIsFavorite] = useState(false)
 
-  // Carregar produto ao montar ou quando ID mudar
   useEffect(() => {
-    if (id) {
-      loadProduto()
-    }
+    if (id) loadProduto()
   }, [id])
 
-  // Carregar produtos relacionados após carregar produto principal
   useEffect(() => {
-    if (produto?.categoria?.id) {
-      loadProdutosRelacionados()
-    }
+    if (produto?.categoria?.id) loadProdutosRelacionados()
   }, [produto])
 
   const loadProduto = async () => {
@@ -55,12 +49,8 @@ export default function ProductDetail() {
       setLoading(true)
       const data = await productService.getProdutoById(id)
       setProduto(data)
-      
-      // Se produto já está no carrinho, mostrar quantidade atual
       const quantidadeCarrinho = getItemQuantity(id)
-      if (quantidadeCarrinho > 0) {
-        setQuantidade(quantidadeCarrinho)
-      }
+      if (quantidadeCarrinho > 0) setQuantidade(quantidadeCarrinho)
     } catch (error) {
       logger.error('Erro ao carregar produto', { error: error.message, produtoId: id })
       toast.error('Produto não encontrado')
@@ -72,47 +62,48 @@ export default function ProductDetail() {
 
   const loadProdutosRelacionados = async () => {
     try {
-      const params = {
+      const data = await productService.getProdutos({
         categoriaId: produto.categoria.id,
         page: 0,
         size: 4,
         ativo: true
-      }
-      
-      const data = await productService.getProdutos(params)
-      
-      // Filtrar para não mostrar o produto atual
+      })
       const relacionados = (data.content || data)
         .filter(p => p.id !== produto.id)
         .slice(0, 4)
-      
       setProdutosRelacionados(relacionados)
     } catch (error) {
       logger.error('Erro ao carregar produtos relacionados', { error: error.message, categoriaId: produto?.categoria?.id })
     }
   }
 
+  // FIX 2: removed duplicate toast — addItem in CartContext already shows its own success toast
   const handleAddToCart = () => {
     if (!produto) return
-    
-    if (quantidade > produto.quantidadeEstoque) {
-      toast.error(`Apenas ${produto.quantidadeEstoque} unidades disponíveis`)
+    // FIX 1: guard only when stock is known (not null)
+    if (quantidadeEstoque !== null && quantidade > quantidadeEstoque) {
+      toast.error(`Apenas ${quantidadeEstoque} unidades disponíveis`)
       return
     }
-
     addItem(produto, quantidade)
-    toast.success(`${quantidade} ${quantidade === 1 ? 'item adicionado' : 'itens adicionados'} ao carrinho`)
+    // No toast here — CartContext.addItem already fires one
   }
 
-  const handleBuyNow = () => {
-    handleAddToCart()
+  // FIX 3: only navigate to cart if the add didn't bail out early
+  const handleBuyNow = async () => {
+    if (!produto) return
+    if (quantidadeEstoque !== null && quantidade > quantidadeEstoque) {
+      toast.error(`Apenas ${quantidadeEstoque} unidades disponíveis`)
+      return
+    }
+    await addItem(produto, quantidade)
     navigate('/carrinho')
   }
 
   const handleQuantityChange = (novaQuantidade) => {
-    if (novaQuantidade > produto.quantidadeEstoque) {
-      toast.warning(`Apenas ${produto.quantidadeEstoque} unidades disponíveis`)
-      setQuantidade(produto.quantidadeEstoque)
+    if (quantidadeEstoque !== null && novaQuantidade > quantidadeEstoque) {
+      toast.warning(`Apenas ${quantidadeEstoque} unidades disponíveis`)
+      setQuantidade(quantidadeEstoque)
       return
     }
     setQuantidade(novaQuantidade)
@@ -125,49 +116,40 @@ export default function ProductDetail() {
 
   const handleShare = () => {
     if (navigator.share) {
-      navigator.share({
-        title: produto.nome,
-        text: produto.descricao,
-        url: window.location.href,
-      })
+      navigator.share({ title: produto.nome, text: produto.descricao, url: window.location.href })
     } else {
       navigator.clipboard.writeText(window.location.href)
       toast.success('Link copiado para área de transferência')
     }
   }
 
-  if (loading) {
-    return <Loading />
-  }
+  if (loading) return <Loading />
 
   if (!produto) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Produto não encontrado</h2>
-          <Link to="/produtos">
-            <Button>Ver Produtos</Button>
-          </Link>
+          <Link to="/produtos"><Button>Ver Produtos</Button></Link>
         </div>
       </div>
     )
   }
 
-  // Normalise preco — NestJS returns a plain number; guard against legacy { valor } shape
   const precoBase = typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco
   const precoPromocional = produto.precoPromocional ?? null
-  const quantidadeEstoque = produto.quantidadeEstoque ?? 1
+  // FIX 1: null means unknown/unlimited — do NOT default to 1
+  const quantidadeEstoque = produto.quantidadeEstoque ?? null
 
-  // Calcular desconto
   const desconto = precoPromocional && precoBase
     ? Math.round(((precoBase - precoPromocional) / precoBase) * 100)
     : 0
 
   const precoFinal = precoPromocional ?? precoBase ?? 0
-  const temEstoque = quantidadeEstoque > 0
-  const estoqueMinimo = quantidadeEstoque <= 5 && quantidadeEstoque > 0
+  // FIX 1: out of stock only when explicitly 0; null = assume available
+  const temEstoque = quantidadeEstoque === null || quantidadeEstoque > 0
+  const estoqueMinimo = quantidadeEstoque !== null && quantidadeEstoque <= 5 && quantidadeEstoque > 0
 
-  // Breadcrumb
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
     { label: 'Produtos', path: '/produtos' },
@@ -177,50 +159,36 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Breadcrumb items={breadcrumbItems} />
         </div>
       </div>
 
-      {/* Conteúdo Principal */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          
-          {/* Galeria de Imagens (Esquerda) */}
           <div>
-            <ImageGallery 
+            <ImageGallery
               images={produto.imagens || [produto.imagem]}
               selectedIndex={imagemSelecionada}
               onSelectImage={setImagemSelecionada}
             />
           </div>
 
-          {/* Informações do Produto (Direita) */}
           <div>
-            {/* Categoria e Badge */}
             <div className="flex items-center gap-3 mb-3">
-              <Link 
+              <Link
                 to={`/produtos?categoriaId=${produto.categoria?.id}`}
                 className="text-sm text-primary-600 hover:text-primary-700 font-medium"
               >
                 {produto.categoria?.nome}
               </Link>
-              {produto.destaque && (
-                <Badge variant="warning" size="sm">Destaque</Badge>
-              )}
-              {desconto > 0 && (
-                <Badge variant="danger" size="sm">-{desconto}%</Badge>
-              )}
+              {produto.destaque && <Badge variant="warning" size="sm">Destaque</Badge>}
+              {desconto > 0 && <Badge variant="danger" size="sm">-{desconto}%</Badge>}
             </div>
 
-            {/* Nome do Produto */}
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {produto.nome}
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">{produto.nome}</h1>
 
-            {/* Avaliação */}
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
@@ -231,26 +199,17 @@ export default function ProductDetail() {
                   />
                 ))}
               </div>
-              <span className="text-sm text-gray-600">
-                ({produto.numeroAvaliacoes || 0} avaliações)
-              </span>
+              <span className="text-sm text-gray-600">({produto.numeroAvaliacoes || 0} avaliações)</span>
               <span className="text-sm text-gray-400">|</span>
-              <span className="text-sm text-gray-600">
-                {produto.vendidos || 0} vendidos
-              </span>
+              <span className="text-sm text-gray-600">{produto.vendidos || 0} vendidos</span>
             </div>
 
-            {/* Preços */}
             <div className="mb-6">
               {desconto > 0 && (
-                <p className="text-lg text-gray-500 line-through mb-1">
-                  R$ {precoBase?.toFixed(2)}
-                </p>
+                <p className="text-lg text-gray-500 line-through mb-1">R$ {precoBase?.toFixed(2)}</p>
               )}
               <div className="flex items-baseline gap-3">
-                <p className="text-4xl font-bold text-primary-600">
-                  R$ {precoFinal.toFixed(2)}
-                </p>
+                <p className="text-4xl font-bold text-primary-600">R$ {precoFinal.toFixed(2)}</p>
                 {desconto > 0 && (
                   <span className="text-lg text-green-600 font-medium">
                     Economize R$ {(precoBase - precoFinal).toFixed(2)}
@@ -262,46 +221,38 @@ export default function ProductDetail() {
               </p>
             </div>
 
-            {/* Descrição Curta */}
             {produto.descricao && (
               <div className="mb-6 pb-6 border-b">
-                <p className="text-gray-700 leading-relaxed">
-                  {produto.descricao}
-                </p>
+                <p className="text-gray-700 leading-relaxed">{produto.descricao}</p>
               </div>
             )}
 
-            {/* Estoque */}
             <div className="mb-6">
               {!temEstoque ? (
                 <Badge variant="danger">Produto Esgotado</Badge>
               ) : estoqueMinimo ? (
-                <div className="flex items-center gap-2">
-                  <Badge variant="warning">Últimas {produto.quantidadeEstoque} unidades!</Badge>
-                </div>
-              ) : (
+                <Badge variant="warning">Últimas {quantidadeEstoque} unidades!</Badge>
+              ) : quantidadeEstoque !== null ? (
                 <p className="text-sm text-green-600 font-medium">
-                  ✓ Em estoque ({produto.quantidadeEstoque} disponíveis)
+                  ✓ Em estoque ({quantidadeEstoque} disponíveis)
                 </p>
+              ) : (
+                <p className="text-sm text-green-600 font-medium">✓ Em estoque</p>
               )}
             </div>
 
-            {/* Quantidade Selector */}
             {temEstoque && (
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Quantidade:
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Quantidade:</label>
                 <QuantitySelector
                   value={quantidade}
                   onChange={handleQuantityChange}
                   min={1}
-                  max={produto.quantidadeEstoque}
+                  max={quantidadeEstoque ?? undefined}
                 />
               </div>
             )}
 
-            {/* Botões de Ação */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <Button
                 onClick={handleAddToCart}
@@ -313,33 +264,23 @@ export default function ProductDetail() {
                 <FiShoppingCart className="mr-2" />
                 {isInCart(produto.id) ? 'Atualizar Carrinho' : 'Adicionar ao Carrinho'}
               </Button>
-              
-              <Button
-                onClick={handleBuyNow}
-                disabled={!temEstoque}
-                variant="outline"
-                size="lg"
-              >
+              <Button onClick={handleBuyNow} disabled={!temEstoque} variant="outline" size="lg">
                 Comprar Agora
               </Button>
             </div>
 
-            {/* Botões Secundários */}
             <div className="flex gap-3 mb-8">
               <button
                 onClick={handleToggleFavorite}
                 className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${
-                  isFavorite 
-                    ? 'border-red-300 bg-red-50 text-red-600' 
+                  isFavorite
+                    ? 'border-red-300 bg-red-50 text-red-600'
                     : 'border-gray-300 hover:border-gray-400 text-gray-700'
                 }`}
               >
                 <FiHeart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
-                <span className="text-sm font-medium">
-                  {isFavorite ? 'Favoritado' : 'Favoritar'}
-                </span>
+                <span className="text-sm font-medium">{isFavorite ? 'Favoritado' : 'Favoritar'}</span>
               </button>
-              
               <button
                 onClick={handleShare}
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-gray-400 text-gray-700 transition-colors"
@@ -349,7 +290,6 @@ export default function ProductDetail() {
               </button>
             </div>
 
-            {/* Features/Garantias */}
             <div className="bg-gray-50 rounded-lg p-6 space-y-4">
               <div className="flex items-start gap-3">
                 <FiTruck className="text-primary-600 mt-1" size={24} />
@@ -358,7 +298,6 @@ export default function ProductDetail() {
                   <p className="text-sm text-gray-600">para compras acima de R$ 99</p>
                 </div>
               </div>
-              
               <div className="flex items-start gap-3">
                 <FiShield className="text-primary-600 mt-1" size={24} />
                 <div>
@@ -366,7 +305,6 @@ export default function ProductDetail() {
                   <p className="text-sm text-gray-600">Devolução grátis</p>
                 </div>
               </div>
-              
               <div className="flex items-start gap-3">
                 <FiCreditCard className="text-primary-600 mt-1" size={24} />
                 <div>
@@ -378,10 +316,8 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Informações Detalhadas */}
         <ProductInfo produto={produto} />
 
-        {/* Produtos Relacionados */}
         {produtosRelacionados.length > 0 && (
           <div className="mt-12">
             <RelatedProducts produtos={produtosRelacionados} />

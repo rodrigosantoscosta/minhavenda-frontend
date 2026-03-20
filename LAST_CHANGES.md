@@ -1,5 +1,35 @@
 # Last Changes
 
+## 2026-03-19 — Playwright E2E setup: config, scripts, AGENTS rules
+
+### Files changed
+- `playwright.config.js` — rewritten: Chromium only, baseURL=http://localhost:5173, webServer auto-starts `pnpm dev`, HTML reporter, screenshot on failure, trace on retry
+- `package.json` — modified: added `test:e2e`, `test:e2e:ui`, `test:e2e:debug`, `test:e2e:report` scripts
+- `AGENTS.md` — modified: added Section 14 — Playwright E2E test rules and script reference
+
+### Notes
+The webServer block means `pnpm test:e2e` is self-contained — no need to start Vite first. Do not run `pnpm dev` before running tests or port 5173 will conflict (unless using `reuseExistingServer`, which is enabled on local but disabled on CI).
+
+---
+
+## 2026-03-19 — UI/UX overhaul: card sizing, button sizes, blue hover, mobile-first product cards
+
+### Files changed
+- `src/components/common/Button.jsx` — modified: reduced all size variants (sm/md/lg) — buttons were too large across the app
+- `src/components/common/products/ProductCard.jsx` — modified: **mobile-first rewrite** — horizontal list layout on mobile (`flex`), vertical grid card on `sm:`+; removed black overlay (replaced with blue tint); reduced price size, padding, and font sizes throughout
+- `src/components/product/ProductsGrid.jsx` — modified: grid gap reduced to `gap-3 sm:gap-5` for tighter mobile layout
+- `src/components/product/ProductCardSkeleton.jsx` — modified: skeleton now mirrors the horizontal mobile / vertical desktop layout of ProductCard
+- `src/components/common/OrderCard.jsx` — modified: card padding reduced (`p-4 md:p-6` → `p-3 md:p-4`); total price `text-2xl` → `text-lg`
+- `src/components/home/FeaturedCategories.jsx` — modified: category button padding `p-6` → `p-3`; icon container `p-4` → `p-2.5`; icon size 24 → 18
+- `src/components/search/SearchBar.jsx` — modified: input hover border changed to blue (`hover:border-blue-400`); `py-2.5` → `py-2`
+- `src/components/search/SearchFilters.jsx` — modified: all inputs/select now have `hover:border-blue-400 transition-colors` (replaces browser-default dark border)
+- `AGENTS.md` — modified: added **Section 12 — Mobile-First UI/UX** with mandatory rules, checklist, and breakpoint conventions
+
+### Notes
+Product cards now follow the Drogasil-style pattern on mobile: small fixed image on the left, content on the right, compact button. Stars are hidden on mobile to save space. Favourite button and hover overlay are desktop-only. All changes are mobile-first (base → sm: → lg:).
+
+---
+
 ## 2026-03-07 — SSE migration + 429 rate limit handling
 
 ### Files modified
