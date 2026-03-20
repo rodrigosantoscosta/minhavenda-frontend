@@ -61,28 +61,9 @@ export function CartProvider({ children }) {
     }
   }
 
-  const fetchProductsStock = async (produtoIds) => {
-    try {
-      const stockPromises = produtoIds.map(async (id) => {
-        try {
-          const response = await api.get(`/produtos/${id}`)
-          return { id, estoque: response.data.quantidadeEstoque || 0 }
-        } catch (error) {
-          logger.warn({ error, produtoId: id }, 'Failed to fetch product stock')
-          return { id, estoque: 0 }
-        }
-      })
-
-      const stocks = await Promise.all(stockPromises)
-      const stockMap = {}
-      stocks.forEach(({ id, estoque }) => { stockMap[id] = estoque })
-      logger.debug({ stockMap }, 'Product stocks fetched')
-      return stockMap
-    } catch (error) {
-      logger.error({ error }, 'Error fetching product stocks')
-      return {}
-    }
-  }
+  // Stock is validated server-side (PUT /carrinho/itens/:id returns 400 if exhausted).
+  // The /estoque endpoint is ADMIN-only — never pre-fetch stock for customers.
+  // Items loaded from the backend get estoque: null (no known client-side limit).
 
   const loadCartFromBackend = async () => {
     if (loading) {
@@ -103,16 +84,13 @@ export function CartProvider({ children }) {
         valorTotal: backendCart.valorTotal
       }, 'Cart loaded from backend')
 
-      const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
-      const stockMap = await fetchProductsStock(produtoIds)
-
       const backendItems = (backendCart.itens || []).map(item => ({
         id: item.produtoId,
         nome: item.produtoNome,
         preco: item.precoUnitario,
         precoOriginal: item.precoUnitario,
         quantidade: item.quantidade,
-        estoque: stockMap[item.produtoId] || 0,
+        estoque: null, // validated server-side; null = no client-side limit
         imagem: item.produtoImagem || '',
         categoria: item.categoriaNome || 'Sem categoria',
         itemId: item.id
@@ -196,16 +174,13 @@ export function CartProvider({ children }) {
           valorTotal: backendCart.valorTotal
         }, 'Item added - cart updated')
 
-        const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
-        const stockMap = await fetchProductsStock(produtoIds)
-
         const backendItems = (backendCart.itens || []).map(item => ({
           id: item.produtoId,
           nome: item.produtoNome,
           preco: item.precoUnitario,
           precoOriginal: item.precoUnitario,
           quantidade: item.quantidade,
-          estoque: stockMap[item.produtoId] || 0,
+          estoque: null, // validated server-side; null = no client-side limit
           imagem: item.produtoImagem || '',
           categoria: item.categoriaNome || 'Sem categoria',
           itemId: item.id
@@ -285,9 +260,18 @@ export function CartProvider({ children }) {
       if (isAuthenticated) {
         const item = items.find(item => item.id === produtoId)
 
-        if (!item || !item.itemId) {
-          logger.warn({ produtoId }, 'Item not found in cart')
-          toast.error('Item não encontrado no carrinho')
+        if (!item?.itemId) {
+          // itemId may be stale — reload and retry once
+          logger.warn({ produtoId }, 'itemId missing, reloading cart before remove')
+          await loadCartFromBackend()
+          const freshItem = items.find(i => i.id === produtoId)
+          if (!freshItem?.itemId) {
+            logger.error({ produtoId }, 'Item still not found after reload')
+            toast.error('Item não encontrado no carrinho')
+            return
+          }
+          // Re-invoke with fresh state (recursive, but itemId will be set now)
+          await removeItem(produtoId)
           return
         }
 
@@ -296,16 +280,13 @@ export function CartProvider({ children }) {
         const response = await api.delete(`/carrinho/itens/${item.itemId}`)
         const backendCart = response.data
 
-        const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
-        const stockMap = await fetchProductsStock(produtoIds)
-
         const backendItems = (backendCart.itens || []).map(item => ({
           id: item.produtoId,
           nome: item.produtoNome,
           preco: item.precoUnitario,
           precoOriginal: item.precoUnitario,
           quantidade: item.quantidade,
-          estoque: stockMap[item.produtoId] || 0,
+          estoque: null, // validated server-side; null = no client-side limit
           imagem: item.produtoImagem || '',
           categoria: item.categoriaNome || 'Sem categoria',
           itemId: item.id
@@ -361,16 +342,13 @@ export function CartProvider({ children }) {
         const response = await api.put(`/carrinho/itens/${item.itemId}`, { quantidade: novaQuantidade })
         const backendCart = response.data
 
-        const produtoIds = (backendCart.itens || []).map(item => item.produtoId)
-        const stockMap = await fetchProductsStock(produtoIds)
-
         const backendItems = (backendCart.itens || []).map(item => ({
           id: item.produtoId,
           nome: item.produtoNome,
           preco: item.precoUnitario,
           precoOriginal: item.precoUnitario,
           quantidade: item.quantidade,
-          estoque: stockMap[item.produtoId] || 0,
+          estoque: null, // validated server-side; null = no client-side limit
           imagem: item.produtoImagem || '',
           categoria: item.categoriaNome || 'Sem categoria',
           itemId: item.id
