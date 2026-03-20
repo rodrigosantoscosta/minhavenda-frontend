@@ -319,74 +319,78 @@ export function CartProvider({ children }) {
     }
   }
 
+  // Debounce timers: one per item — keyed by produtoId
+  const updateDebounceRefs = useRef({})
+
   const updateQuantity = async (produtoId, novaQuantidade) => {
-    try {
-      if (novaQuantidade <= 0) {
-        await removeItem(produtoId)
-        return
-      }
-
-      setLoading(true)
-
-      if (isAuthenticated) {
-        const item = items.find(item => item.id === produtoId)
-
-        if (!item || !item.itemId) {
-          logger.warn({ produtoId }, 'Item not found for quantity update')
-          toast.error('Item não encontrado no carrinho')
-          return
-        }
-
-        logger.info({ itemId: item.itemId, produtoId, oldQuantity: item.quantidade, newQuantity: novaQuantidade }, 'Updating quantity via API')
-
-        const response = await api.put(`/carrinho/itens/${item.itemId}`, { quantidade: novaQuantidade })
-        const backendCart = response.data
-
-        const backendItems = (backendCart.itens || []).map(item => ({
-          id: item.produtoId,
-          nome: item.produtoNome,
-          preco: item.precoUnitario,
-          precoOriginal: item.precoUnitario,
-          quantidade: item.quantidade,
-          estoque: null, // validated server-side; null = no client-side limit
-          imagem: item.produtoImagem || '',
-          categoria: item.categoriaNome || 'Sem categoria',
-          itemId: item.id
-        }))
-
-        setCart(backendCart)
-        setItems(backendItems)
-        logger.info({ produtoId, novaQuantidade, valorTotal: backendCart.valorTotal }, 'Quantity updated successfully')
-      } else {
-        logger.info({ produtoId, novaQuantidade }, 'Updating quantity in localStorage')
-
-        const updatedItems = items.map(item => {
-          if (item.id === produtoId) {
-            if (item.estoque !== null && novaQuantidade > item.estoque) {
-              logger.warn({ produtoId, solicitado: novaQuantidade, estoque: item.estoque }, 'Quantity exceeds stock')
-              toast.warning('Quantidade maior que o estoque disponível')
-              return item
-            }
-            return { ...item, quantidade: novaQuantidade }
-          }
-          return item
-        })
-
-        setItems(updatedItems)
-        storageUtil.setItem('cart', updatedItems)
-        logger.info({ produtoId, novaQuantidade }, 'Quantity updated in localStorage')
-      }
-    } catch (error) {
-      logger.error({ error, produtoId, novaQuantidade }, 'Error updating quantity')
-      const message = error.response?.data?.message || 'Erro ao atualizar quantidade'
-      toast.error(message)
-
-      if (isAuthenticated) {
-        await loadCartFromBackend()
-      }
-    } finally {
-      setLoading(false)
+    if (novaQuantidade <= 0) {
+      await removeItem(produtoId)
+      return
     }
+
+    // 1. Optimistic update — reflect change immediately in the UI
+    setItems(prev => prev.map(item =>
+      item.id === produtoId ? { ...item, quantidade: novaQuantidade } : item
+    ))
+
+    if (!isAuthenticated) {
+      // localStorage path — already done above, just persist
+      setItems(prev => {
+        storageUtil.setItem('cart', prev)
+        return prev
+      })
+      return
+    }
+
+    // 2. Debounce the API call — cancel pending timer for this item if any
+    if (updateDebounceRefs.current[produtoId]) {
+      clearTimeout(updateDebounceRefs.current[produtoId])
+    }
+
+    updateDebounceRefs.current[produtoId] = setTimeout(async () => {
+      delete updateDebounceRefs.current[produtoId]
+
+      // Read latest state at flush time via functional updater
+      setItems(prev => {
+        const item = prev.find(i => i.id === produtoId)
+        if (!item?.itemId) return prev
+
+        const flushQuantidade = item.quantidade
+
+        // Fire the API call outside the setter
+        ;(async () => {
+          try {
+            logger.info({ itemId: item.itemId, produtoId, flushQuantidade }, 'Flushing quantity update to API')
+            const response = await api.put(`/carrinho/itens/${item.itemId}`, { quantidade: flushQuantidade })
+            const backendCart = response.data
+
+            const backendItems = (backendCart.itens || []).map(i => ({
+              id: i.produtoId,
+              nome: i.produtoNome,
+              preco: i.precoUnitario,
+              precoOriginal: i.precoUnitario,
+              quantidade: i.quantidade,
+              estoque: null,
+              imagem: i.produtoImagem || '',
+              categoria: i.categoriaNome || 'Sem categoria',
+              itemId: i.id
+            }))
+
+            setCart(backendCart)
+            setItems(backendItems)
+            logger.info({ produtoId, flushQuantidade, valorTotal: backendCart.valorTotal }, 'Quantity flushed successfully')
+          } catch (error) {
+            logger.error({ error, produtoId, flushQuantidade }, 'Error flushing quantity update')
+            const message = error.response?.data?.message || 'Erro ao atualizar quantidade'
+            toast.error(message)
+            // Roll back to server state on error
+            await loadCartFromBackend()
+          }
+        })()
+
+        return prev
+      })
+    }, 600)
   }
 
   const clearCart = async () => {
