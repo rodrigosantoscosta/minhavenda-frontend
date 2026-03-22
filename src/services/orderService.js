@@ -1,5 +1,6 @@
 import { get, post } from './api'
 import logger from '../utils/logger'
+import { generateMockOrders as fakerGenerateMockOrders } from '../mocks/factories'
 
 /**
  * Mapear status do backend para o formato do frontend.
@@ -17,7 +18,7 @@ function mapStatus(status) {
   return statusMap[status] || status
 }
 
-const USE_MOCK = false
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 export const setOrderServiceMode = (useMock) => {
   logger.info({ useMock }, 'Modo do orderService alterado')
@@ -115,7 +116,7 @@ async function getOrderDetailsAPI(orderId) {
     status: mapStatus(response.status),
     itens: response.itens ? response.itens.map(item => ({
       id: item.id,
-      produto: { id: item.produtoId, nome: item.produtoNome, imagem: 'https://placehold.co/600x400/e5e7eb/9ca3af?text=Sem+imagem' },
+      produto: { id: item.produtoId, nome: item.produtoNome, imagem: `https://picsum.photos/seed/prod-${item.produtoId}/100/100` },
       quantidade: item.quantidade,
       precoUnitario: item.precoUnitario,
       precoOriginal: item.precoUnitario,
@@ -213,44 +214,7 @@ export const clearOrderMockData = () => {
 }
 
 function generateMockOrders() {
-  const statuses = ['PENDENTE', 'PAGO', 'ENVIADO', 'ENTREGUE', 'CANCELADO']
-  const produtos = [
-    { id: '1', nome: 'Notebook Gamer Pro', imagem: 'https://via.placeholder.com/100' },
-    { id: '2', nome: 'Mouse Wireless RGB', imagem: 'https://via.placeholder.com/100' },
-    { id: '3', nome: 'Teclado Mecânico', imagem: 'https://via.placeholder.com/100' },
-    { id: '4', nome: 'Monitor 4K', imagem: 'https://via.placeholder.com/100' },
-    { id: '5', nome: 'Headset Bluetooth', imagem: 'https://via.placeholder.com/100' }
-  ]
-  const orders = []
-  for (let i = 1; i <= 5; i++) {
-    const numItens = Math.floor(Math.random() * 3) + 1
-    const itens = []
-    for (let j = 0; j < numItens; j++) {
-      const produto = produtos[Math.floor(Math.random() * produtos.length)]
-      const quantidade = Math.floor(Math.random() * 2) + 1
-      const preco = Math.floor(Math.random() * 500) + 100
-      const precoOriginal = preco + Math.floor(Math.random() * 200)
-      itens.push({ id: produto.id, produto, quantidade, precoUnitario: preco, precoOriginal, subtotal: preco * quantidade })
-    }
-    const subtotal = itens.reduce((total, item) => total + item.subtotal, 0)
-    const desconto = Math.floor(Math.random() * 100)
-    const frete = subtotal >= 200 ? 0 : 15
-    const total = subtotal - desconto + frete
-    const diasAtras = Math.floor(Math.random() * 30)
-    const dataCriacao = new Date()
-    dataCriacao.setDate(dataCriacao.getDate() - diasAtras)
-    orders.push({
-      id: `PED${String(i).padStart(6, '0')}`,
-      dataCriacao: dataCriacao.toISOString(),
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      itens,
-      endereco: { rua: 'Rua das Flores', numero: '123', bairro: 'Centro', cidade: 'São Paulo', estado: 'SP', cep: '01234-567' },
-      pagamento: { metodo: 'PIX', status: 'PAGO' },
-      valores: { subtotal, desconto, frete, total },
-      usuario: { id: '1', nome: 'Usuário Teste', email: 'teste@exemplo.com' }
-    })
-  }
-  return orders
+  return fakerGenerateMockOrders(8)
 }
 
 function generateTrackingInfo(status) {

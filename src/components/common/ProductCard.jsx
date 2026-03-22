@@ -2,21 +2,16 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiShoppingCart, FiHeart } from 'react-icons/fi'
 import Button from './Button'
-import Badge from './Badge'
 
 /**
- * ProductCard Component
- * 
- * Card para exibir produto
+ * ProductCard Component — redesigned
  */
 export default function ProductCard({ product, onAddToCart, onToggleFavorite }) {
   const [imageError, setImageError] = useState(false)
+  const [addedFeedback, setAddedFeedback] = useState(false)
 
-  // Placeholder image used when the product image is missing or fails to load
-  const placeholder = 'https://placehold.co/600x400/transparent/F00'
+  const placeholder = 'https://placehold.co/600x400/f3f4f6/9ca3af?text=Sem+imagem'
 
-  // Log received image URL for debugging (can be removed later)
-  console.debug('ProductCard image URL:', product?.url_imagem)
   const {
     id,
     nome,
@@ -33,126 +28,127 @@ export default function ProductCard({ product, onAddToCart, onToggleFavorite }) 
   const precoFinal = precoPromocional || preco?.valor || preco || 0
   const temDesconto = precoPromocional && preco?.valor
   const disponivel = estoque > 0
+  const desconto = temDesconto
+    ? Math.round(((preco.valor - precoPromocional) / preco.valor) * 100)
+    : null
 
-  // Função segura para formatar valores
   const formatarValor = (valor) => {
-    if (typeof valor !== 'number' || isNaN(valor)) {
-      return 'R$ 0,00'
-    }
-    return `R$ ${valor.toFixed(2)}`
+    if (typeof valor !== 'number' || isNaN(valor)) return 'R$ 0,00'
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
   }
 
   const handleAddToCart = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    if (onAddToCart) {
-      onAddToCart(product)
-    }
+    if (!onAddToCart) return
+    onAddToCart(product)
+    setAddedFeedback(true)
+    setTimeout(() => setAddedFeedback(false), 1500)
   }
 
   const handleToggleFavorite = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    if (onToggleFavorite) {
-      onToggleFavorite(product)
-    }
+    if (onToggleFavorite) onToggleFavorite(product)
   }
 
   return (
     <Link
       to={`/produto/${id}`}
-      className="group block bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
+      className="group flex flex-col bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-200 overflow-hidden"
     >
-      {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden bg-gray-100">
+      {/* Image */}
+      <div className="relative aspect-square overflow-hidden bg-gray-50">
         {/* Badges */}
-        <div className="absolute top-2 left-2 z-10 flex flex-col gap-2">
-          {novo && <Badge variant="success">Novo</Badge>}
-          {emPromocao && <Badge variant="danger">Promoção</Badge>}
-          {!disponivel && <Badge variant="secondary">Esgotado</Badge>}
+        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
+          {novo && (
+            <span className="text-xs font-semibold bg-emerald-500 text-white px-2 py-0.5 rounded-full">
+              Novo
+            </span>
+          )}
+          {desconto && (
+            <span className="text-xs font-semibold bg-red-500 text-white px-2 py-0.5 rounded-full">
+              -{desconto}%
+            </span>
+          )}
+          {!disponivel && (
+            <span className="text-xs font-semibold bg-gray-400 text-white px-2 py-0.5 rounded-full">
+              Esgotado
+            </span>
+          )}
         </div>
 
-        {/* Favorite Button */}
+        {/* Favorite */}
         <button
           onClick={handleToggleFavorite}
-          className="absolute top-2 right-2 z-10 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50"
+          aria-label="Favoritar"
+          className="absolute top-3 right-3 z-10 p-1.5 bg-white rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500 text-gray-400"
         >
-          <FiHeart className="w-5 h-5 text-gray-600 hover:text-red-500" />
+          <FiHeart className="w-4 h-4" />
         </button>
 
-        {/* Product Image */}
         <img
           src={imageError || !url_imagem ? placeholder : url_imagem}
           alt={nome || 'Produto'}
           onError={() => setImageError(true)}
           loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-
-        {/* Discount Badge */}
-        {temDesconto && (
-          <div className="absolute bottom-2 right-2 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-bold">
-            -{Math.round(((preco.valor - precoPromocional) / preco.valor) * 100)}%
-          </div>
-        )}
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        {/* Category */}
+      <div className="flex flex-col flex-1 p-4 gap-2">
+        {/* Category label */}
         {categoria && (
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+          <p className="text-[11px] font-medium text-gray-400 uppercase tracking-widest">
             {categoria.nome || categoria}
           </p>
         )}
 
         {/* Title */}
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+        <h3 className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2 group-hover:text-primary-600 transition-colors">
           {nome}
         </h3>
 
-        {/* Description */}
-        {descricao && (
-          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-            {descricao}
-          </p>
-        )}
+        {/* Spacer */}
+        <div className="flex-1" />
 
         {/* Price */}
-        <div className="mb-3">
+        <div className="mt-1">
           {temDesconto && (
-            <p className="text-sm text-gray-500 line-through mb-1">
-              R$ {preco.valor.toFixed(2)}
+            <p className="text-xs text-gray-400 line-through">
+              {formatarValor(preco.valor)}
             </p>
           )}
-          <p className="text-2xl font-bold text-gray-900">
+          <p className={`text-xl font-bold tracking-tight ${temDesconto ? 'text-red-600' : 'text-gray-900'}`}>
             {formatarValor(precoFinal)}
           </p>
         </div>
 
-        {/* Stock Info */}
-        {disponivel ? (
-          estoque < 10 && (
-            <p className="text-sm text-orange-600 mb-3">
-              Apenas {estoque} {estoque === 1 ? 'unidade' : 'unidades'} disponível
-            </p>
-          )
-        ) : (
-          <p className="text-sm text-red-600 mb-3">
-            Produto esgotado
+        {/* Low stock warning */}
+        {disponivel && estoque < 10 && (
+          <p className="text-[11px] text-orange-500 font-medium">
+            Restam apenas {estoque} {estoque === 1 ? 'unidade' : 'unidades'}
           </p>
         )}
 
-        {/* Add to Cart Button */}
-        <Button
-          variant="primary"
-          fullWidth
-          leftIcon={<FiShoppingCart />}
+        {/* Add to Cart */}
+        <button
           onClick={handleAddToCart}
           disabled={!disponivel}
+          className={`
+            mt-2 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all duration-150
+            ${!disponivel
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : addedFeedback
+                ? 'bg-emerald-500 text-white'
+                : 'bg-primary-600 hover:bg-primary-700 text-white active:scale-95'
+            }
+          `}
         >
-          {disponivel ? 'Adicionar ao Carrinho' : 'Indisponível'}
-        </Button>
+          <FiShoppingCart className="w-4 h-4" />
+          {!disponivel ? 'Indisponível' : addedFeedback ? 'Adicionado!' : 'Adicionar ao carrinho'}
+        </button>
       </div>
     </Link>
   )
