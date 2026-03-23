@@ -1,6 +1,0 @@
-name: playwright-cli
-description: Run Playwright browser automation from the CLI
-command: playwright-cli
-args: []
-workingDirectory: .
-
