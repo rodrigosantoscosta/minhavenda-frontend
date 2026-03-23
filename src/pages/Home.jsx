@@ -154,17 +154,6 @@ export default function Home() {
             )}
           </div>
 
-            {selectedCategory && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleCategoryChange(null)}
-              >
-                Limpar filtro
-              </Button>
-            )}
-          </div>
-
           {/* Category Filter */}
           {categorias.length > 0 && (
             <div className="mb-8">
