@@ -40,27 +40,27 @@ export default function StatusBadge({
       label: 'Pago',
       description: 'Pagamento confirmado',
       color: 'info',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      textColor: 'text-blue-800',
+      bgColor: 'bg-primary-50',
+      borderColor: 'border-primary-200',
+      textColor: 'text-primary-800',
       icon: FiCheck
     },
     PROCESSANDO: {
       label: 'Processando',
       description: 'Em preparação',
       color: 'info',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      textColor: 'text-blue-800',
+      bgColor: 'bg-primary-50',
+      borderColor: 'border-primary-200',
+      textColor: 'text-primary-800',
       icon: FiRefreshCw
     },
     ENVIADO: {
       label: 'Enviado',
       description: 'A caminho',
       color: 'info',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      textColor: 'text-blue-800',
+      bgColor: 'bg-primary-50',
+      borderColor: 'border-primary-200',
+      textColor: 'text-primary-800',
       icon: FiTruck
     },
     ENTREGUE: {

@@ -74,9 +74,9 @@ const SortOptions = ({
             px-4 py-2.5
             bg-white border border-gray-300 rounded-lg
             text-sm text-gray-700
-            hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-            transition-colors duration-200
-            ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}
+            hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-500
+            transition-[border-color,box-shadow] duration-150
+            ${isOpen ? 'ring-2 ring-primary-500/40 border-primary-500' : ''}
           `}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
@@ -109,7 +109,7 @@ const SortOptions = ({
                       hover:bg-gray-100 focus:outline-none focus:bg-gray-100
                       transition-colors duration-150
                       ${option.value === value 
-                        ? 'bg-blue-50 text-blue-700 font-medium' 
+                        ? 'bg-primary-50 text-primary-700 font-medium' 
                         : 'text-gray-700'
                       }
                     `}
@@ -119,7 +119,7 @@ const SortOptions = ({
                     <div className="flex items-center justify-between">
                       <span>{option.label}</span>
                       {option.value === value && (
-                        <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="h-4 w-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       )}

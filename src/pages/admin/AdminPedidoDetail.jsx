@@ -5,7 +5,7 @@ import AdminLayout from '../../components/admin/AdminLayout'
 import adminService from '../../services/adminService'
 import {
   formatBRL, formatDate, formatDateTime, StatusBadge,
-  PageLoader, AdminCard, AdminModal, PageTitle,
+  PageLoader, AdminCard, AdminModal, PageTitle, Th, Tr,
   inputCls, inputStyle, FieldLabel, BtnPrimary, BtnSecondary,
 } from '../../utils/adminUtils'
 import { useToast } from '../../components/common/Toast'
@@ -122,18 +122,23 @@ export default function AdminPedidoDetail() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Link to="/admin/pedidos" className="transition-colors hover:text-white" style={{ color: '#6B7280' }}>
-            <FiArrowLeft size={20} />
-          </Link>
-          <div className="flex items-center gap-3 flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <Link to="/admin/pedidos" className="transition-colors hover:text-white shrink-0" style={{ color: '#6B7280' }}>
+              <FiArrowLeft size={20} />
+            </Link>
             <PageTitle>Pedido</PageTitle>
-            <span className="font-mono text-sm" style={{ color: '#9CA3AF' }}>{pedido.id.slice(0, 8).toUpperCase()}</span>
+            <span className="font-mono text-sm shrink-0" style={{ color: '#9CA3AF' }}>{pedido.id.slice(0, 8).toUpperCase()}</span>
             <StatusBadge status={pedido.status} />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {actions.map(a => (
-              <button key={a.key} onClick={() => setModal(a.key)} className="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style={a.style}>
+              <button
+                key={a.key}
+                onClick={() => setModal(a.key)}
+                className="px-3 py-2 rounded-xl text-sm font-sans font-medium transition-[background-color,transform] duration-150 active:scale-[0.96]"
+                style={a.style}
+              >
                 {a.label}
               </button>
             ))}
@@ -169,27 +174,29 @@ export default function AdminPedidoDetail() {
             {/* Items */}
             <AdminCard>
               <div className="px-6 py-4" style={{ borderBottom: '1px solid #1E2028' }}>
-                <p className="text-sm font-semibold text-white">Itens do Pedido</p>
+                <p className="text-sm font-display font-semibold text-white">Itens do Pedido</p>
               </div>
-              <table className="w-full">
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #1E2028' }}>
-                    {['Produto', 'Qtd', 'Preço Unit.', 'Subtotal'].map(h => (
-                      <th key={h} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#6B7280' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {pedido.itens.map(item => (
-                    <tr key={item.id} style={{ borderBottom: '1px solid #1E2028' }}>
-                      <td className="px-6 py-3 text-sm text-white">{item.produtoNome}</td>
-                      <td className="px-6 py-3 text-sm font-mono" style={{ color: '#9CA3AF' }}>{item.quantidade}</td>
-                      <td className="px-6 py-3 text-sm font-mono" style={{ color: '#9CA3AF' }}>{formatBRL(item.precoUnitario)}</td>
-                      <td className="px-6 py-3 text-sm font-mono font-medium text-white">{formatBRL(item.subtotal)}</td>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr>
+                      {['Produto', 'Qtd', 'Preço Unit.', 'Subtotal'].map(h => (
+                        <Th key={h}>{h}</Th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {pedido.itens.map(item => (
+                      <Tr key={item.id}>
+                        <td className="px-6 py-3 text-sm font-sans text-white">{item.produtoNome}</td>
+                        <td className="px-6 py-3 text-sm font-mono tabular-nums" style={{ color: '#9CA3AF' }}>{item.quantidade}</td>
+                        <td className="px-6 py-3 text-sm font-mono tabular-nums" style={{ color: '#9CA3AF' }}>{formatBRL(item.precoUnitario)}</td>
+                        <td className="px-6 py-3 text-sm font-mono font-bold tabular-nums text-white">{formatBRL(item.subtotal)}</td>
+                      </Tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </AdminCard>
 
             {/* Address + tracking */}

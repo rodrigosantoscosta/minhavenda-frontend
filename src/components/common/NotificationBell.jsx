@@ -38,7 +38,7 @@ export default function NotificationBell() {
   // Ícone por tipo
   function TypeIcon({ type }) {
     if (type === 'cancelled') return <FiXCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-    if (type === 'status_change') return <FiRefreshCw className="w-4 h-4 text-blue-500 flex-shrink-0" />
+    if (type === 'status_change') return <FiRefreshCw className="w-4 h-4 text-primary-500 flex-shrink-0" />
     return <FiPackage className="w-4 h-4 text-primary-500 flex-shrink-0" />
   }
 
@@ -72,7 +72,7 @@ export default function NotificationBell() {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+        <div className="absolute right-0 mt-1.5 w-80 bg-white rounded-2xl shadow-dropdown z-50 overflow-hidden">
           {/* Header do dropdown */}
           <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
             <span className="text-sm font-semibold text-gray-900">Notificações</span>
@@ -96,13 +96,13 @@ export default function NotificationBell() {
                   key={notif.id}
                   onClick={() => handleItemClick(notif)}
                   className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex gap-3 items-start ${
-                    !notif.read ? 'bg-blue-50 hover:bg-blue-100' : ''
+                    !notif.read ? 'bg-primary-50 hover:bg-primary-100' : ''
                   }`}
                 >
                   {/* Dot de não lida */}
                   <div className="mt-0.5">
                     {!notif.read && (
-                      <span className="block w-2 h-2 rounded-full bg-blue-500 mt-1" />
+                      <span className="block w-2 h-2 rounded-full bg-primary-500 mt-1" />
                     )}
                     {notif.read && <span className="block w-2 h-2" />}
                   </div>

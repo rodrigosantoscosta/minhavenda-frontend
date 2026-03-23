@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell, PieChart, Pie, Legend, Resp
 import { FiAlertTriangle, FiDollarSign, FiShoppingCart, FiClock, FiAlertOctagon } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
 import adminService from '../../services/adminService'
-import { formatBRL, PageLoader, AdminCard, PageTitle } from '../../utils/adminUtils'
+import { formatBRL, PageLoader, AdminCard, PageTitle, Th, Tr } from '../../utils/adminUtils'
 import { useToast } from '../../components/common/Toast'
 
 const STATUS_COLORS = {
@@ -123,32 +123,34 @@ export default function AdminDashboard() {
                 {stats.estoqueBaixo.length} produto{stats.estoqueBaixo.length !== 1 ? 's' : ''}
               </span>
             </div>
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: '1px solid #1E2028' }}>
-                  {['Produto', 'Quantidade', ''].map(h => (
-                    <th key={h} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#6B7280' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {stats.estoqueBaixo.map(item => (
-                  <tr key={item.produtoId} style={{ borderBottom: '1px solid #1E2028' }}>
-                    <td className="px-6 py-3 text-sm text-white">{item.nome}</td>
-                    <td className="px-6 py-3">
-                      <span className="text-sm font-mono px-2 py-0.5 rounded" style={{ color: '#EF4444', backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
-                        {item.quantidade} un
-                      </span>
-                    </td>
-                    <td className="px-6 py-3 text-right">
-                      <Link to="/admin/estoque" className="text-xs transition-colors hover:underline" style={{ color: '#F97316' }}>
-                        Ajustar Estoque →
-                      </Link>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    {['Produto', 'Quantidade', ''].map(h => (
+                      <Th key={h}>{h}</Th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {stats.estoqueBaixo.map(item => (
+                    <Tr key={item.produtoId}>
+                      <td className="px-6 py-3 text-sm font-sans text-white">{item.nome}</td>
+                      <td className="px-6 py-3">
+                        <span className="text-sm font-mono tabular-nums px-2 py-0.5 rounded-md" style={{ color: '#EF4444', backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                          {item.quantidade} un
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-right">
+                        <Link to="/admin/estoque" className="text-xs font-sans transition-colors hover:underline" style={{ color: '#F97316' }}>
+                          Ajustar Estoque →
+                        </Link>
+                      </td>
+                    </Tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </AdminCard>
         )}
 

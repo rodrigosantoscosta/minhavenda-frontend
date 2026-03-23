@@ -1,36 +1,51 @@
-// src/components/common/EmptyState.jsx - ESTADO VAZIO
-export default function EmptyState({ 
-  icon, 
-  title, 
-  description, 
-  action 
-}) {
+/**
+ * EmptyState — better visual hierarchy with staggered entrance.
+ * Skill: split + stagger, text-balance on heading, text-pretty on description.
+ */
+export default function EmptyState({ icon, title, description, action }) {
   return (
-    <div className="text-center py-16 px-4">
-      {/* Ícone */}
+    <div className="flex flex-col items-center text-center py-20 px-4">
+
+      {/* Icon in a soft circle with depth */}
       {icon && (
-        <div className="flex justify-center mb-6 text-gray-400">
-          {icon}
+        <div
+          className="relative mb-7 animate-fadeInUp"
+          style={{ animationDelay: '0ms' }}
+        >
+          {/* Outer soft ring */}
+          <div className="absolute inset-0 rounded-full bg-gray-100 scale-125 opacity-50" />
+          <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 text-gray-400">
+            {icon}
+          </div>
         </div>
       )}
 
-      {/* Título */}
+      {/* Title — skill: text-balance */}
       {title && (
-        <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+        <h3
+          className="font-display font-bold text-xl text-gray-900 mb-3 text-balance animate-fadeInUp"
+          style={{ animationDelay: '80ms' }}
+        >
           {title}
         </h3>
       )}
 
-      {/* Descrição */}
+      {/* Description — skill: text-pretty */}
       {description && (
-        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+        <p
+          className="font-sans text-gray-500 text-sm leading-relaxed mb-8 max-w-sm text-pretty animate-fadeInUp"
+          style={{ animationDelay: '160ms' }}
+        >
           {description}
         </p>
       )}
 
-      {/* Ação (botão, link, etc) */}
+      {/* Action */}
       {action && (
-        <div className="flex justify-center">
+        <div
+          className="animate-fadeInUp"
+          style={{ animationDelay: '240ms' }}
+        >
           {action}
         </div>
       )}

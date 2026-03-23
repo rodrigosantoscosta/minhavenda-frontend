@@ -1,22 +1,43 @@
+/**
+ * Loading — brand-aligned spinner with fadeIn entrance.
+ * Skill: specific transition properties, no transition-all.
+ */
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary-600"></div>
-        <p className="mt-4 text-gray-600 font-medium">Carregando...</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 animate-fadeIn">
+      <div className="flex flex-col items-center gap-5">
+        {/* Brand spinner — single ring in primary, GPU-composited */}
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-primary-100" />
+          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary-600 animate-spin" />
+        </div>
+        {/* Staggered text — skill: fadeInUp with delay */}
+        <div className="text-center" style={{ animationDelay: '120ms' }}>
+          <p className="font-display font-semibold text-gray-800 text-sm animate-fadeInUp">
+            Carregando
+          </p>
+          <p className="font-sans text-gray-400 text-xs mt-1 animate-fadeInUp" style={{ animationDelay: '200ms' }}>
+            Aguarde um momento...
+          </p>
+        </div>
       </div>
     </div>
   )
 }
 
-export function Spinner({ size = 'md' }) {
-  const sizeClasses = {
-    sm: 'h-4 w-4 border-2',
-    md: 'h-8 w-8 border-2',
-    lg: 'h-16 w-16 border-4',
+/**
+ * Spinner — inline, for use within other components.
+ */
+export function Spinner({ size = 'md', className = '' }) {
+  const sizes = {
+    sm: 'w-4 h-4 border-2',
+    md: 'w-7 h-7 border-2',
+    lg: 'w-11 h-11 border-2',
   }
-
   return (
-    <div className={`inline-block animate-spin rounded-full border-t-primary-600 border-b-primary-600 ${sizeClasses[size]}`}></div>
+    <div className={`relative shrink-0 ${sizes[size] ? '' : ''} ${className}`}>
+      <div className={`rounded-full border-primary-100 ${sizes[size] || sizes.md}`} />
+      <div className={`absolute inset-0 rounded-full border-transparent border-t-primary-600 animate-spin ${sizes[size] || sizes.md}`} />
+    </div>
   )
 }

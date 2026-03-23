@@ -80,14 +80,14 @@ export default function AdminDLQ() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {queues.map(queue => (
               <AdminCard key={queue} className="p-6 hover:border-orange-500/30 transition-colors">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
                   <FiAlertOctagon size={16} style={{ color: '#EF4444' }} />
                 </div>
                 <p className="text-xs font-mono break-all mb-4" style={{ color: '#9CA3AF' }}>{queue}</p>
                 <button
                   onClick={() => handleRequeue(queue)}
                   disabled={requeueing === queue}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
                   style={{ color: '#F97316', backgroundColor: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)' }}
                 >
                   <FiRefreshCw size={14} className={requeueing === queue ? 'animate-spin' : ''} />

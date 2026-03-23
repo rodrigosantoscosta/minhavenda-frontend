@@ -74,7 +74,7 @@ export default function AdminEditProduto() {
             <AdminCard className="p-6 space-y-4">
               <div><FieldLabel>Nome *</FieldLabel><input required className={inputCls} style={inputStyle} value={form.nome} onChange={set('nome')} /></div>
               <div><FieldLabel>Descrição *</FieldLabel><textarea required rows={4} className={`${inputCls} resize-none`} style={inputStyle} value={form.descricao} onChange={set('descricao')} /></div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><FieldLabel>Preço (BRL) *</FieldLabel><input required type="number" step="0.01" className={inputCls} style={inputStyle} value={form.preco} onChange={set('preco')} /></div>
                 <div>
                   <FieldLabel>Categoria</FieldLabel>
@@ -88,7 +88,7 @@ export default function AdminEditProduto() {
 
             <AdminCard className="p-6 space-y-4">
               <p className="text-sm font-semibold text-white">Dimensões e Peso</p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[['Peso (kg)', 'pesoKg'], ['Altura (cm)', 'alturaCm'], ['Largura (cm)', 'larguraCm'], ['Comprimento (cm)', 'comprimentoCm']].map(([lbl, k]) => (
                   <div key={k}><FieldLabel>{lbl}</FieldLabel><input type="number" step="0.01" className={inputCls} style={inputStyle} value={form[k]} onChange={set(k)} /></div>
                 ))}
@@ -101,7 +101,7 @@ export default function AdminEditProduto() {
             <AdminCard className="p-6">
               <p className="text-sm font-semibold text-white mb-3">Imagem</p>
               {form.urlImagem && (
-                <img src={form.urlImagem} alt="preview" className="w-full aspect-square object-cover rounded-lg mb-3" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />
+                <img src={form.urlImagem} alt="preview" className="w-full aspect-square object-cover rounded-xl mb-3" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />
               )}
               <FieldLabel>URL da Imagem</FieldLabel>
               <input className={inputCls} style={inputStyle} value={form.urlImagem} onChange={set('urlImagem')} placeholder="https://..." />

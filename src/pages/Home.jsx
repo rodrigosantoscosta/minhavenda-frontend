@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import productService from '../services/productService'
 import ProductCard from '../components/common/products/ProductCard'
 import CategoryFilter from '../components/product/CategoryFilter'
-import Hero from '../components/home/Hero'
-import FeaturedCategories from '../components/home/FeaturedCategories'
 import ProductsGrid from '../components/product/ProductsGrid'
 import Pagination from '../components/common/Pagination'
 import Loading from '../components/common/Loading'
@@ -13,7 +10,6 @@ import { useScrollOnPageChange } from '../hooks/useScrollOnPageChange'
 import EmptyState from '../components/common/EmptyState'
 import Button from '../components/common/Button'
 import logger from '../utils/logger'
-
 
 import { 
   FiShoppingBag, 
@@ -23,28 +19,23 @@ import {
 export default function Home() {
   const { addItem } = useCart()
 
-  // Estados
   const [produtos, setProdutos] = useState([])
   const [categorias, setCategorias] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   
-  // Paginação
-  const [page, setPage] = useState(0) // Backend usa 0-indexed // Backend usa 0-indexed
+  const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const pageSize = 12
   useScrollOnPageChange(page)
 
-  // Filtros
   const [selectedCategory, setSelectedCategory] = useState(null)
 
-  // Carregar dados ao montar
   useEffect(() => {
     loadInitialData()
   }, [])
 
-  // Recarregar produtos quando categoria ou página mudar
   useEffect(() => {
     if (!loading) {
       loadProdutos()
@@ -54,8 +45,6 @@ export default function Home() {
   const loadInitialData = async () => {
     try {
       setLoading(true)
-      logger.info('Carregando dados iniciais')
-      
       await Promise.all([
         loadCategorias(),
         loadProdutos(),
@@ -69,17 +58,8 @@ export default function Home() {
 
   const loadCategorias = async () => {
     try {
-      logger.info('Buscando categorias')
       const data = await productService.getCategorias()
-      logger.debug({ data }, 'Categorias recebidas')
-      
-      // Verifica se é array
-      if (Array.isArray(data)) {
-        setCategorias(data)
-      } else {
-        logger.warn({ data }, 'Categorias não é um array')
-        setCategorias([])
-      }
+      setCategorias(Array.isArray(data) ? data : [])
     } catch (error) {
       logger.error({ error }, 'Erro ao carregar categorias')
       setCategorias([])
@@ -88,61 +68,35 @@ export default function Home() {
 
   const loadProdutos = async () => {
     try {
-      if (page === 0) {
-        setLoading(true)
-      } else {
-        setLoadingMore(true)
-      }
+      if (page === 0) setLoading(true)
+      else setLoadingMore(true)
 
       const params = {
-        page: page,
+        page,
         size: pageSize,
         sort: 'dataCriacao,desc',
-        ativo: true
+        ativo: true,
       }
+      if (selectedCategory) params.categoriaId = selectedCategory
 
-      if (selectedCategory) {
-        params.categoriaId = selectedCategory
-      }
-
-      logger.info({ params }, 'Buscando produtos')
       const data = await productService.getProdutos(params)
-      logger.debug({ data }, 'Resposta completa do backend')
 
-      // TRATAMENTO CORRETO DOS DADOS
       let produtosArray = []
-      
-      // Cenário 1: Resposta paginada (Spring Page)
-      if (data && data.content && Array.isArray(data.content)) {
-        logger.info('Resposta paginada detectada')
+      if (data?.content && Array.isArray(data.content)) {
         produtosArray = data.content
         setTotalPages(data.totalPages || 0)
         setTotalElements(data.totalElements || 0)
-      }
-      // Cenário 2: Array direto
-      else if (Array.isArray(data)) {
-        logger.info('Array direto detectado')
+      } else if (Array.isArray(data)) {
         produtosArray = data
         setTotalPages(1)
         setTotalElements(data.length)
-      }
-      // Cenário 3: Objeto com produtos
-      else if (data && data.produtos && Array.isArray(data.produtos)) {
-        logger.info('Objeto com array de produtos detectado')
+      } else if (data?.produtos && Array.isArray(data.produtos)) {
         produtosArray = data.produtos
         setTotalPages(data.totalPages || 1)
         setTotalElements(data.total || data.produtos.length)
       }
-      else {
-        logger.warn({ data }, 'Formato de resposta desconhecido')
-        produtosArray = []
-      }
-
-      logger.info({ itemCount: produtosArray.length }, 'Produtos processados')
-      logger.debug({ totalPages, totalElements, currentPage: page }, 'Dados de paginação')
 
       setProdutos(produtosArray)
-      
     } catch (error) {
       logger.error({ error }, 'Erro ao carregar produtos')
       setProdutos([])
@@ -153,82 +107,54 @@ export default function Home() {
   }
 
   const handleAddToCart = (produto) => {
-    logger.info({ produtoId: produto.id, nome: produto.nome }, 'Adicionando ao carrinho')
     addItem(produto, 1)
   }
 
   const handleCategoryChange = (categoryId) => {
-    logger.info({ categoryId }, 'Mudando categoria')
     setSelectedCategory(categoryId)
-    setPage(0) // Reset para primeira página
+    setPage(0)
   }
 
   const handlePageChange = (newPage) => {
-    logger.info({ newPage }, 'Mudando página')
-    setPage(newPage - 1) // Converter para 0-indexed
+    setPage(newPage - 1)
   }
 
   if (loading && page === 0) {
     return <Loading />
   }
 
-  logger.debug({ produtosCount: produtos.length }, 'Renderizando Home')
-
   return (
-    <div className="bg-gray-50">
-      {/* Hero Section */}
-      <Hero />
-
-      {/* Featured Categories */}
-      {categorias.length > 0 && (
-        <section className="py-12 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Categorias em Destaque
-              </h2>
-              <p className="text-gray-600">
-                Encontre o que você procura
-              </p>
-            </div>
-            <FeaturedCategories 
-              categorias={categorias} 
-              onCategorySelect={handleCategoryChange}
-              selectedCategory={selectedCategory}
-            />
-          </div>
-        </section>
-      )}
-
+    <div className="bg-gray-50 min-h-screen">
       {/* Catálogo Principal */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center">
-              <FiPackage className="text-primary-600 mr-3" size={28} />
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900">
-                  {selectedCategory 
-                    ? categorias.find(c => c.id === selectedCategory)?.nome 
-                    : 'Todos os Produtos'}
-                </h2>
-                <p className="text-gray-600 mt-1">
-                  {totalElements} {totalElements === 1 ? 'produto' : 'produtos'} encontrados
+          {/* Section Header — skill: text-balance heading, tabular-nums count, stagger */}
+          <div className="flex items-end justify-between mb-6 border-b border-gray-100 pb-5">
+            <div className="animate-fadeInUp">
+              <h1 className="font-display font-bold text-2xl text-gray-900 tracking-tight text-balance">
+                {selectedCategory
+                  ? categorias.find(c => c.id === selectedCategory)?.nome
+                  : 'Todos os Produtos'}
+              </h1>
+              {totalElements > 0 && (
+                <p className="font-sans text-sm text-gray-400 mt-1 tabular-nums animate-fadeInUp" style={{ animationDelay: '80ms' }}>
+                  {totalElements} {totalElements === 1 ? 'produto' : 'produtos'}
                 </p>
-              </div>
+              )}
             </div>
-            
+
             {selectedCategory && (
               <Button
                 variant="ghost"
+                size="sm"
                 onClick={() => handleCategoryChange(null)}
               >
-                Limpar Filtro
+                Limpar filtro
               </Button>
             )}
           </div>
 
-          {/* Filtro de Categorias */}
+          {/* Category Filter */}
           {categorias.length > 0 && (
             <div className="mb-8">
               <CategoryFilter
@@ -239,23 +165,15 @@ export default function Home() {
             </div>
           )}
 
-          {/* Debug Info (REMOVER EM PRODUÇÃO) */}
-          {/* <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-sm text-blue-800">
-               Debug: {produtos.length} produtos no estado | Página: {page + 1} | Total Páginas: {totalPages}
-              
-            </p>
-          </div> */}
-
-          {/* Grid de Produtos */}
+          {/* Products */}
           {produtos.length === 0 ? (
             <EmptyState
               icon={<FiShoppingBag size={64} />}
               title="Nenhum produto encontrado"
               description={
                 selectedCategory
-                  ? "Não há produtos nesta categoria no momento"
-                  : "Estamos preparando novidades para você!"
+                  ? 'Não há produtos nesta categoria no momento'
+                  : 'Estamos preparando novidades para você!'
               }
               action={
                 selectedCategory && (
@@ -273,11 +191,10 @@ export default function Home() {
                 loading={loadingMore}
               />
 
-              {/* Paginação */}
               {totalPages > 1 && (
                 <div className="mt-12">
                   <Pagination
-                    currentPage={page + 1} // Converter para 1-indexed para UI
+                    currentPage={page + 1}
                     totalPages={totalPages}
                     onPageChange={handlePageChange}
                   />
@@ -287,25 +204,6 @@ export default function Home() {
           )}
         </div>
       </section>
-
-      {/* Call to Action */}
-      {/* <section className="py-16 bg-gradient-to-r from-primary-600 to-primary-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Não encontrou o que procura?
-          </h2>
-          <p className="text-primary-100 mb-8 text-lg">
-            Explore nossa coleção completa de produtos
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/produtos">
-              <Button variant="white" size="lg">
-                Ver Todos os Produtos
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section> */}
     </div>
   )
 }

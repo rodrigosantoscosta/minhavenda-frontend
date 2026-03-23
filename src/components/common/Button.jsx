@@ -3,15 +3,16 @@ import { FiLoader } from 'react-icons/fi'
 
 /**
  * Button Component
- * 
- * @param {string} variant - primary | secondary | outline | danger | ghost
- * @param {string} size - sm | md | lg
- * @param {boolean} loading - Mostra spinner
- * @param {boolean} disabled - Desabilita botão
- * @param {boolean} fullWidth - Largura total
- * @param {ReactNode} children - Conteúdo do botão
- * @param {ReactNode} leftIcon - Ícone à esquerda
- * @param {ReactNode} rightIcon - Ícone à direita
+ *
+ * @param {string}    variant   - primary | secondary | outline | danger | ghost | white | success
+ * @param {string}    size      - sm | md | lg
+ * @param {boolean}   loading   - Shows spinner
+ * @param {boolean}   disabled  - Disables button
+ * @param {boolean}   fullWidth - Full width
+ * @param {boolean}   static    - Disables scale-on-press (for contexts where motion is distracting)
+ * @param {ReactNode} children
+ * @param {ReactNode} leftIcon
+ * @param {ReactNode} rightIcon
  */
 const Button = forwardRef(({
   variant = 'primary',
@@ -19,44 +20,49 @@ const Button = forwardRef(({
   loading = false,
   disabled = false,
   fullWidth = false,
+  static: isStatic = false,
   children,
   leftIcon,
   rightIcon,
   className = '',
   ...props
 }, ref) => {
-  
-  // Base styles
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
-  
-  // Size variants
+
+  // Skill: specify exact transition properties — never use transition-all
+  const baseStyles = [
+    'inline-flex items-center justify-center font-sans font-medium rounded-xl',
+    'transition-[background-color,color,box-shadow,transform,opacity] duration-150',
+    'focus:outline-none focus:ring-2 focus:ring-offset-2',
+    'disabled:opacity-50 disabled:cursor-not-allowed',
+    // Skill: scale-on-press (0.96) — disabled when isStatic or disabled
+    !isStatic && !disabled ? 'active:not-disabled:scale-[0.96]' : '',
+  ].join(' ')
+
   const sizeStyles = {
-    sm: 'px-2.5 py-1 text-xs',
-    md: 'px-3.5 py-1.5 text-sm',
-    lg: 'px-5 py-2 text-base',
+    sm: 'px-3 py-1.5 text-xs gap-1.5',
+    md: 'px-4 py-2 text-sm gap-2',
+    lg: 'px-5 py-2.5 text-base gap-2',
   }
-  
-  // Color variants
+
+  // Skill: shadows-as-borders for elevation variants
   const variantStyles = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus:ring-primary-500 shadow-sm hover:shadow-md',
-    secondary: 'bg-gray-600 text-white hover:bg-gray-700 active:bg-gray-800 focus:ring-gray-500 shadow-sm hover:shadow-md',
-    outline: 'bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50 active:bg-primary-100 focus:ring-primary-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-500 shadow-sm hover:shadow-md',
-    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-500',
-    success: 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800 focus:ring-green-500 shadow-sm hover:shadow-md',
+    primary:   'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus:ring-primary-500/50 shadow-card hover:shadow-card-hover',
+    secondary: 'bg-gray-700 text-white hover:bg-gray-800 active:bg-gray-900 focus:ring-gray-500/50 shadow-card hover:shadow-card-hover',
+    outline:   'bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50 active:bg-primary-100 focus:ring-primary-500/50',
+    danger:    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-500/50 shadow-card hover:shadow-card-hover',
+    ghost:     'bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-400/50',
+    // Skill: white variant used by ProductCard hover overlay
+    white:     'bg-white text-gray-900 hover:bg-gray-50 active:bg-gray-100 focus:ring-gray-400/50 shadow-card hover:shadow-card-hover',
+    success:   'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 focus:ring-emerald-500/50 shadow-card hover:shadow-card-hover',
   }
-  
-  // Width
-  const widthStyles = fullWidth ? 'w-full' : ''
-  
-  // Combined classes
-  const classes = `
-    ${baseStyles}
-    ${sizeStyles[size]}
-    ${variantStyles[variant]}
-    ${widthStyles}
-    ${className}
-  `.trim().replace(/\s+/g, ' ')
+
+  const classes = [
+    baseStyles,
+    sizeStyles[size] || sizeStyles.md,
+    variantStyles[variant] || variantStyles.primary,
+    fullWidth ? 'w-full' : '',
+    className,
+  ].join(' ').replace(/\s+/g, ' ').trim()
 
   return (
     <button
@@ -65,27 +71,13 @@ const Button = forwardRef(({
       disabled={disabled || loading}
       {...props}
     >
-      {/* Left Icon */}
-      {leftIcon && !loading && (
-        <span className="mr-2">{leftIcon}</span>
-      )}
-      
-      {/* Loading Spinner */}
-      {loading && (
-        <FiLoader className="w-4 h-4 mr-2 animate-spin" />
-      )}
-      
-      {/* Content */}
+      {loading && <FiLoader className="w-4 h-4 animate-spin shrink-0" />}
+      {!loading && leftIcon && <span className="shrink-0">{leftIcon}</span>}
       <span>{children}</span>
-      
-      {/* Right Icon */}
-      {rightIcon && !loading && (
-        <span className="ml-2">{rightIcon}</span>
-      )}
+      {!loading && rightIcon && <span className="shrink-0">{rightIcon}</span>}
     </button>
   )
 })
 
 Button.displayName = 'Button'
-
 export default Button

@@ -1,52 +1,60 @@
-export default function CategoryFilter({ 
-  categorias = [], 
-  selectedCategory, 
-  onCategoryChange 
+/**
+ * CategoryFilter — horizontal scroll pills with fade hint and active lift.
+ * Skill: specific transition properties, shadows-as-borders, scale on press.
+ */
+export default function CategoryFilter({
+  categorias = [],
+  selectedCategory,
+  onCategoryChange
 }) {
-  if (categorias.length === 0) {
-    return null
-  }
+  if (categorias.length === 0) return null
+
+  const pillBase = [
+    'px-4 py-1.5 rounded-full font-sans font-medium text-sm whitespace-nowrap',
+    'transition-[background-color,color,box-shadow,transform] duration-150',
+    'active:scale-[0.96]',
+    'focus:outline-none focus:ring-2 focus:ring-primary-500/40',
+  ].join(' ')
+
+  const pillActive   = 'bg-primary-600 text-white shadow-card'
+  const pillInactive = 'bg-white text-gray-600 shadow-card hover:shadow-card-hover hover:text-gray-900'
 
   return (
-    <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-      {/* Botão "Todas" */}
-      <button
-        onClick={() => onCategoryChange(null)}
-        className={`
-          px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all
-          ${!selectedCategory
-            ? 'bg-primary-600 text-white shadow-md'
-            : 'bg-white text-gray-700 border border-gray-300 hover:border-primary-300 hover:bg-primary-50'
-          }
-        `}
-      >
-        Todas
-      </button>
-
-      {/* Botões de Categorias */}
-      {categorias.map(categoria => (
+    // Skill: right-side fade hint via mask-image to signal overflow
+    <div
+      className="relative"
+      style={{
+        maskImage: 'linear-gradient(to right, transparent 0%, black 2%, black 90%, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 2%, black 90%, transparent 100%)',
+      }}
+    >
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide px-2">
+        {/* "Todas" pill */}
         <button
-          key={categoria.id}
-          onClick={() => onCategoryChange(categoria.id)}
-          className={`
-            px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all
-            ${selectedCategory === categoria.id
-              ? 'bg-primary-600 text-white shadow-md'
-              : 'bg-white text-gray-700 border border-gray-300 hover:border-primary-300 hover:bg-primary-50'
-            }
-          `}
+          onClick={() => onCategoryChange(null)}
+          className={`${pillBase} ${!selectedCategory ? pillActive : pillInactive}`}
         >
-          {categoria.nome}
-          {categoria.totalProdutos > 0 && (
-            <span className={`
-              ml-2 text-xs
-              ${selectedCategory === categoria.id ? 'text-primary-100' : 'text-gray-500'}
-            `}>
-              ({categoria.totalProdutos})
-            </span>
-          )}
+          Todas
         </button>
-      ))}
+
+        {/* Category pills */}
+        {categorias.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => onCategoryChange(cat.id)}
+            className={`${pillBase} ${selectedCategory === cat.id ? pillActive : pillInactive}`}
+          >
+            {cat.nome}
+            {cat.totalProdutos > 0 && (
+              <span className={`ml-1.5 text-[11px] tabular-nums ${
+                selectedCategory === cat.id ? 'opacity-70' : 'text-gray-400'
+              }`}>
+                {cat.totalProdutos}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

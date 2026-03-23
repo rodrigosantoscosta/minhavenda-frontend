@@ -52,7 +52,7 @@ function CreateModal({ open, onClose, categorias, onCreated }) {
         <div className="col-span-2">
           <FieldLabel>URL da Imagem</FieldLabel>
           <input className={inputCls} style={inputStyle} value={form.urlImagem} onChange={set('urlImagem')} placeholder="https://..." />
-          {form.urlImagem && <img src={form.urlImagem} alt="preview" className="mt-2 h-16 w-16 object-cover rounded-lg" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />}
+          {form.urlImagem && <img src={form.urlImagem} alt="preview" className="mt-2 h-16 w-16 object-cover rounded-xl" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />}
         </div>
         <div><FieldLabel>Peso (kg)</FieldLabel><input type="number" step="0.01" className={inputCls} style={inputStyle} value={form.pesoKg} onChange={set('pesoKg')} /></div>
         <div><FieldLabel>Altura (cm)</FieldLabel><input type="number" className={inputCls} style={inputStyle} value={form.alturaCm} onChange={set('alturaCm')} /></div>
@@ -120,7 +120,7 @@ export default function AdminProdutos() {
             <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#6B7280' }} />
             <input
               placeholder="Buscar por nome..."
-              className="w-full rounded-lg pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none transition-colors"
+              className="w-full rounded-xl pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none transition-colors"
               style={{ backgroundColor: '#111318', border: '1px solid #1E2028' }}
               value={search} onChange={e => setSearch(e.target.value)}
             />
@@ -136,46 +136,73 @@ export default function AdminProdutos() {
           </select>
         </div>
 
-        <AdminCard>
+        {/* Mobile card grid */}
+        <div className="sm:hidden space-y-3">
           {loading ? <PageLoader /> : produtos.length === 0 ? <EmptyState /> : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead><tr style={{ borderBottom: '1px solid #1E2028' }}>
-                  <Th></Th><Th>Nome</Th><Th>Categoria</Th><Th>Preço</Th><Th>Status</Th><Th>Ações</Th>
-                </tr></thead>
-                <tbody>
-                  {produtos.map(p => (
-                    <Tr key={p.id}>
-                      <td className="px-5 py-3 w-12">
-                        {p.urlImagem
-                          ? <img src={p.urlImagem} alt={p.nome} className="w-10 h-10 rounded-lg object-cover" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />
-                          : <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#1E2028' }}><FiPackage size={16} style={{ color: '#6B7280' }} /></div>}
-                      </td>
-                      <td className="px-5 py-3">
-                        <p className="text-sm font-medium text-white">{p.nome}</p>
-                        <p className="text-xs truncate max-w-xs" style={{ color: '#6B7280' }}>{p.descricao}</p>
-                      </td>
-                      <td className="px-5 py-3 text-sm" style={{ color: '#9CA3AF' }}>{p.categoriaNome || '—'}</td>
-                      <td className="px-5 py-3 text-sm font-mono font-medium text-white">{formatBRL(p.preco)}</td>
-                      <td className="px-5 py-3">
-                        <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded-md"
-                          style={p.ativo ? { color: '#22C55E', backgroundColor: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' } : { color: '#6B7280', backgroundColor: '#1E2028', border: '1px solid #2a2d38' }}>
-                          {p.ativo ? 'Ativo' : 'Inativo'}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-2">
-                          <Link to={`/admin/produtos/${p.id}`} className="p-1.5 rounded-md transition-colors hover:text-orange-400" style={{ color: '#6B7280' }}><FiEdit2 size={14} /></Link>
-                          <button onClick={() => setDeleteId(p.id)} className="p-1.5 rounded-md transition-colors hover:text-red-400" style={{ color: '#6B7280' }}><FiTrash2 size={14} /></button>
-                        </div>
-                      </td>
-                    </Tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            produtos.map(p => (
+              <AdminCard key={p.id} className="p-4">
+                <div className="flex items-start gap-3">
+                  {p.urlImagem
+                    ? <img src={p.urlImagem} alt={p.nome} className="w-12 h-12 rounded-xl object-cover shrink-0" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />
+                    : <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: '#1E2028' }}><FiPackage size={18} style={{ color: '#6B7280' }} /></div>}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">{p.nome}</p>
+                    <p className="text-xs font-sans" style={{ color: '#6B7280' }}>{p.categoriaNome || '—'}</p>
+                    <p className="text-sm font-mono font-bold text-white mt-1 tabular-nums">{formatBRL(p.preco)}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Link to={`/admin/produtos/${p.id}`} className="p-2 rounded-xl transition-colors" style={{ color: '#6B7280' }}><FiEdit2 size={15} /></Link>
+                    <button onClick={() => setDeleteId(p.id)} className="p-2 rounded-xl transition-colors" style={{ color: '#6B7280' }}><FiTrash2 size={15} /></button>
+                  </div>
+                </div>
+              </AdminCard>
+            ))
           )}
-        </AdminCard>
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden sm:block">
+          <AdminCard>
+            {loading ? <PageLoader /> : produtos.length === 0 ? <EmptyState /> : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead><tr>
+                    <Th></Th><Th>Nome</Th><Th>Categoria</Th><Th>Preço</Th><Th>Status</Th><Th>Ações</Th>
+                  </tr></thead>
+                  <tbody>
+                    {produtos.map(p => (
+                      <Tr key={p.id}>
+                        <td className="px-5 py-3 w-12">
+                          {p.urlImagem
+                            ? <img src={p.urlImagem} alt={p.nome} className="w-10 h-10 rounded-xl object-cover" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />
+                            : <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#1E2028' }}><FiPackage size={16} style={{ color: '#6B7280' }} /></div>}
+                        </td>
+                        <td className="px-5 py-3">
+                          <p className="text-sm font-medium text-white">{p.nome}</p>
+                          <p className="text-xs truncate max-w-xs font-sans" style={{ color: '#6B7280' }}>{p.descricao}</p>
+                        </td>
+                        <td className="px-5 py-3 text-sm font-sans" style={{ color: '#9CA3AF' }}>{p.categoriaNome || '—'}</td>
+                        <td className="px-5 py-3 text-sm font-mono font-bold text-white tabular-nums">{formatBRL(p.preco)}</td>
+                        <td className="px-5 py-3">
+                          <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded-md"
+                            style={p.ativo ? { color: '#22C55E', backgroundColor: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' } : { color: '#6B7280', backgroundColor: '#1E2028', border: '1px solid #2a2d38' }}>
+                            {p.ativo ? 'Ativo' : 'Inativo'}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-2">
+                            <Link to={`/admin/produtos/${p.id}`} className="p-1.5 rounded-xl transition-colors hover:text-orange-400" style={{ color: '#6B7280' }}><FiEdit2 size={14} /></Link>
+                            <button onClick={() => setDeleteId(p.id)} className="p-1.5 rounded-xl transition-colors hover:text-red-400" style={{ color: '#6B7280' }}><FiTrash2 size={14} /></button>
+                          </div>
+                        </td>
+                      </Tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </AdminCard>
+        </div>
       </div>
 
       <CreateModal open={createOpen} onClose={() => setCreateOpen(false)} categorias={categorias} onCreated={p => setProdutos(ps => [p, ...ps])} />

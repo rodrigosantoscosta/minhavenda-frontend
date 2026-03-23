@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import ProductCard from '../common/ProductCard' 
+import ProductCard from '../common/products/ProductCard' 
 import { FiChevronRight } from 'react-icons/fi'
 
 export default function RelatedProducts({ produtos = [] }) {
