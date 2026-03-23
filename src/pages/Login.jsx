@@ -295,7 +295,7 @@ export default function Login() {
             <div className="mt-4 grid grid-cols-2 gap-3">
               {[
                 { label: 'Cliente', email: 'joao.silva@email.com', senha: 'senha123' },
-                { label: 'Admin',   email: 'admin@loja.com',        senha: 'admin123' },
+                { label: 'Admin',   email: 'admin@loja.com',        senha: 'senha123' },
               ].map(({ label, email, senha }) => (
                 <button
                   key={label}
