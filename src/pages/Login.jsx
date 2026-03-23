@@ -276,15 +276,50 @@ export default function Login() {
             </div>
           </form>
 
-          {/* Forgot password */}
-          <p
-            className="text-center mt-5 font-sans text-sm text-gray-500 animate-fadeInUp"
+          {/* Demo credentials */}
+          <div
+            className="mt-6 animate-fadeInUp"
             style={{ animationDelay: '280ms' }}
           >
-            <Link to="/recuperar-senha" className="text-primary-600 hover:text-primary-700 font-medium transition-colors duration-150">
-              Esqueceu sua senha?
-            </Link>
-          </p>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="px-3 bg-gray-50 text-xs font-sans text-gray-400 uppercase tracking-wide">
+                  Acesso demo
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {[
+                { label: 'Cliente', email: 'joao.silva@email.com', senha: 'senha123' },
+                { label: 'Admin',   email: 'admin@loja.com',        senha: 'admin123' },
+              ].map(({ label, email, senha }) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => {
+                    setFormData({ email, senha })
+                    setErrors({})
+                    setServerError('')
+                  }}
+                  className="flex flex-col items-start px-3 py-2.5 rounded-xl border border-gray-200
+                    hover:border-primary-300 hover:bg-primary-50
+                    transition-[border-color,background-color,transform] duration-150 active:scale-[0.96]
+                    text-left group"
+                >
+                  <span className="text-xs font-display font-semibold text-gray-700 group-hover:text-primary-700 transition-colors duration-150">
+                    {label}
+                  </span>
+                  <span className="text-[11px] font-sans text-gray-400 truncate w-full mt-0.5 group-hover:text-primary-500 transition-colors duration-150">
+                    {email}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
