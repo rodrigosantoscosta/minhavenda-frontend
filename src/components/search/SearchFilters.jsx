@@ -111,7 +111,7 @@ const SearchFilters = ({
           <select
             value={localFilters.categoriaId || ''}
             onChange={(e) => handleFilterChange('categoriaId', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md hover:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md hover:border-primary-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-[border-color,box-shadow] duration-150"
             disabled={isLoadingCategorias}
           >
             <option value="">Todas as categorias</option>
@@ -137,7 +137,7 @@ const SearchFilters = ({
                   value={localFilters.precoMin || ''}
                   onChange={(e) => handlePrecoChange('precoMin', e.target.value)}
                   placeholder="0,00"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-primary-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-[border-color,box-shadow] duration-150"
                 />
               </div>
             </div>
@@ -150,7 +150,7 @@ const SearchFilters = ({
                   value={localFilters.precoMax || ''}
                   onChange={(e) => handlePrecoChange('precoMax', e.target.value)}
                   placeholder="0,00"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-primary-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-[border-color,box-shadow] duration-150"
                 />
               </div>
             </div>
@@ -161,7 +161,7 @@ const SearchFilters = ({
         <div className="flex space-x-3 pt-4 border-t border-gray-200">
           <button
             onClick={handleApplyFilters}
-            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            className="flex-1 bg-primary-600 text-white py-2 px-4 rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-[background-color,transform] duration-150 active:scale-[0.96] font-sans font-medium text-sm"
           >
             Aplicar Filtros
           </button>

@@ -187,8 +187,8 @@ export default function OrderSummary({
 
           {/* Mensagem Frete Grátis */}
           {!temFreteGratis && subtotal > 0 && subtotal < 200 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center gap-2 text-sm text-blue-800">
+            <div className="bg-primary-50 border border-primary-200 rounded-xl p-3">
+              <div className="flex items-center gap-2 text-sm text-primary-800">
                 <FiTruck className="w-4 h-4 flex-shrink-0" />
                 <span>
                   Faltam <strong>{formatarValor(faltaParaFreteGratis)}</strong> para frete grátis!

@@ -182,26 +182,26 @@ export default function SuccessModal({
         </div>
 
         {/* Próximos Passos */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-medium text-blue-900 mb-3 flex items-center gap-2">
+        <div className="bg-primary-50 border border-primary-200 rounded-xl p-4">
+          <h3 className="font-medium text-primary-900 mb-3 flex items-center gap-2">
             <FiClock className="w-4 h-4" />
             Próximos Passos
           </h3>
-          <div className="space-y-2 text-sm text-blue-800">
+          <div className="space-y-2 text-sm text-primary-800">
             <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-1.5 flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-primary-600 rounded-full mt-1.5 flex-shrink-0" />
               <span>Você receberá um e-mail com a confirmação do pedido</span>
             </div>
             <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-1.5 flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-primary-600 rounded-full mt-1.5 flex-shrink-0" />
               <span>Aguardando aprovação do pagamento</span>
             </div>
             <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-1.5 flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-primary-600 rounded-full mt-1.5 flex-shrink-0" />
               <span>Após aprovação, seu pedido será separado e enviado</span>
             </div>
             <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-1.5 flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-primary-600 rounded-full mt-1.5 flex-shrink-0" />
               <span>Você receberá o código de rastreamento por e-mail</span>
             </div>
           </div>

@@ -240,8 +240,8 @@ export default function Cart() {
                 </div>
 
                 {frete > 0 && subtotal < 200 && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-sm text-blue-800">
+                  <div className="bg-primary-50 border border-primary-200 rounded-xl p-3">
+                    <p className="text-sm text-primary-800">
                       Faltam <strong>{formatarValor(200 - subtotal)}</strong> para frete grátis!
                     </p>
                   </div>

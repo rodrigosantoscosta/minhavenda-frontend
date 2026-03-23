@@ -202,7 +202,7 @@ export default function OrderDetail() {
                 <span className={`text-sm font-medium capitalize ${
                   order.status === 'ENTREGUE' ? 'text-green-700' :
                   order.status === 'CANCELADO' ? 'text-red-700' :
-                  order.status === 'ENVIADO' ? 'text-blue-700' :
+                  order.status === 'ENVIADO' ? 'text-primary-700' :
                   'text-amber-700'
                 }`}>
                   {getStatusLabel(order.status)}
@@ -283,7 +283,7 @@ export default function OrderDetail() {
                         w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
                         ${item.status === 'ENTREGUE' ? 'bg-green-100 text-green-700' :
                           item.status === 'CANCELADO' ? 'bg-red-100 text-red-700' :
-                          item.status === 'ENVIADO' ? 'bg-blue-100 text-blue-700' :
+                          item.status === 'ENVIADO' ? 'bg-primary-100 text-primary-700' :
                           item.status === 'PAGO' ? 'bg-green-100 text-green-700' :
                           'bg-gray-100 text-gray-700'
                         }

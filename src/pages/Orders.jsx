@@ -314,7 +314,7 @@ export default function Orders() {
                 <div className="text-xs text-gray-600">Entregues</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-display font-bold text-primary-600 tabular-nums">
                   {orders.filter(o => ['PENDENTE', 'PAGO', 'ENVIADO'].includes(o.status)).length}
                 </div>
                 <div className="text-xs text-gray-600">Em Andamento</div>

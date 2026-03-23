@@ -120,10 +120,10 @@ function Toast({ type, message, onClose }) {
     },
     info: {
       icon: <FiInfo className="w-5 h-5" />,
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-500',
-      textColor: 'text-blue-800',
-      iconColor: 'text-blue-500',
+      bgColor: 'bg-primary-50',
+      borderColor: 'border-primary-500',
+      textColor: 'text-primary-900',
+      iconColor: 'text-primary-600',
     },
   }
 
