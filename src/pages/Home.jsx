@@ -128,20 +128,31 @@ export default function Home() {
       {/* Catálogo Principal */}
       <section className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="flex items-end justify-between mb-6 border-b border-gray-200 pb-5">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          {/* Section Header — skill: text-balance heading, tabular-nums count, stagger */}
+          <div className="flex items-end justify-between mb-6 border-b border-gray-100 pb-5">
+            <div className="animate-fadeInUp">
+              <h1 className="font-display font-bold text-2xl text-gray-900 tracking-tight text-balance">
                 {selectedCategory
                   ? categorias.find(c => c.id === selectedCategory)?.nome
                   : 'Todos os Produtos'}
               </h1>
               {totalElements > 0 && (
-                <p className="text-sm text-gray-500 mt-1">
-                  {totalElements} {totalElements === 1 ? 'produto' : 'produtos'} encontrados
+                <p className="font-sans text-sm text-gray-400 mt-1 tabular-nums animate-fadeInUp" style={{ animationDelay: '80ms' }}>
+                  {totalElements} {totalElements === 1 ? 'produto' : 'produtos'}
                 </p>
               )}
             </div>
+
+            {selectedCategory && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleCategoryChange(null)}
+              >
+                Limpar filtro
+              </Button>
+            )}
+          </div>
 
             {selectedCategory && (
               <Button
