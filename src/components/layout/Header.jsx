@@ -175,7 +175,7 @@ export default function Header() {
             {/* Mobile menu toggle — min 40×40 */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 transition-colors duration-150"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 transition-colors duration-150 shrink-0"
               aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
             >
               {/* Skill: CSS cross-fade icon swap without motion library */}
