@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import productService from '../services/productService'
-import ProductCard from '../components/common/ProductCard'
+import ProductCard from '../components/common/products/ProductCard'
 import { useToast } from '../components/common/Toast'
 import { LoadingContainer } from '../components/common/Loading'
 import Button from '../components/common/Button'
