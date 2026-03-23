@@ -77,7 +77,7 @@ export default function AdminCategorias() {
           {loading ? <PageLoader /> : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead><tr style={{ borderBottom: '1px solid #1E2028' }}>
+                <thead><tr>
                   <Th>ID</Th><Th>Nome</Th><Th>Descrição</Th><Th>Ativo</Th><Th>Criado em</Th><Th>Ações</Th>
                 </tr></thead>
                 <tbody>

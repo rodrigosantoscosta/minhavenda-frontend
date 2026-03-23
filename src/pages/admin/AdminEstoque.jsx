@@ -93,7 +93,7 @@ export default function AdminEstoque() {
           {loading ? <PageLoader /> : rows.length === 0 ? <EmptyState /> : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead><tr style={{ borderBottom: '1px solid #1E2028' }}>
+                <thead><tr>
                   <Th>Produto</Th><Th>Quantidade</Th><Th>Última Atualização</Th><Th>Ações</Th>
                 </tr></thead>
                 <tbody>
