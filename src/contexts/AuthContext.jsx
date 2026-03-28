@@ -291,6 +291,39 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  /**
+   * Google OAuth — called by OAuthCallback page with the one-time code.
+   * Delegates to authService.googleExchange(), then syncs auth state.
+   */
+  const loginWithGoogle = useCallback(async (code) => {
+    try {
+      logger.info('Attempting Google OAuth exchange')
+      setLoading(true)
+
+      const response = await authService.googleExchange(code)
+
+      const userData = response.user
+      if (!userData) {
+        throw new Error('Resposta do servidor inválida: sem dados do usuário')
+      }
+
+      setUser(userData)
+      setIsAuthenticated(true)
+
+      const expiration = jwtHelper.getTokenExpiration(response.token)
+      setTokenExpiresAt(expiration)
+      setShowExpirationWarning(false)
+
+      logger.info({ userId: userData.id, role: userData.role }, 'Google OAuth login successful')
+      return { success: true, user: userData }
+    } catch (error) {
+      logger.error({ error }, 'Google OAuth login failed')
+      return { success: false, error: error.message || 'Falha no login com Google' }
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   const logout = useCallback(() => {
     logger.info({ userId: userRef.current?.id }, 'User logging out')
     authService.logout()
@@ -323,6 +356,7 @@ export function AuthProvider({ children }) {
     showExpirationWarning,
     login,
     register,
+    loginWithGoogle,
     logout,
     updateUser,
     checkAuth,

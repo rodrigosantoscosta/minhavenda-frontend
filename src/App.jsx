@@ -18,6 +18,7 @@ import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
 import SearchPage from './pages/SearchPage'
 import NotFound from './pages/NotFound'
+import OAuthCallback from './pages/OAuthCallback'
 
 // ========== PÁGINAS PROTEGIDAS ==========
 import Checkout from './pages/Checkout'
@@ -61,6 +62,9 @@ function AppInner() {
                 <Route path="/busca" element={<SearchPage />} />
 
                 {/* ── Autenticação ── */}
+                {/* ── OAuth callback — must be public, no guard ── */}
+                <Route path="/auth/callback" element={<OAuthCallback />} />
+
                 <Route path="/login"    element={<PublicRoute redirectTo="/"><Login /></PublicRoute>} />
                 <Route path="/register" element={<PublicRoute redirectTo="/"><Register /></PublicRoute>} />
 
