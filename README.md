@@ -39,17 +39,17 @@ pnpm install
 ### Environment variables
 
 ```bash
-cp .env.example .env.development
+cp .env.example .env
 ```
 
 | Variable | Default | Description |
 |---|---|---|
-| `VITE_API_URL` | `/api` | Backend base URL |
+| `VITE_API_URL` | `/api` | Backend base URL. Keep as `/api` in dev — Vite proxies it to `localhost:3000`. |
 | `VITE_USE_MOCK` | `false` | Force mock layer regardless of backend state |
 
 > **Important:** Always keep `VITE_API_URL=/api` (relative) in development so Vite's proxy
-> forwards requests to `http://localhost:3000`. An absolute URL bypasses the proxy and breaks
-> API calls in dev.
+> forwards requests to `http://localhost:3000`. An absolute URL bypasses the proxy and will
+> break API calls in dev.
 
 ### Run the dev server
 
@@ -57,7 +57,7 @@ cp .env.example .env.development
 pnpm dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173).
+Open [http://localhost:5173](http://localhost:5173).  
 Admin dashboard: [http://localhost:5173/admin/dashboard](http://localhost:5173/admin/dashboard).
 
 ---
@@ -91,11 +91,10 @@ src/
 │   │                   #   Pagination, StatusBadge, SuccessModal, OrderCard
 │   ├── home/           # Hero, FeaturedCategories
 │   ├── layout/         # Header (storefront), Footer
-│   ├── product/        # ProductCard, ImageGallery, CategoryFilter,
-│   │                   #   RelatedProducts
+│   ├── product/        # ProductCard, ImageGallery, CategoryFilter, RelatedProducts
 │   └── search/         # SearchBar, SearchFilters, SortOptions
 ├── contexts/           # React Context providers
-│   ├── AuthContext.jsx         # JWT state + auto-expiry monitoring
+│   ├── AuthContext.jsx         # JWT state, auto-expiry monitoring, Google OAuth exchange
 │   ├── CartContext.jsx         # Cart state (optimistic UI + debounced sync)
 │   └── NotificationContext.jsx # In-app order notifications
 ├── hooks/
@@ -106,32 +105,34 @@ src/
 │   └── mockProductService.js  # Mirrors productService contract exactly
 ├── pages/              # Route-level page components
 │   ├── admin/          # ADMIN role required for all routes under /admin/*
-│   │   ├── AdminDashboard.jsx      # KPI cards + low-stock table
-│   │   ├── AdminPedidos.jsx        # Order list — mobile cards / desktop table
-│   │   ├── AdminPedidoDetail.jsx   # Order detail + status transition modals
-│   │   ├── AdminProdutos.jsx       # Product CRUD — mobile cards / desktop table
-│   │   ├── AdminEditProduto.jsx    # Edit product form
-│   │   ├── AdminEstoque.jsx        # Inventory command center (see below)
-│   │   ├── AdminCategorias.jsx     # Category CRUD
-│   │   └── AdminDLQ.jsx            # RabbitMQ Dead Letter Queue viewer
+│   │   ├── AdminDashboard.jsx
+│   │   ├── AdminPedidos.jsx
+│   │   ├── AdminPedidoDetail.jsx
+│   │   ├── AdminProdutos.jsx
+│   │   ├── AdminEditProduto.jsx
+│   │   ├── AdminEstoque.jsx
+│   │   ├── AdminCategorias.jsx
+│   │   └── AdminDLQ.jsx
 │   ├── Home.jsx
+│   ├── Login.jsx               # Email/password form + "Entrar com Google" button
+│   ├── Register.jsx
+│   ├── OAuthCallback.jsx       # Handles /auth/callback?code= redirect from backend
 │   ├── Products.jsx / ProductDetail.jsx
 │   ├── Cart.jsx
 │   ├── Checkout.jsx
 │   ├── Orders.jsx / OrderDetail.jsx
-│   ├── Login.jsx / Register.jsx
 │   └── Profile.jsx
 ├── services/           # API service layer
-│   ├── api.js                  # Axios instance + interceptors
-│   ├── adminService.js         # All /admin/* API calls
-│   ├── authService.js
+│   ├── api.js                  # Axios instance + interceptors (silent token refresh)
+│   ├── adminService.js
+│   ├── authService.js          # login, register, googleExchange, refreshTokens, logout
 │   ├── cartService.js
 │   ├── checkoutService.js
-│   ├── notificationService.js  # Polling bridge for RabbitMQ events
+│   ├── notificationService.js
 │   ├── orderService.js
 │   ├── productService.js       # withFallback() HOF — real → mock on error
 │   └── searchService.js
-└── utils/              # Helpers
+└── utils/
     ├── adminUtils.jsx          # Design tokens (T), shared admin UI atoms
     ├── imageHelper.js
     ├── jwtHelper.js
@@ -173,74 +174,101 @@ src/
 - Shopping cart with optimistic UI + debounced backend sync
 - Checkout with address form and payment method selection (PIX, CARTAO, BOLETO)
 - Order tracking with status history
-- In-app notifications for order events polling RabbitMQ backend events
-- JWT authentication with automatic expiration monitoring
+- In-app notifications for order events
+- JWT authentication with automatic expiry monitoring and silent token refresh
+- **Google OAuth login** — one click, no password required
 - Fully responsive — mobile drawer menu + desktop navbar
 
+### Authentication
+
+The frontend implements a full **dual-token auth flow** — short-lived access tokens (24h) paired with long-lived refresh tokens (7d). On any 401 from a protected endpoint, `api.js` automatically attempts a silent refresh before retrying the original request. Concurrent requests during a refresh are queued — only one refresh call is ever made at a time.
+
+**Token storage** (`localStorage`):
+
+| Key | Contents |
+|---|---|
+| `token` | JWT access token |
+| `refreshToken` | JWT refresh token |
+| `user` | Decoded user object `{ id, nome, email, role }` |
+| `tokenExpiration` | Access token expiry timestamp (ms) |
+
+**Google OAuth flow:**
+
+```
+User clicks "Entrar com Google"
+      ↓
+Browser navigates to VITE_API_URL/auth/google (full redirect — no axios call)
+      ↓
+Google consent screen
+      ↓
+Backend receives callback → resolves user → stores token pair under UUID code in Redis
+      ↓
+Backend redirects to /auth/callback?code=<uuid>
+      ↓
+OAuthCallback.jsx reads code → POST /auth/google/exchange → receives token pair
+      ↓
+Tokens saved to localStorage → navigate to home
+```
+
+On failure, `OAuthCallback` stores an error message in `sessionStorage` and redirects to `/login` where it is displayed automatically.
+
 ### Mock Fallback Layer
-`src/services/productService.js` wraps every real API call in a `withFallback(realFn, mockFn)`
-HOF. When the backend returns an error, the mock silently activates and returns stable Faker data
-(seed 42, pt_BR locale) with realistic 120–380 ms simulated latency. Set `VITE_USE_MOCK=true`
-to force mocks regardless of backend state — useful for offline demos.
+`src/services/productService.js` wraps every real API call in `withFallback(realFn, mockFn)`.
+When the backend errors, the mock silently activates and returns stable Faker data (seed 42, pt_BR) with realistic 120–380 ms simulated latency. Set `VITE_USE_MOCK=true` to force mocks regardless of backend state — useful for offline demos.
 
 ### Admin Dashboard (`/admin/*` — ADMIN role required)
-
-- **Dashboard** — KPI cards and low-stock alerts; graceful degradation when backend is unavailable
-- **Pedidos** — Order management with status filter, mobile card stack / desktop table, status
-  transition modals (Pagar → Enviar → Entregar / Cancelar)
-- **Produtos** — Product CRUD with search + category/status filters, mobile card grid / desktop
-  table, image URL preview
-- **Estoque — Inventory Command Center**
-  - Summary bar: 3 clickable stat cards (Crítico ≤5 / Baixo 6–20 / OK >20) with live counts
-    and a loading progress bar while the 30+ parallel stock calls resolve
-  - Filter bar: client-side name search + category dropdown (no extra API calls)
-  - Rows sorted by severity first (critical → low → ok), then alphabetically
-  - Mobile card stack with full-width action buttons (Adicionar / Remover / Ajustar)
-  - Desktop table with icon-only compact action buttons and severity + qty badges
+- **Dashboard** — KPI cards and low-stock alerts
+- **Pedidos** — Order management with status filter, mobile card stack / desktop table, status transition modals
+- **Produtos** — Product CRUD with search + category/status filters, image URL preview
+- **Estoque** — Inventory Command Center with severity stat cards (Crítico / Baixo / OK), client-side filters, severity-first sort
 - **Categorias** — Category CRUD with active/inactive toggle
 - **DLQ** — RabbitMQ Dead Letter Queue viewer and requeue tool
 
 ### Admin Layout — Responsive
 - Desktop (`lg+`): fixed left sidebar, 224 px wide
-- Mobile (`< lg`): hidden sidebar replaced by a top bar (hamburger + `MV` logo + page breadcrumb)
-  and a slide-in drawer with backdrop
+- Mobile (`< lg`): top bar (hamburger + `MV` logo + breadcrumb) + slide-in drawer with backdrop
 
 ---
 
 ## Authentication & Roles
 
-- JWT stored in `localStorage` under `token`
-- `AdminRoute` in `src/components/common/ProtectedRoute.jsx` guards all `/admin/*` routes —
-  requires `user.role === 'ADMIN'`
-- On login, the JWT payload `tipo` claim (`ADMIN` / `CLIENTE`) is extracted and mapped to `role`
-- 401 responses anywhere in the app trigger auto-logout and redirect to `/login`
-- Demo credentials (seeded by NestJS migration V4):
-
-| Email | Role | Password |
+| Credential | Role | Password |
 |---|---|---|
 | `admin@loja.com` | ADMIN | `senha123` |
 | `joao.silva@email.com` | CLIENTE | `senha123` |
+
+- `AdminRoute` in `src/components/common/ProtectedRoute.jsx` guards all `/admin/*` routes — requires `user.role === 'ADMIN'`
+- Role is decoded from the JWT payload `role` claim (`ADMIN` / `CLIENTE`) at login time
+- `/auth/callback` is a public route — no auth guard — required for the OAuth redirect to land
 
 ---
 
 ## Backend Integration
 
-The NestJS backend runs on port `3000`. The Vite dev server proxies `/api` → `http://localhost:3000`
-via `vite.config.js`, so all service calls use the relative path `/api/...`.
+The NestJS backend runs on port `3000`. Vite proxies `/api → http://localhost:3000`.
+
+### Auth endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/login` | Returns `{ accessToken, refreshToken, email, nome }` |
+| POST | `/api/auth/register` | Same shape as login |
+| GET | `/api/auth/google` | Initiates Google OAuth (full browser redirect) |
+| POST | `/api/auth/google/exchange` | Swaps one-time `code` for `{ accessToken, refreshToken }` |
+| POST | `/api/auth/refresh` | Rotates token pair — body: `{ refreshToken }` |
+| POST | `/api/auth/logout` | Revokes refresh token — body: `{ refreshToken }` |
 
 ### Customer endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/auth/login` | Login — returns `{ token, email, nome }` |
-| POST | `/api/auth/register` | Register |
 | GET | `/api/produtos` | Product list (paginated) |
 | GET | `/api/produtos/:id` | Product detail |
 | GET | `/api/categorias` | Category list |
 | GET | `/api/carrinho` | Fetch cart |
-| POST | `/api/carrinho/itens` | Add item to cart |
-| PUT | `/api/carrinho/itens/:id` | Update cart item quantity |
-| DELETE | `/api/carrinho/itens/:id` | Remove cart item |
+| POST | `/api/carrinho/itens` | Add item |
+| PUT | `/api/carrinho/itens/:id` | Update item quantity |
+| DELETE | `/api/carrinho/itens/:id` | Remove item |
 | POST | `/api/checkout/finalizar` | Create order |
 | GET | `/api/meus-pedidos` | List user orders |
 | GET | `/api/pedidos/:id` | Order detail |
@@ -253,26 +281,11 @@ via `vite.config.js`, so all service calls use the relative path `/api/...`.
 |---|---|---|
 | GET | `/api/admin/dashboard` | KPI stats |
 | GET | `/api/admin/pedidos` | All orders |
-| GET | `/api/admin/pedidos/:id` | Order detail (full) |
-| POST | `/api/admin/pedidos/:id/pagar` | Mark as paid |
-| POST | `/api/admin/pedidos/:id/enviar` | Mark as shipped |
-| POST | `/api/admin/pedidos/:id/entregar` | Mark as delivered |
-| POST | `/api/admin/pedidos/:id/cancelar` | Cancel |
-| GET | `/api/produtos?ativo=true` | Product list (admin, unpaginated) |
-| POST | `/api/produtos` | Create product |
-| PUT | `/api/produtos/:id` | Update product |
-| DELETE | `/api/produtos/:id` | Delete product |
-| GET | `/api/categorias` | Category list |
-| POST | `/api/categorias` | Create category |
-| PUT | `/api/categorias/:id` | Update category |
-| DELETE | `/api/categorias/:id` | Delete category |
-| GET | `/api/estoque/produto/:id` | Stock for product |
-| POST | `/api/estoque/produto/:id/adicionar` | Add stock |
-| POST | `/api/estoque/produto/:id/remover` | Remove stock |
-| PUT | `/api/estoque/produto/:id/ajustar` | Adjust stock to value |
-| GET | `/api/admin/dlq/queues` | DLQ queue list |
-| GET | `/api/admin/dlq/:queue/messages` | DLQ messages |
-| POST | `/api/admin/dlq/:queue/requeue` | Requeue messages |
+| POST | `/api/admin/pedidos/:id/{pagar,enviar,entregar,cancelar}` | Status transitions |
+| GET/POST/PUT/DELETE | `/api/produtos` | Product CRUD |
+| GET/POST/PUT/DELETE | `/api/categorias` | Category CRUD |
+| GET/POST/PUT | `/api/estoque/produto/:id/{adicionar,remover,ajustar}` | Stock management |
+| GET/POST | `/api/admin/dlq/*` | DLQ viewer and requeue |
 
 ---
 
@@ -280,13 +293,20 @@ via `vite.config.js`, so all service calls use the relative path `/api/...`.
 
 | Branch | Purpose |
 |---|---|
-| `prd-nest` | Production — deployed to Vercel |
-| `dev-nestjs` | Integration branch for NestJS-backed features |
-| `dev-mockupdata` | Active development — all redesign work lands here |
+| `dev-nestjs` | Main development branch — **deploy target** |
+| `prd-nest` | Exists but is NOT the deploy target |
+| `dev-mockupdata` | Active feature development |
 
-`dev-mockupdata` is currently **12 commits ahead** of `prd-nest`. The pending merge brings:
-the full UI redesign (brand identity, typography, design tokens), the Faker mock fallback layer,
-admin responsive layout, the Estoque inventory redesign, cart optimistic UI, and several bug fixes.
+---
+
+## Deployment
+
+| Variable | Development | Production |
+|---|---|---|
+| `VITE_API_URL` | `/api` (relative — Vite proxy) | `https://api.minhavenda.com/api` |
+| `VITE_USE_MOCK` | `false` | `false` |
+
+Configured for Vercel (`vercel-build` script in `package.json`). For Railway or Render, set `VITE_API_URL` to the deployed NestJS service URL.
 
 ---
 
@@ -296,15 +316,3 @@ admin responsive layout, the Estoque inventory redesign, cart optimistic UI, and
 - See [`NEXT_STEPS.md`](./NEXT_STEPS.md) for pending work and known issues.
 - See [`LAST_CHANGES.md`](./LAST_CHANGES.md) for a session-by-session changelog.
 - See [`docs/CHANGES_EXPLAINED.md`](./docs/CHANGES_EXPLAINED.md) for detailed explanations of key architectural decisions.
-
----
-
-## Deployment
-
-| Variable | Development | Production |
-|---|---|---|
-| `VITE_API_URL` | `/api` (relative — uses Vite proxy) | `https://api.minhavenda.com/api` |
-| `VITE_USE_MOCK` | `false` | `false` |
-
-The project is configured for Vercel (`vercel-build` script in `package.json`).
-For Railway or Render, point `VITE_API_URL` to the deployed NestJS service URL.
