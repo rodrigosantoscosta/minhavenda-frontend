@@ -87,6 +87,7 @@ const SearchPage = () => {
   }, [getParamsFromURL, updateURL])
 
   const handlePageChange = useCallback((newPage) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     updateURL({ ...getParamsFromURL(), page: newPage - 1 })
   }, [getParamsFromURL, updateURL])
 

@@ -187,7 +187,7 @@ export default function Login() {
 
             {/* Email */}
             <div className="animate-fadeInUp" style={{ animationDelay: '80ms' }}>
-              <label className="block text-sm font-sans font-medium text-gray-700 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-sans font-medium text-gray-700 mb-1.5">
                 Email
               </label>
               <div className="relative">
@@ -195,6 +195,7 @@ export default function Login() {
                   <FiMail className="text-gray-400 w-4 h-4" />
                 </div>
                 <input
+                  id="email"
                   type="email"
                   name="email"
                   value={formData.email}
@@ -211,7 +212,7 @@ export default function Login() {
 
             {/* Senha */}
             <div className="animate-fadeInUp" style={{ animationDelay: '140ms' }}>
-              <label className="block text-sm font-sans font-medium text-gray-700 mb-1.5">
+              <label htmlFor="senha" className="block text-sm font-sans font-medium text-gray-700 mb-1.5">
                 Senha
               </label>
               <div className="relative">
@@ -219,6 +220,7 @@ export default function Login() {
                   <FiLock className="text-gray-400 w-4 h-4" />
                 </div>
                 <input
+                  id="senha"
                   type={showPassword ? 'text' : 'password'}
                   name="senha"
                   value={formData.senha}
