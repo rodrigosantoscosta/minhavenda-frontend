@@ -5,12 +5,21 @@
  * Mock shape matches current AuthResponseDto:
  *   { accessToken, refreshToken, email, nome }
  *
- * Selectors verified against actual Login.jsx render:
- *   - Heading h2:      "Acesse sua conta"
- *   - Register link:   "Cadastre-se grátis"
- *   - Submit button:   "Entrar"
+ * Selectors:
+ *   - Email input:     #email  (id set in Login.jsx)
+ *   - Password input:  #senha  (id set in Login.jsx)
+ *   - Submit button:   role=button name=/^entrar$/i
  *   - Password toggle: aria-label "Mostrar senha" / "Ocultar senha"
  *   - Google button:   link "Entrar com Google"
+ *
+ * NOTE: getByLabel(/senha/i) is NOT used because the toggle button
+ * aria-label="Mostrar senha" also matches, causing a strict mode violation.
+ * Use page.locator('#senha') instead.
+ *
+ * NOTE: The email input has type="email" so only values that pass the
+ * browser's native format check reach React's onSubmit handler. To test
+ * the custom "Email inválido" regex, use a value like 'a@b' which passes
+ * the browser check but lacks a dot in the domain (fails /\S+@\S+\.\S+/).
  */
 
 import { test, expect } from '@playwright/test'
@@ -79,8 +88,8 @@ test.describe('Login page', () => {
   // ── 1. Page renders correctly ─────────────────────────────────────────────
 
   test('shows email and password fields and a submit button', async ({ page }) => {
-    await expect(page.getByLabel(/email/i)).toBeVisible()
-    await expect(page.getByLabel(/senha/i)).toBeVisible()
+    await expect(page.locator('#email')).toBeVisible()
+    await expect(page.locator('#senha')).toBeVisible()
     // Exact match avoids grabbing the "Mostrar senha" toggle button
     await expect(page.getByRole('button', { name: /^entrar$/i })).toBeVisible()
   })
@@ -98,7 +107,10 @@ test.describe('Login page', () => {
   })
 
   test('shows "email inválido" for a malformed email', async ({ page }) => {
-    await page.getByLabel(/email/i).fill('not-an-email')
+    // 'a@b' passes browser native type="email" validation (format looks valid)
+    // but fails the custom regex /\S+@\S+\.\S+/ (no dot in domain) so React
+    // shows the "Email inválido" message.
+    await page.locator('#email').fill('a@b')
     await page.getByRole('button', { name: /^entrar$/i }).click()
     await expect(page.getByText(/email inválido/i)).toBeVisible()
   })
@@ -107,27 +119,28 @@ test.describe('Login page', () => {
 
   test('redirects to home page after successful login', async ({ page }) => {
     await mockLoginSuccess(page)
-    await page.getByLabel(/email/i).fill('joao@email.com')
-    await page.getByLabel(/senha/i).fill('senha123')
+    await page.locator('#email').fill('joao@email.com')
+    await page.locator('#senha').fill('senha123')
     await page.getByRole('button', { name: /^entrar$/i }).click()
     await expect(page).toHaveURL('/')
   })
 
   test('shows the user name in the header after login', async ({ page }) => {
     await mockLoginSuccess(page)
-    await page.getByLabel(/email/i).fill('joao@email.com')
-    await page.getByLabel(/senha/i).fill('senha123')
+    await page.locator('#email').fill('joao@email.com')
+    await page.locator('#senha').fill('senha123')
     await page.getByRole('button', { name: /^entrar$/i }).click()
-    // Header displays first name extracted from JWT payload by buildUser()
-    await expect(page.getByText('João')).toBeVisible()
+    // Header shows first name; use first() because the name may appear
+    // multiple times across the page (nav, welcome text, etc.)
+    await expect(page.getByText('João').first()).toBeVisible()
   })
 
   // ── 4. Failed login ───────────────────────────────────────────────────────
 
   test('shows a server error message on wrong credentials', async ({ page }) => {
     await mockLoginFailure(page)
-    await page.getByLabel(/email/i).fill('joao@email.com')
-    await page.getByLabel(/senha/i).fill('senhaerrada')
+    await page.locator('#email').fill('joao@email.com')
+    await page.locator('#senha').fill('senhaerrada')
     await page.getByRole('button', { name: /^entrar$/i }).click()
     // authService maps mensagem field to the error banner
     await expect(page.getByText(/credenciais inválidas/i)).toBeVisible()
@@ -138,7 +151,7 @@ test.describe('Login page', () => {
   // ── 5. Toggle password visibility ─────────────────────────────────────────
 
   test('toggles password field type when the eye icon is clicked', async ({ page }) => {
-    const passwordInput = page.getByLabel(/senha/i)
+    const passwordInput = page.locator('#senha')
     await passwordInput.fill('minhaSenha')
 
     // Initially hidden
