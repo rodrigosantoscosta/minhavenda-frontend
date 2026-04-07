@@ -45,6 +45,8 @@
 
 ## Completed
 
+- [x] DRE Custom Date Panel: Two separate modals for start/end date selection — done 2026-04-07
+- [x] DRE Custom Date Panel UX flow improvement (step indicator, disabled dates, better guidance) — done 2026-04-07
 - [x] Period selector UI/UX overhaul on DRE Module (preset pills, mobile-first, 44px targets, scale-on-press, shadow button) — done 2026-04-07
 - [x] Replace polling with SSE in `notificationService.js` — `fetch` + `ReadableStream` with JWT auth,
   SSE parser, auto-reconnect, `AbortController` on logout — done 2026-03-07
