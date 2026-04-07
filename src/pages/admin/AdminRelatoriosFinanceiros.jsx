@@ -212,31 +212,53 @@ export default function AdminRelatoriosFinanceiros() {
                   >
                     Data de início
                   </label>
-                  <input
-                    id="dre-inicio"
-                    type="date"
-                    value={inicio}
-                    onChange={(e) => {
-                      setInicio(e.target.value)
-                      setActivePreset('custom')
-                      setDreData(null)
-                      setDespesasData(null)
-                    }}
-                    className="w-full min-h-[44px] px-3 py-2.5 rounded-xl text-sm font-medium tabular-nums transition-[border-color,box-shadow] duration-150 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    style={{
-                      backgroundColor: T.bg,
-                      border: `1px solid ${T.border}`,
-                      color: '#E5E7EB',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = T.accent
-                      e.currentTarget.style.boxShadow = `0 0 0 3px ${T.accentBg}`
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = T.border
-                      e.currentTarget.style.boxShadow = 'none'
-                    }}
-                  />
+                  <div className="relative">
+                    <input
+                      id="dre-inicio"
+                      type="date"
+                      value={inicio}
+                      onChange={(e) => {
+                        setInicio(e.target.value)
+                        setActivePreset('custom')
+                        setDreData(null)
+                        setDespesasData(null)
+                      }}
+                      className="w-full min-h-[44px] px-3 pr-10 py-2.5 rounded-xl text-sm font-medium tabular-nums transition-[border-color,box-shadow] duration-150 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                      style={{
+                        backgroundColor: T.bg,
+                        border: `1px solid ${T.border}`,
+                        color: '#E5E7EB',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'textfield',
+                        appearance: 'none',
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = T.accent
+                        e.currentTarget.style.boxShadow = `0 0 0 3px ${T.accentBg}`
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = T.border
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
+                    />
+                    <style>{`
+                      #dre-inicio::-webkit-calendar-picker-indicator {
+                        position: absolute;
+                        right: 0;
+                        width: 100%;
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                        opacity: 0;
+                        cursor: pointer;
+                      }
+                    `}</style>
+                    <FiCalendar
+                      size={16}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                      style={{ color: T.accent }}
+                    />
+                  </div>
                 </div>
 
                 {/* End date input */}
@@ -248,31 +270,53 @@ export default function AdminRelatoriosFinanceiros() {
                   >
                     Data de fim
                   </label>
-                  <input
-                    id="dre-fim"
-                    type="date"
-                    value={fim}
-                    onChange={(e) => {
-                      setFim(e.target.value)
-                      setActivePreset('custom')
-                      setDreData(null)
-                      setDespesasData(null)
-                    }}
-                    className="w-full min-h-[44px] px-3 py-2.5 rounded-xl text-sm font-medium tabular-nums transition-[border-color,box-shadow] duration-150 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    style={{
-                      backgroundColor: T.bg,
-                      border: `1px solid ${T.border}`,
-                      color: '#E5E7EB',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = T.accent
-                      e.currentTarget.style.boxShadow = `0 0 0 3px ${T.accentBg}`
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = T.border
-                      e.currentTarget.style.boxShadow = 'none'
-                    }}
-                  />
+                  <div className="relative">
+                    <input
+                      id="dre-fim"
+                      type="date"
+                      value={fim}
+                      onChange={(e) => {
+                        setFim(e.target.value)
+                        setActivePreset('custom')
+                        setDreData(null)
+                        setDespesasData(null)
+                      }}
+                      className="w-full min-h-[44px] px-3 pr-10 py-2.5 rounded-xl text-sm font-medium tabular-nums transition-[border-color,box-shadow] duration-150 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                      style={{
+                        backgroundColor: T.bg,
+                        border: `1px solid ${T.border}`,
+                        color: '#E5E7EB',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'textfield',
+                        appearance: 'none',
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = T.accent
+                        e.currentTarget.style.boxShadow = `0 0 0 3px ${T.accentBg}`
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = T.border
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
+                    />
+                    <style>{`
+                      #dre-fim::-webkit-calendar-picker-indicator {
+                        position: absolute;
+                        right: 0;
+                        width: 100%;
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                        opacity: 0;
+                        cursor: pointer;
+                      }
+                    `}</style>
+                    <FiCalendar
+                      size={16}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                      style={{ color: T.accent }}
+                    />
+                  </div>
                 </div>
 
                 {/* Consultar button */}
