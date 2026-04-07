@@ -45,6 +45,7 @@
 
 ## Completed
 
+- [x] Period selector UI/UX overhaul on DRE Module (preset pills, mobile-first, 44px targets, scale-on-press, shadow button) — done 2026-04-07
 - [x] Replace polling with SSE in `notificationService.js` — `fetch` + `ReadableStream` with JWT auth,
   SSE parser, auto-reconnect, `AbortController` on logout — done 2026-03-07
 - [x] `case 429` block in `api.js` + `api:rate-limited` CustomEvent (manual apply pending) — done 2026-03-07

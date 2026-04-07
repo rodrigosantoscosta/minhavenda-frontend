@@ -1,5 +1,67 @@
 # Last Changes
 
+## 2026-04-07 — Day picker UI/UX redesign: step indicator + improved calendar CSS
+
+### Files changed
+- `src/pages/admin/AdminRelatoriosFinanceiros.jsx` — updated `CustomDatePanel`:
+  - **Step indicator bar** — replaced old "De/Até" summary with a horizontal two-step progress indicator (início → fim) separated by a connector line
+  - ✓ orange badge when a step is completed, pulsing "2" badge while selecting end, dimmed "2" badge when nothing selected yet
+  - **Improved calendar grid** — tighter border-spacing (3px × 4px), larger day text (14px), ring-shadow (`0 0 0 3px`) on selected from-only day for visibility, denser range_middle pill (18% opacity), `cursor: pointer` on calendar container, `:active` scale feedback
+  - **Removed** `disabled={false}` prop from DayPicker (unnecessary)
+
+### Notes
+Build passes: `npx vite build` ✓ (2512 modules). The step indicator gives clear visual feedback at every stage: "pick start date" → "pick end date" → "both dates set, hit Consultar". Applies ui-ux-pro-max skill recommendations (cursor-pointer, touch targets, active scale, proper focus states).
+
+---
+
+## 2026-04-07 — Replace native date inputs with react-day-picker inline calendar
+
+### Files changed
+- `package.json` / `pnpm-lock.yaml` — added `react-day-picker@9.14.0` dependency
+- `src/pages/admin/AdminRelatoriosFinanceiros.jsx` — rewritten `CustomDatePanel`:
+  - **Removed** two disconnected `<input type="date">` fields (native browser pickers were unreliable on Windows and broke with custom CSS).
+  - **Added** `react-day-picker` (`<DayPicker mode="range">`) — an inline calendar rendered entirely inside the app.
+  - **Range mode** — first click sets start date, second click sets end range; clicking before start swaps automatically.
+  - **Range summary bar** — above the calendar shows `De: 07 abr` / `Até: 07 abr` with weekday names (`Segunda`, etc.) and a "Selecione o fim..." prompt while selecting the end date.
+  - **Dark theme** — full custom CSS via `<style>` tag scoped to `.rdp-root` with accent colors from design tokens (`T.accent` #F97316, `T.accentBg`, `T.bg`).
+  - **Selected range styling** — solid orange start/end with pill-shaped middle (`range_middle` with `T.accentBg`).
+  - **Today indicator** — today's date has an orange border ring.
+  - **Inline error** — red warning text when início > fim.
+  - **Portuguese locale** — imported `ptBR` from `react-day-picker/locale` for month/day names.
+  - **Consultar button** — moved below calendar, full-width, disabled until both dates are selected.
+  - **Unused imports cleaned up** — removed `FiCalendarOpen`.
+
+### Notes
+Native `<input type="date">` was replaced because browser overlays don't respect custom styling and are inconsistent across browsers/OS. react-day-picker renders inside the React tree so full control over theme, behavior, and UX. Build passes: `npx vite build` ✓ (2512 modules). The previous design (two inputs with connector SVG) was discarded entirely — this is a clean rewrite.
+
+---
+
+### Files changed
+- `src/pages/admin/AdminRelatoriosFinanceiros.jsx` — rewritten:
+  - **Auto-query on preset tap** — selecting a preset (Hoje, 7 dias, Este mês, etc.) immediately fires the query; no extra click needed.
+  - **Animated "Personalizado" panel** — the custom date inputs appear/disappear with a `cubic-bezier(0.2,0,0,1)` opacity + translateY transition (200ms, interruptible via CSS transitions, not keyframes).
+  - **Results fade-in** — `<ResultsFadeIn>` wrapper on DRE and Despesas reports splits the enter animation from its container, fading up with a soft 6px `translateY`.
+  - **Extracted `PresetPill` component** — clean, reusable `forwardRef` pill with `aria-pressed`, check icon, and blue hover.
+  - **Concentric border radius** — card (`rounded-2xl`) > inputs (`rounded-lg`); consistent visual hierarchy.
+  - **Tabular-nums on date inputs** — prevents layout shift when dates change.
+  - **Hover on date inputs uses blue** (`hover:border-blue-400` per mobile-first guideline).
+  - Date inputs use `T.bg` background (darker tone) instead of `T.surface` for better depth contrast.
+
+### Notes
+Applied the "make-interfaces-feel-better" skill: CSS transitions instead of keyframes for interruptible animations, specific `transition-property` values (never `transition: all`), `scale(0.96)` on press, 44px minimum touch targets, shadows on Consultar button. Build passes cleanly.
+
+---
+
+## 2026-04-07 — Period selector UI/UX overhaul on Relatorios Financeiros (DRE Module)
+
+### Files changed
+- `src/pages/admin/AdminRelatoriosFinanceiros.jsx` — rewritten: added period preset pills (Hoje, 7 dias, Este mês, 30 dias, Trimestre, Mês passado, Personalizado); mobile-first layout (pills scroll horizontally on mobile, expand on sm+); date range summary badge with calendar icon; custom date inputs only show when "Personalizado" is active; all interactive elements are ≥44px touch targets; `active:scale-[0.96]` on buttons; shadows on Consultar button; focus rings on date inputs; smooth transitions throughout
+
+### Notes
+Applied "make-interfaces-feel-better" skill principles: concentric border radius (preset chips use rounded-full, card uses rounded-2xl, inputs use rounded-lg), shadows over borders for the Consultar button, scale-on-press at 0.96, minimum 44px hit areas on all interactive elements, mobile-first grid collapse, specific transition properties (no `transition: all`). Build passes cleanly (`vite build` exit 0).
+
+---
+
 ## 2026-03-19 — Playwright E2E setup: config, scripts, AGENTS rules
 
 ### Files changed
