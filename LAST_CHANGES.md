@@ -1,65 +1,87 @@
-## 2026-04-07 — Replace DRE Custom Date Panel with Two Separate Modals
+## 2026-04-07 — Replace modals with inline date inputs for DRE
 
 ### Files changed
-- `src/pages/admin/AdminRelatoriosFinanceiros.jsx` — modified: Replaced single range-picker modal with two separate sequential modals
+- `src/pages/admin/AdminRelatoriosFinanceiros.jsx` — modified: Removed all modal code and replaced with inline native date inputs
 
 ### Changes Summary
 
-#### Complete Restructure of Date Selection Flow
+#### Complete Simplification: No More Modals
 
-**Old Flow (Range Picker):**
-- Single modal with calendar in range mode
-- User selected start and end dates on same calendar
-- Complex range highlighting logic
-- Auto-applied both dates at once
+**Before:**
+- Two sequential modals for date selection
+- Complex state management (`modalStep`, `handleStartApply`, `handleEndApply`)
+- Custom calendar with DayPicker library
+- ~220 lines of modal component code
+- Animation and transition logic
+- Multiple closing/opening race condition issues
 
-**New Flow (Two Separate Modals):**
-1. User clicks "Personalizado" → Modal 1 opens
-2. **Modal 1**: "Selecione a data de início"
-   - Single date calendar
-   - User picks start date
-   - Click "OK" → Modal closes
-3. **Modal 2**: "Selecione a data de fim" (opens automatically)
-   - Single date calendar  
-   - User picks end date
-   - Click "OK" → Modal closes
-4. Both dates displayed in separate cards
-5. User clicks "Consultar" button manually
+**After:**
+- Two inline `<input type="date">` fields directly in the card
+- Native browser date picker (calendar icon clicks → OS date picker)
+- Zero modals, zero race conditions
+- ~250 lines of code removed
+- Simple, familiar UX everyone knows
 
-#### Implementation Details
+#### New UI Layout
 
-**Replaced DateRangeModal with DateSelectionModal:**
-- New component accepts `step` prop ('start' or 'end')
-- Mode changed from `mode="range"` to `mode="single"` in DayPicker
-- Simpler calendar without range highlighting CSS
-- Shows selected date with weekday in date card
-- "OK" button instead of "Aplicar período"
+```
+┌─────────────────────────────────────────────────────────┐
+│  [Hoje] [7 dias] [Este mês] [30 dias] [Trimestre] ...  │
+├─────────────────────────────────────────────────────────┤
+│  Data de início          Data de fim                    │
+│  [📅 __/__/____]        [📅 __/__/____]  [Consultar]   │
+└─────────────────────────────────────────────────────────┘
+```
 
-**Updated State Management:**
-- Changed `modalOpen` (boolean) → `modalStep` (null | 'start' | 'end')
-- Added `handleStartApply`: sets start date, opens end date modal
-- Added `handleEndApply`: sets end date, closes modal (no auto-query)
-- Added `handleModalClose`: resets modal step to null
+- **Desktop**: Inputs side-by-side with Consultar button
+- **Mobile**: Inputs stack vertically, button full-width
+- Native date picker icon (📅) visible on click
+- Browser's optimized date picker appears (works perfectly on mobile)
 
-**Enhanced Date Display:**
-- Replaced single range label with two separate date cards
-- Each card shows: label (Início/Fim) + formatted date
-- Cards have borders and background for visual separation
-- Arrow icon between cards shows direction
-- Empty state shows "—" for unselected dates
+#### Code Removed
+- `DateSelectionModal` component (~220 lines)
+- `modalStep` state variable
+- `handleStartApply`, `handleEndApply`, `handleModalClose` handlers
+- `toISO()`, `isoToDate()`, `formatDateCard()` helper functions
+- `MONTH_NAMES_PT`, `WEEKDAY_PT` constants
+- `DayPicker` import and all custom calendar CSS
+- `formatRangeLabel()` function
+- `useMemo` import (no longer needed)
+- `FiChevronRight`, `FiX` icon imports
 
-**Removed Features:**
-- Step indicator (1 → 2) from previous iteration
-- Range selection CSS (`.rdp-range_start`, `.rdp-range_middle`, `.rdp-range_end`)
-- Disabled dates logic (no longer needed)
-- Reset button (simpler to just close and reopen modal)
-- Auto-consultar on apply (user must click button)
+#### Code Added
+- Two `<input type="date">` elements with labels
+- Focus/blur styling for accessibility (orange ring on focus)
+- `min-h-[44px]` for mobile touch targets
+- Responsive layout: `flex-col` on mobile, `flex-row` on desktop
+
+#### State Management Simplified
+```javascript
+// Old state
+const [modalStep, setModalStep] = useState(null) // Removed
+
+// Direct input onChange updates
+onChange={(e) => {
+  setInicio(e.target.value)
+  setActivePreset('custom')
+  setDreData(null)
+  setDespesasData(null)
+}}
+```
+
+### Benefits
+- ✅ **Simpler UX**: No modals, no confusion, just fill two fields
+- ✅ **Better mobile**: Native date pickers are OS-optimized
+- ✅ **Accessibility**: Native inputs work with screen readers
+- ✅ **Less code**: ~250 lines removed, easier to maintain
+- ✅ **No bugs**: No race conditions, no animation issues
+- ✅ **Familiar**: Everyone knows how date inputs work
+- ✅ **Fast**: Direct input, fewer clicks
 
 ### Notes
-- Modal animation and styling preserved from previous versions
-- Both modals use same component, just different `step` prop
-- No breaking changes to preset buttons (7 days, This month, etc.)
-- Consultar button only enabled when both dates are set (existing validation)
-- Pre-existing React lint warning about setState in useEffect (matches pattern used throughout codebase)
+- Preset buttons still work (Hoje, 7 dias, Este mês, etc.)
+- Clicking preset still auto-queries the report
+- Manual date input requires clicking "Consultar" button
+- All existing validation preserved (can't query without both dates)
 
 ---
