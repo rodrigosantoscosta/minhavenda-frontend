@@ -74,7 +74,8 @@ export default function Home() {
       const params = {
         page,
         size: pageSize,
-        sort: 'dataCriacao,desc',
+        sort: 'dataCadastro',
+        sortDir: 'DESC',
         ativo: true,
       }
       if (selectedCategory) params.categoriaId = selectedCategory

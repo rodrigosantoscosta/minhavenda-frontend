@@ -181,7 +181,7 @@ src/
 
 ### Authentication
 
-Full **dual-token auth flow** — short-lived access tokens (24h) paired with long-lived refresh tokens (7d). On any 401 from a protected endpoint, `api.js` automatically attempts a silent refresh before retrying. Concurrent requests during a refresh are queued — only one refresh call is ever made at a time.
+Full **dual-token auth flow** — short-lived access tokens (15 min) paired with long-lived refresh tokens (7d). On any 401 from a protected endpoint, `api.js` automatically attempts a silent refresh before retrying. Concurrent requests during a refresh are queued — only one refresh call is ever made at a time.
 
 **Token storage** (`localStorage`):
 
@@ -282,7 +282,7 @@ The NestJS backend runs on port `3000`. Vite proxies `/api → http://localhost:
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/auth/login` | Returns `{ accessToken, refreshToken, email, nome }` |
+| POST | `/api/auth/login` | Returns `{ accessToken (15 min), refreshToken (7d), email, nome }` |
 | POST | `/api/auth/register` | Same shape as login |
 | GET | `/api/auth/google` | Initiates Google OAuth (full browser redirect) |
 | POST | `/api/auth/google/exchange` | Swaps one-time `code` for `{ accessToken, refreshToken }` |

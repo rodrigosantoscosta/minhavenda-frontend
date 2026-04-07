@@ -138,6 +138,18 @@ const adminService = {
     return res.data
   },
 
+  // ─── Relatórios Financeiros ───────────────────────────────────────────────
+
+  async getDRE(inicio, fim) {
+    const res = await api.get('/admin/relatorios/dre', { params: { inicio, fim } })
+    return res.data
+  },
+
+  async getDespesas(inicio, fim) {
+    const res = await api.get('/admin/relatorios/despesas', { params: { inicio, fim } })
+    return res.data
+  },
+
   // ─── Dashboard ────────────────────────────────────────────────────────────
   // NOTE: This endpoint does NOT exist yet on the backend.
   // The AdminDashboard page must handle the 404 gracefully.

@@ -3,16 +3,17 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import {
   FiGrid, FiList, FiPackage, FiArchive, FiTag,
-  FiAlertOctagon, FiLogOut, FiMenu, FiX, FiChevronRight,
+  FiAlertOctagon, FiLogOut, FiMenu, FiX, FiChevronRight, FiBarChart2,
 } from 'react-icons/fi'
 
 const NAV_ITEMS = [
-  { to: '/admin/dashboard',  icon: FiGrid,        label: 'Dashboard' },
-  { to: '/admin/pedidos',    icon: FiList,         label: 'Pedidos' },
-  { to: '/admin/produtos',   icon: FiPackage,      label: 'Produtos' },
-  { to: '/admin/estoque',    icon: FiArchive,      label: 'Estoque' },
-  { to: '/admin/categorias', icon: FiTag,          label: 'Categorias' },
-  { to: '/admin/dlq',        icon: FiAlertOctagon, label: 'DLQ' },
+  { to: '/admin/dashboard',         icon: FiGrid,        label: 'Dashboard' },
+  { to: '/admin/pedidos',           icon: FiList,         label: 'Pedidos' },
+  { to: '/admin/produtos',          icon: FiPackage,      label: 'Produtos' },
+  { to: '/admin/estoque',           icon: FiArchive,      label: 'Estoque' },
+  { to: '/admin/categorias',        icon: FiTag,          label: 'Categorias' },
+  { to: '/admin/relatorios-financeiros', icon: FiBarChart2, label: 'Relatórios' },
+  { to: '/admin/dlq',               icon: FiAlertOctagon, label: 'DLQ' },
 ]
 
 // Design tokens

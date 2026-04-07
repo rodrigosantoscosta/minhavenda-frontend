@@ -35,6 +35,7 @@ import AdminEditProduto from './pages/admin/AdminEditProduto'
 import AdminEstoque from './pages/admin/AdminEstoque'
 import AdminCategorias from './pages/admin/AdminCategorias'
 import AdminDLQ from './pages/admin/AdminDLQ'
+import AdminRelatoriosFinanceiros from './pages/admin/AdminRelatoriosFinanceiros'
 
 /**
  * Inner component — needs to be inside BrowserRouter to call useLocation.
@@ -83,6 +84,7 @@ function AppInner() {
                 <Route path="/admin/produtos/:id" element={<AdminRoute><AdminEditProduto /></AdminRoute>} />
                 <Route path="/admin/estoque"     element={<AdminRoute><AdminEstoque /></AdminRoute>} />
                 <Route path="/admin/categorias"  element={<AdminRoute><AdminCategorias /></AdminRoute>} />
+                <Route path="/admin/relatorios-financeiros" element={<AdminRoute><AdminRelatoriosFinanceiros /></AdminRoute>} />
                 <Route path="/admin/dlq"         element={<AdminRoute><AdminDLQ /></AdminRoute>} />
 
                 {/* ── 404 ── */}
