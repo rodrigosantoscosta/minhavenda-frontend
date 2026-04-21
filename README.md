@@ -1,6 +1,6 @@
 # MinhaVenda — Frontend
 
-Full-stack e-commerce storefront and admin dashboard for **MinhaVenda**, a Brazilian online store. Built with React + Vite, backed by the [`minhavenda-nestjs`](../minhavenda-nestjs) NestJS API.
+Full-stack e-commerce storefront and admin dashboard for **MinhaVenda**, a online store. Built with React + Vite, backed by the [`minhavenda-nestjs`](../minhavenda-nestjs) NestJS API.
 
 ---
 
@@ -8,7 +8,7 @@ Full-stack e-commerce storefront and admin dashboard for **MinhaVenda**, a Brazi
 
 | Layer | Technology |
 |---|---|
-| Framework | React 19 + Vite 7 |
+| Framework | React 19 + TypeScript (strict mode) + Vite 7 |
 | Styling | Tailwind CSS 3 |
 | Routing | React Router DOM v7 |
 | HTTP client | Axios |
@@ -16,8 +16,9 @@ Full-stack e-commerce storefront and admin dashboard for **MinhaVenda**, a Brazi
 | Icons | react-icons v5 (Feather) |
 | Logging | Pino |
 | Mock data | @faker-js/faker (pt_BR, seed 42) |
-| E2E tests | Playwright (27 tests, all passing) |
+| E2E tests | Playwright (Chromium only) |
 | Package manager | pnpm 10 |
+| Type checking | TypeScript 6.0 (strict mode) |
 
 ---
 
@@ -81,7 +82,7 @@ src/
 ├── assets/             # Static assets (images, SVGs)
 ├── components/
 │   ├── admin/          # Admin-only components
-│   │   └── AdminLayout.jsx   # Sidebar (desktop) + drawer (mobile) + top bar
+│   │   └── AdminLayout.tsx   # Sidebar (desktop) + drawer (mobile) + top bar
 │   ├── checkout/       # AddressForm, OrderSummary
 │   ├── common/         # Shared UI — Button, Badge, Modal, Toast,
 │   │                   #   Loading, EmptyState, NotificationBell,
@@ -91,51 +92,59 @@ src/
 │   ├── product/        # ProductCard, ImageGallery, CategoryFilter, RelatedProducts
 │   └── search/         # SearchBar, SearchFilters, SortOptions
 ├── contexts/           # React Context providers
-│   ├── AuthContext.jsx         # JWT state, auto-expiry monitoring, Google OAuth exchange
-│   ├── CartContext.jsx         # Cart state (optimistic UI + debounced sync)
-│   └── NotificationContext.jsx # In-app order notifications
+│   ├── AuthContext.tsx         # JWT state, auto-expiry monitoring, Google OAuth exchange
+│   ├── CartContext.tsx         # Cart state (optimistic UI + debounced sync)
+│   └── NotificationContext.tsx # In-app order notifications
 ├── hooks/
-│   ├── useAuthToken.js         # Token decode + expiry helpers
-│   └── useNotifications.js    # Notification state + localStorage
+│   ├── useAuthToken.ts         # Token decode + expiry helpers
+│   ├── useNotifications.ts    # Notification state + localStorage
+│   └── useScrollOnPageChange.ts # Scroll to top on page change
 ├── mocks/              # Auto-fallback mock layer (active when backend is down)
-│   ├── factories.js            # Faker factories — fixed seed 42, pt_BR locale
-│   └── mockProductService.js  # Mirrors productService contract exactly
+│   ├── factories.ts            # Faker factories — fixed seed 42, pt_BR locale (fully typed)
+│   └── mockProductService.ts  # Mirrors productService contract exactly (fully typed)
 ├── pages/              # Route-level page components
 │   ├── admin/          # ADMIN role required for all routes under /admin/*
-│   │   ├── AdminDashboard.jsx
-│   │   ├── AdminPedidos.jsx
-│   │   ├── AdminPedidoDetail.jsx
-│   │   ├── AdminProdutos.jsx
-│   │   ├── AdminEditProduto.jsx
-│   │   ├── AdminEstoque.jsx
-│   │   ├── AdminCategorias.jsx
-│   │   └── AdminDLQ.jsx
-│   ├── Home.jsx
-│   ├── Login.jsx               # Email/password + "Entrar com Google" (id="email", id="senha")
-│   ├── Register.jsx
-│   ├── OAuthCallback.jsx       # Handles /auth/callback?code= redirect from backend
-│   ├── SearchPage.jsx          # Full-text search, filters, sort, offset pagination
-│   ├── Products.jsx / ProductDetail.jsx
-│   ├── Cart.jsx
-│   ├── Checkout.jsx
-│   ├── Orders.jsx / OrderDetail.jsx
-│   └── Profile.jsx
-├── services/           # API service layer
-│   ├── api.js                  # Axios instance + interceptors (silent token refresh)
-│   ├── adminService.js         # All /admin/* endpoints (orders, products, stock, categories, DLQ)
-│   ├── authService.js          # login, register, googleExchange, refreshTokens, logout
-│   ├── cartService.js
-│   ├── checkoutService.js
-│   ├── notificationService.js
-│   ├── orderService.js
-│   ├── productService.js       # withFallback() HOF — real → mock on error
-│   └── searchService.js        # Splits sort="nome:asc" → { sort, sortDir } before API call
+│   │   ├── AdminDashboard.tsx
+│   │   ├── AdminPedidos.tsx
+│   │   ├── AdminPedidoDetail.tsx
+│   │   ├── AdminProdutos.tsx
+│   │   ├── AdminEditProduto.tsx
+│   │   ├── AdminEstoque.tsx
+│   │   ├── AdminCategorias.tsx
+│   │   ├── AdminDLQ.tsx
+│   │   ├── AdminRelatoriosFinanceiros.tsx
+│   │   └── components/
+│   │       ├── DreReport.tsx
+│   │       └── DespesasReport.tsx
+│   ├── Home.tsx
+│   ├── Login.tsx               # Email/password + "Entrar com Google" (id="email", id="senha")
+│   ├── Register.tsx
+│   ├── OAuthCallback.tsx       # Handles /auth/callback?code= redirect from backend
+│   ├── SearchPage.tsx          # Full-text search, filters, sort, offset pagination
+│   ├── Products.tsx / ProductDetail.tsx
+│   ├── Cart.tsx
+│   ├── Checkout.tsx
+│   ├── Orders.tsx / OrderDetail.tsx
+│   ├── Profile.tsx
+│   └── TestAPI.tsx / TestComponents.tsx
+├── services/           # API service layer (all fully typed)
+│   ├── api.ts                  # Axios instance + interceptors (silent token refresh)
+│   ├── adminService.ts         # All /admin/* endpoints (orders, products, stock, categories, DLQ)
+│   ├── authService.ts          # login, register, googleExchange, refreshTokens, logout
+│   ├── cartService.ts
+│   ├── checkoutService.ts
+│   ├── notificationService.ts
+│   ├── orderService.ts
+│   ├── productService.ts       # withFallback() HOF — real → mock on error
+│   └── searchService.ts        # Splits sort="nome:asc" → { sort, sortDir } before API call
+├── types/
+│   └── index.ts                # Shared TypeScript type definitions (80+ types)
 └── utils/
-    ├── adminUtils.jsx          # Design tokens (T), shared admin UI atoms
-    ├── imageHelper.js
-    ├── jwtHelper.js
-    ├── logger.js               # Pino logger wrapper
-    └── storageUtil.js          # Safe localStorage wrapper
+    ├── adminUtils.tsx          # Design tokens (T), shared admin UI atoms
+    ├── imageHelper.ts
+    ├── jwtHelper.ts
+    ├── logger.ts               # Pino logger wrapper
+    └── storageUtil.ts          # Safe localStorage wrapper
 ```
 
 ---
@@ -181,7 +190,7 @@ src/
 
 ### Authentication
 
-Full **dual-token auth flow** — short-lived access tokens (15 min) paired with long-lived refresh tokens (7d). On any 401 from a protected endpoint, `api.js` automatically attempts a silent refresh before retrying. Concurrent requests during a refresh are queued — only one refresh call is ever made at a time.
+Full **dual-token auth flow** — short-lived access tokens (15 min) paired with long-lived refresh tokens (7d). On any 401 from a protected endpoint, `api.ts` automatically attempts a silent refresh before retrying. Concurrent requests during a refresh are queued — only one refresh call is ever made at a time.
 
 **Token storage** (`localStorage`):
 
@@ -205,14 +214,14 @@ Backend receives callback → resolves user → stores token pair under UUID cod
       ↓
 Backend redirects to /auth/callback?code=<uuid>
       ↓
-OAuthCallback.jsx reads code → POST /auth/google/exchange → receives { accessToken, refreshToken }
+OAuthCallback.tsx reads code → POST /auth/google/exchange → receives { accessToken, refreshToken }
       ↓
 Tokens saved to localStorage → navigate to home
 ```
 
 On failure, `OAuthCallback` stores an error in `sessionStorage` and redirects to `/login`.
 
-### Search Service (`searchService.js`)
+### Search Service (`searchService.ts`)
 
 `GET /api/produtos` accepts separate `sort` and `sortDir` params. The internal `_splitSort()` helper converts the UI shorthand (`"preco:desc"`) into `{ sort: "preco", sortDir: "DESC" }` before the axios call, keeping URL/state management simple while matching the backend's `FiltroProdutoDto`.
 
@@ -223,7 +232,9 @@ API params:  sort=preco&sortDir=DESC
 ```
 
 ### Mock Fallback Layer
-`src/services/productService.js` wraps every real API call in `withFallback(realFn, mockFn)`. When the backend errors, the mock silently activates and returns stable Faker data (seed 42, pt_BR) with realistic 120–380 ms simulated latency. Set `VITE_USE_MOCK=true` to force mocks — useful for offline demos.
+`src/services/productService.ts` wraps every real API call in `withFallback(realFn, mockFn)`. When the backend errors, the mock silently activates and returns stable Faker data (seed 42, pt_BR) with realistic 120–380 ms simulated latency. Set `VITE_USE_MOCK=true` to force mocks — useful for offline demos.
+
+**Note:** All mock files are fully typed against backend DTOs as of April 2026.
 
 ### Admin Dashboard (`/admin/*` — ADMIN role required)
 - **Dashboard** — KPI cards and low-stock alerts
@@ -246,7 +257,7 @@ API params:  sort=preco&sortDir=DESC
 | `admin@loja.com` | ADMIN | `senha123` |
 | `joao.silva@email.com` | CLIENTE | `senha123` |
 
-- `AdminRoute` in `src/components/common/ProtectedRoute.jsx` guards all `/admin/*` routes — requires `user.role === 'ADMIN'`
+- `AdminRoute` in `src/components/common/ProtectedRoute.tsx` guards all `/admin/*` routes — requires `user.role === 'ADMIN'`
 - Role is decoded from the JWT payload `role` claim at login time by `authService.buildUser()`
 - `/auth/callback` is a public route — required for the OAuth redirect to land
 
@@ -271,6 +282,40 @@ pnpm test:e2e
 - Login email field: `page.locator('#email')` — `getByLabel(/email/i)` also works
 - Login password field: `page.locator('#senha')` — do NOT use `getByLabel(/senha/i)` as it also matches the toggle button `aria-label="Mostrar senha"`
 - "Email inválido" validation: fill `'a@b'` (passes browser `type="email"` check, fails custom regex `\S+@\S+\.\S+`)
+
+---
+
+## TypeScript Migration
+
+**Status:** ✅ **COMPLETE** (April 8, 2026)
+
+The entire codebase has been migrated from JavaScript/JSX to TypeScript/TSX:
+
+- **86 source files** — all `.ts` or `.tsx`
+- **Strict mode enabled** — `tsconfig.json` with full strict checking
+- **Zero implicit `any` types** — all types explicit or properly inferred
+- **Type-safe mocks** — mock services validated against backend DTOs
+- **Comprehensive type definitions** — 80+ types in `src/types/index.ts`
+
+### Type Highlights
+
+```typescript
+// All services use import type syntax
+import type { Product, Category, Order, User } from '../types'
+
+// Mock services are type-checked
+const getProductPool = (): MockProduct[] => { ... }
+
+// Error handling without 'any'
+const err: Error & { response?: { status: number } } = new Error('Not found')
+err.response = { status: 404 }
+```
+
+### Running Type Checks
+
+```bash
+npx tsc --noEmit  # Type-check without building
+```
 
 ---
 

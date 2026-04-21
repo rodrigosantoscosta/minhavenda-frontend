@@ -2,26 +2,16 @@
 
 ## High Priority
 
-- [ ] **Audit `src/components/common/ProductCard.jsx`** (the older card at `common/`, not `common/products/`) — verify it also has the mobile-first horizontal layout or is no longer used anywhere.
-- [ ] **Test mobile-first product cards on real device / 390px viewport** — confirm image height renders correctly (`minHeight: 7rem`) and button is tappable (≥44px).
-- [ ] **Review `SearchPage.jsx` sidebar on mobile** — sidebar is `hidden lg:block`; the toggle button only shows on `< lg`. Ensure filter panel overlays content correctly on small screens without layout shift.
-
-- [ ] **Wire `startPolling` token argument in `AuthContext.jsx`** — `notificationService.startPolling`
+- [ ] **Create Module 4: The Smart Cart** — optimistic UI, debounced sync, mock fallback, how cart uses auth state
+- [ ] **Assemble full course HTML** — run build.sh or manually combine _base.html, all modules, and _footer.html into a single index.html
+- [ ] **Fix remaining TypeScript errors** — 828 errors remain in components, pages, and contexts (prop types, context usage, missing dependencies)
+- [ ] **Wire `startPolling` token argument in `AuthContext.tsx`** — `notificationService.startPolling`
   now requires a second `token` argument. Update the call site in `AuthContext`:
-  ```js
+  ```ts
   startPolling(addNotification, authService.getToken())
   ```
   Without this, the SSE connection will be rejected as unauthenticated (401).
-
-- [ ] **Apply `case 429` to `api.js` manually** — Serena language server was unavailable
-  during the session (Node.js not in PATH). Add the block between `case 503` and the default,
-  and add the `api:rate-limited` event listener to `Login.jsx` and `Register.jsx`.
-  Exact code in `docs/CHANGES_EXPLAINED.md`.
-
-- [ ] Add `cancelOrder` export to `src/services/orderService.js` if missing — the
-  OrderDetail page now calls it; verify the API endpoint `/pedidos/{id}/cancelar` is wired.
-
-- [ ] Resolve missing `logger` reference in `OrderDetail.jsx` — verify import at runtime.
+- [ ] **Run full Playwright test suite** — verify all E2E tests pass with TypeScript codebase
 
 ## Medium Priority
 
@@ -35,7 +25,7 @@
 ## Low Priority / Nice to Have
 
 - [ ] Add unit tests for `useNotifications` hook (localStorage persistence, max-20 cap, markAsRead, sort order).
-- [ ] Add unit tests for `notificationService.js` — mock `fetch`, verify SSE parser handles partial
+- [ ] Add unit tests for `notificationService.ts` — mock `fetch`, verify SSE parser handles partial
   chunks, blank lines, and unknown event names correctly.
 - [ ] Add form validation hook `useFormValidation.js`.
 - [ ] Lazy load pages with `React.lazy()` for bundle splitting.
@@ -45,6 +35,10 @@
 
 ## Completed
 
+- [x] Module 5: The Admin Empire — admin dashboard, DLQ, role-based access, two-tier architecture — done 2026-04-10
+- [x] Module 3: Auth, Tokens, and Silent Refresh — dual-token JWT, silent refresh, Google OAuth, interceptor 401 handling — done 2026-04-10
+- [x] Complete TypeScript migration of mock service files (factories.ts, mockProductService.ts) — done 2026-04-08
+- [x] Complete TypeScript migration of entire codebase (84 files) — done 2026-04-07
 - [x] DRE date selection: Inline native date inputs (no modals) — done 2026-04-07
 - [x] DRE Custom Date Panel: Two separate modals for start/end date selection — done 2026-04-07
 - [x] DRE Custom Date Panel UX flow improvement (step indicator, disabled dates, better guidance) — done 2026-04-07

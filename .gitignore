@@ -60,6 +60,7 @@ playwright/.cache/
 # ============================================================
 .serena/cache/
 .serena/project.local.yml
+minhavenda-course/
 
 # ============================================================
 # Editor & IDE
