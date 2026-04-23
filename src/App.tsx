@@ -5,6 +5,7 @@ import { CartProvider } from './contexts/CartContext'
 import { NotificationProvider } from './contexts/NotificationContext'
 
 import ScrollToTop from './components/common/ScrollToTop'
+import MockModeBanner from './components/common/MockModeBanner'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Cart from './pages/Cart'
@@ -51,6 +52,7 @@ function AppInner() {
       <CartProvider>
         <NotificationProvider>
           <div className="min-h-screen bg-gray-50 flex flex-col">
+            <MockModeBanner />
             {!isAdmin && <Header />}
 
             <main className="flex-1">

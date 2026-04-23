@@ -60,7 +60,6 @@ playwright/.cache/
 # ============================================================
 .serena/cache/
 .serena/project.local.yml
-minhavenda-course/
 
 # ============================================================
 # Editor & IDE
@@ -101,3 +100,4 @@ desktop.ini
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/minhavenda-course
