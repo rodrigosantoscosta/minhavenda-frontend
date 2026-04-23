@@ -57,7 +57,7 @@ export default function MockModeBanner() {
       </svg>
 
       <span>
-        ⚠️ MODO MOCK ATIVO — dados gerados pelo Faker, sem backend real.{' '}
+         MODO MOCK ATIVO — dados gerados pelo Faker, sem backend real.{' '}
         <span style={{ opacity: 0.75, fontWeight: 400 }}>
           Remova <code style={{ background: 'rgba(0,0,0,0.25)', padding: '0 4px', borderRadius: 3 }}>VITE_USE_MOCK=true</code> do{' '}
           <code style={{ background: 'rgba(0,0,0,0.25)', padding: '0 4px', borderRadius: 3 }}>.env.development</code> para usar o backend real.
