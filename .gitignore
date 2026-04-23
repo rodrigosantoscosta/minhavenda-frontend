@@ -75,7 +75,8 @@ playwright/.cache/
 *.sw?
 *.swp
 *.swo
-
+.claude
+.agents
 # ============================================================
 # OS generated files
 # ============================================================
@@ -99,3 +100,4 @@ desktop.ini
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/minhavenda-course

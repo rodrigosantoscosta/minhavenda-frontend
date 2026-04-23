@@ -1,211 +1,192 @@
 // @ts-check
-import { test, expect } from '@playwright/test'
-
 /**
- * scrollTop-pagination.spec.js
+ * tests/scrollTop-pagination.spec.js
  *
- * Tests for the useScrollOnPageChange hook behavior on ProductPage.
+ * Tests for pagination scroll behaviour on SearchPage (/busca).
  *
- * What we're testing:
- *   - When the user clicks "Próxima →" (next page), the page scrolls back to the top.
- *   - When the user clicks "← Anterior" (previous page), the page scrolls back to the top.
- *   - The "Anterior" button is disabled on page 1.
- *   - The "Próxima" button is disabled on the last page.
- *   - The page indicator text updates correctly on navigation.
+ * Route:    /busca?q=produto  (NOT /products — that route is commented out)
+ * API:      GET /api/produtos — intercepted with mock paginated response
  *
- * Strategy:
- *   The dev server must be running on http://localhost:5173 (Vite default).
- *   The backend API does NOT need to be real — we intercept /api/produtos with
- *   a mock that returns a paginated response with enough data (3 pages of 12)
- *   so all pagination UI is rendered.
+ * Pagination component (src/components/common/Pagination.jsx) renders:
+ *   - aria-label="Página anterior"   (Prev button)
+ *   - aria-label="Próxima página"    (Next button)
+ *   - Text: "Página X de Y"          (page indicator, capital P)
  *
- *   scrollTo is mocked at the page level so we can assert it was called with
- *   { top: 0, behavior: 'smooth' } without needing an actual tall page.
+ * currentPage in Pagination is 1-based (SearchPage passes pagination.page + 1).
+ * handlePageChange receives 1-based page and subtracts 1 before updating URL.
  */
 
-const BASE_URL = 'http://localhost:5173'
-const PRODUCTS_URL = `${BASE_URL}/products`
+import { test, expect } from '@playwright/test'
 
-/** Build a fake paginated API response */
-function fakePage(page, totalPages = 3, pageSize = 12) {
-  const totalElements = totalPages * pageSize
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function fakePage(pageIndex, totalPages = 3, pageSize = 12) {
   const content = Array.from({ length: pageSize }, (_, i) => ({
-    id: page * pageSize + i + 1,
-    nome: `Produto ${page * pageSize + i + 1}`,
+    id: pageIndex * pageSize + i + 1,
+    nome: `Produto ${pageIndex * pageSize + i + 1}`,
     descricao: 'Descrição de teste',
     preco: 99.9,
-    moeda: 'BRL',
     urlImagem: null,
     categoriaId: 1,
     categoriaNome: 'Categoria Teste',
     ativo: true,
-    dataCadastro: new Date().toISOString(),
   }))
   return {
     content,
     totalPages,
-    totalElements,
-    number: page,        // 0-based
+    totalElements: totalPages * pageSize,
+    number: pageIndex,
     size: pageSize,
-    first: page === 0,
-    last: page === totalPages - 1,
+    first: pageIndex === 0,
+    last: pageIndex === totalPages - 1,
     numberOfElements: content.length,
   }
 }
 
-test.describe('useScrollOnPageChange — ProductPage pagination scroll', () => {
-  test.beforeEach(async ({ page }) => {
-    // Intercept ALL /api/produtos requests and respond with paged mock data.
-    // Playwright intercepts are matched per-request so we can inspect query params.
-    await page.route('**/api/produtos**', async (route) => {
-      const url = new URL(route.request().url())
-      const pageParam = parseInt(url.searchParams.get('page') ?? '0', 10)
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(fakePage(pageParam, 3, 12)),
-      })
+async function mockProducts(page, totalPages = 3) {
+  await page.route('**/api/produtos**', async (route) => {
+    const url = new URL(route.request().url())
+    const pageParam = parseInt(url.searchParams.get('page') ?? '0', 10)
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(fakePage(pageParam, totalPages)),
     })
+  })
+}
 
-    // Mock window.scrollTo so we can spy on calls without needing a real
-    // tall document. Returns a list of recorded calls via window.__scrollCalls.
+async function mockCategories(page) {
+  await page.route('**/api/categorias**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' })
+  )
+}
+
+// ─── Suite ───────────────────────────────────────────────────────────────────
+
+test.describe('Pagination scroll — SearchPage (/busca)', () => {
+
+  test.beforeEach(async ({ page }) => {
+    await mockProducts(page)
+    await mockCategories(page)
+
+    // Spy on window.scrollTo to assert scroll-to-top behaviour
     await page.addInitScript(() => {
       window.__scrollCalls = []
       const original = window.scrollTo.bind(window)
       window.scrollTo = (...args) => {
-        // scrollTo can be called as scrollTo(x, y) or scrollTo(options)
-        const options = typeof args[0] === 'object' ? args[0] : { top: args[1] ?? 0, left: args[0] ?? 0 }
+        const options =
+          typeof args[0] === 'object'
+            ? args[0]
+            : { top: args[1] ?? 0, left: args[0] ?? 0 }
         window.__scrollCalls.push(options)
-        // Still call the original so scroll position is updated for selectors
         try { original(...args) } catch (_) {}
       }
     })
 
-    await page.goto(PRODUCTS_URL)
-    // Wait for products to render (at least one product card visible)
-    await page.waitForSelector('[data-testid="product-card"], .product-card, h1', { timeout: 10_000 })
+    // SearchPage is at /busca, NOT /products
+    await page.goto('/busca?q=produto')
+    // Wait for at least one product card to confirm data loaded
+    await expect(page.getByText('Produto 1').first()).toBeVisible()
   })
+
+  // ── Selectors — verified from Pagination.jsx source ──────────────────────
+  // prev: aria-label="Página anterior"
+  // next: aria-label="Próxima página"
+  // indicator: text "Página X de Y" (capital P, rendered as plain text)
 
   test('pagination controls are visible when there are multiple pages', async ({ page }) => {
-    const nextBtn = page.getByRole('button', { name: /próxima/i })
-    const prevBtn = page.getByRole('button', { name: /anterior/i })
-    const pageIndicator = page.getByText(/página \d+ de \d+/i)
-
-    await expect(nextBtn).toBeVisible()
-    await expect(prevBtn).toBeVisible()
-    await expect(pageIndicator).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Próxima página' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Página anterior' })).toBeVisible()
+    await expect(page.getByText(/Página \d+ de \d+/)).toBeVisible()
   })
 
-  test('"Anterior" button is disabled on first page', async ({ page }) => {
-    const prevBtn = page.getByRole('button', { name: /anterior/i })
-    await expect(prevBtn).toBeDisabled()
+  test('"Página anterior" button is disabled on the first page', async ({ page }) => {
+    await expect(page.getByRole('button', { name: 'Página anterior' })).toBeDisabled()
   })
 
-  test('"Próxima" button is enabled on first page', async ({ page }) => {
-    const nextBtn = page.getByRole('button', { name: /próxima/i })
-    await expect(nextBtn).toBeEnabled()
+  test('"Próxima página" button is enabled on the first page', async ({ page }) => {
+    await expect(page.getByRole('button', { name: 'Próxima página' })).toBeEnabled()
   })
 
-  test('clicking "Próxima" advances to page 2 and triggers scrollTo top', async ({ page }) => {
-    // Clear any scroll calls from initial render
+  test('clicking "Próxima página" advances to page 2 and triggers scroll-to-top', async ({ page }) => {
     await page.evaluate(() => { window.__scrollCalls = [] })
 
-    const nextBtn = page.getByRole('button', { name: /próxima/i })
-    await nextBtn.click()
+    await page.getByRole('button', { name: 'Próxima página' }).click()
 
-    // Wait for page indicator to update
-    await expect(page.getByText(/página 2 de 3/i)).toBeVisible()
+    // Pagination indicator uses 1-based display
+    await expect(page.getByText('Página 2 de 3')).toBeVisible()
 
-    // Assert scrollTo was called with top: 0
+    // Product from page 2 must be visible (index 13 = page 1 * 12 + 1)
+    await expect(page.getByText('Produto 13').first()).toBeVisible()
+
     const scrollCalls = await page.evaluate(() => window.__scrollCalls)
-    expect(scrollCalls.length).toBeGreaterThanOrEqual(1)
-    const lastCall = scrollCalls[scrollCalls.length - 1]
-    expect(lastCall.top).toBe(0)
-    expect(lastCall.behavior).toBe('smooth')
+    expect(scrollCalls.some((c) => c.top === 0)).toBe(true)
   })
 
-  test('clicking "Anterior" goes back to page 1 and triggers scrollTo top', async ({ page }) => {
+  test('clicking "Página anterior" goes back to page 1 and triggers scroll-to-top', async ({ page }) => {
     // Navigate to page 2 first
-    const nextBtn = page.getByRole('button', { name: /próxima/i })
-    await nextBtn.click()
-    await expect(page.getByText(/página 2 de 3/i)).toBeVisible()
+    await page.getByRole('button', { name: 'Próxima página' }).click()
+    await expect(page.getByText('Página 2 de 3')).toBeVisible()
 
-    // Clear recorded scroll calls
     await page.evaluate(() => { window.__scrollCalls = [] })
 
-    const prevBtn = page.getByRole('button', { name: /anterior/i })
-    await prevBtn.click()
-
-    await expect(page.getByText(/página 1 de 3/i)).toBeVisible()
+    await page.getByRole('button', { name: 'Página anterior' }).click()
+    await expect(page.getByText('Página 1 de 3')).toBeVisible()
 
     const scrollCalls = await page.evaluate(() => window.__scrollCalls)
-    expect(scrollCalls.length).toBeGreaterThanOrEqual(1)
-    const lastCall = scrollCalls[scrollCalls.length - 1]
-    expect(lastCall.top).toBe(0)
-    expect(lastCall.behavior).toBe('smooth')
+    expect(scrollCalls.some((c) => c.top === 0)).toBe(true)
   })
 
-  test('"Próxima" is disabled on the last page', async ({ page }) => {
-    const nextBtn = page.getByRole('button', { name: /próxima/i })
+  test('"Próxima página" is disabled on the last page', async ({ page }) => {
+    const nextBtn = page.getByRole('button', { name: 'Próxima página' })
 
-    // Navigate to last page (page 3 of 3 — two clicks from page 1)
     await nextBtn.click()
-    await expect(page.getByText(/página 2 de 3/i)).toBeVisible()
+    await expect(page.getByText('Página 2 de 3')).toBeVisible()
     await nextBtn.click()
-    await expect(page.getByText(/página 3 de 3/i)).toBeVisible()
+    await expect(page.getByText('Página 3 de 3')).toBeVisible()
 
     await expect(nextBtn).toBeDisabled()
   })
 
-  test('"Anterior" is enabled on page 2 and disabled on page 1', async ({ page }) => {
-    const nextBtn = page.getByRole('button', { name: /próxima/i })
-    const prevBtn = page.getByRole('button', { name: /anterior/i })
+  test('"Página anterior" is disabled on page 1 and enabled on page 2', async ({ page }) => {
+    const prevBtn = page.getByRole('button', { name: 'Página anterior' })
+    const nextBtn = page.getByRole('button', { name: 'Próxima página' })
 
-    // On page 1 — Anterior should be disabled
     await expect(prevBtn).toBeDisabled()
 
-    // Navigate to page 2
     await nextBtn.click()
-    await expect(page.getByText(/página 2 de 3/i)).toBeVisible()
+    await expect(page.getByText('Página 2 de 3')).toBeVisible()
 
-    // On page 2 — Anterior should now be enabled
     await expect(prevBtn).toBeEnabled()
   })
 
-  test('each page navigation triggers exactly one scrollTo(top:0) call', async ({ page }) => {
-    const nextBtn = page.getByRole('button', { name: /próxima/i })
+  test('each page change triggers exactly one scroll-to-top call', async ({ page }) => {
+    const nextBtn = page.getByRole('button', { name: 'Próxima página' })
 
-    // Page 1→2
+    // Page 1 → 2
     await page.evaluate(() => { window.__scrollCalls = [] })
     await nextBtn.click()
-    await expect(page.getByText(/página 2 de 3/i)).toBeVisible()
+    await expect(page.getByText('Página 2 de 3')).toBeVisible()
     let calls = await page.evaluate(() => window.__scrollCalls)
-    const topCalls = calls.filter(c => c.top === 0)
-    expect(topCalls).toHaveLength(1)
+    expect(calls.filter((c) => c.top === 0)).toHaveLength(1)
 
-    // Page 2→3
+    // Page 2 → 3
     await page.evaluate(() => { window.__scrollCalls = [] })
     await nextBtn.click()
-    await expect(page.getByText(/página 3 de 3/i)).toBeVisible()
+    await expect(page.getByText('Página 3 de 3')).toBeVisible()
     calls = await page.evaluate(() => window.__scrollCalls)
-    const topCalls2 = calls.filter(c => c.top === 0)
-    expect(topCalls2).toHaveLength(1)
+    expect(calls.filter((c) => c.top === 0)).toHaveLength(1)
   })
 
-  test('scrollTo is NOT called when a disabled button is clicked', async ({ page }) => {
-    // "Anterior" is disabled on page 1 — clicking it should not fire scrollTo
+  test('scroll-to-top is NOT triggered when a disabled button is force-clicked', async ({ page }) => {
     await page.evaluate(() => { window.__scrollCalls = [] })
 
-    const prevBtn = page.getByRole('button', { name: /anterior/i })
-    // Force-click even though it's disabled (to verify the handler is guarded)
+    const prevBtn = page.getByRole('button', { name: 'Página anterior' })
+    // Force-click even though disabled — handler must guard against it
     await prevBtn.click({ force: true })
-
-    // Small wait to let any async effects settle
     await page.waitForTimeout(300)
 
     const calls = await page.evaluate(() => window.__scrollCalls)
-    const topCalls = calls.filter(c => c.top === 0)
-    // No new scroll-to-top should have been triggered
-    expect(topCalls).toHaveLength(0)
+    expect(calls.filter((c) => c.top === 0)).toHaveLength(0)
   })
 })

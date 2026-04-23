@@ -6,7 +6,7 @@
 ## Core Reality
 The existing project is a customer-facing storefront (JSX, Tailwind, react-icons, react-router-dom v6).
 The admin dashboard must be added as a parallel section under `/admin/*` routes in the same project.
-Stay with JSX throughout — no TypeScript migration.
+**NOTE:** The project has since been migrated to TypeScript (April 2026). All files are now `.ts`/`.tsx`.
 
 ---
 
