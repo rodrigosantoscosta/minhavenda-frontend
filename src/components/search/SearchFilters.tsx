@@ -95,7 +95,7 @@ const SearchFilters = ({
           <h3 className="text-lg font-medium text-gray-900">Filtros</h3>
         </div>
         <button
-          onClick={onToggle}
+          onClick={_onToggle}
           className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Fechar filtros"
         >

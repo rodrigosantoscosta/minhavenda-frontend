@@ -18,6 +18,22 @@ type TypeIconProps = {
 }
 
 /**
+ * Formata um timestamp ISO para texto relativo (ex.: "5min atrás").
+ * Definida fora do componente para evitar a regra react-hooks/purity
+ * (Date.now() é impuro e não pode ser chamado durante o render).
+ */
+function timeAgo(isoString: string): string {
+  const diff = Date.now() - new Date(isoString).getTime()
+  const minutes = Math.floor(diff / 60_000)
+  if (minutes < 1) return 'agora'
+  if (minutes < 60) return `${minutes}min atrás`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h atrás`
+  const days = Math.floor(hours / 24)
+  return `${days}d atrás`
+}
+
+/**
  * Ícone de sino com badge de não lidas e dropdown de notificações de pedidos.
  * Deve ser renderizado apenas quando o usuário está autenticado.
  */
@@ -54,18 +70,6 @@ export default function NotificationBell(): React.JSX.Element {
     if (type === 'cancelled') return <FiXCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
     if (type === 'status_change') return <FiRefreshCw className="w-4 h-4 text-primary-500 flex-shrink-0" />
     return <FiPackage className="w-4 h-4 text-primary-500 flex-shrink-0" />
-  }
-
-  // Formatar timestamp
-  function timeAgo(isoString: string): string {
-    const diff = Date.now() - new Date(isoString).getTime()
-    const minutes = Math.floor(diff / 60_000)
-    if (minutes < 1) return 'agora'
-    if (minutes < 60) return `${minutes}min atrás`
-    const hours = Math.floor(minutes / 60)
-    if (hours < 24) return `${hours}h atrás`
-    const days = Math.floor(hours / 24)
-    return `${days}d atrás`
   }
 
   return (

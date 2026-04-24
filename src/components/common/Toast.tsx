@@ -59,6 +59,10 @@ export function useToast(): ToastContextType {
 export function ToastProvider({ children }: ToastProviderProps): React.JSX.Element {
   const [toasts, setToasts] = useState<ToastItem[]>([])
 
+  const removeToast = useCallback((id: number): void => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
+  }, [])
+
   const addToast = useCallback(({ type = 'info', message, duration = 5000 }: { type?: ToastType; message: string; duration?: number }): number => {
     const id = Date.now()
     const toast: ToastItem = { id, type, message, duration }
@@ -72,11 +76,7 @@ export function ToastProvider({ children }: ToastProviderProps): React.JSX.Eleme
     }
 
     return id
-  }, [])
-
-  const removeToast = useCallback((id: number): void => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id))
-  }, [])
+  }, [removeToast])
 
   const success = useCallback((message: string, duration?: number): number => {
     return addToast({ type: 'success', message, duration })

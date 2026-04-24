@@ -396,7 +396,7 @@ export default function AdminEstoque() {
               ) : filtered.map(row => {
                 const qty = row.estoque?.quantidade
                 const sev = getSeverity(qty)
-                const cfg = SEVERITY[sev]
+                const _cfg = SEVERITY[sev]
                 return (
                   <AdminCard key={row.id} className="p-4">
                     {/* Top row: severity + qty */}

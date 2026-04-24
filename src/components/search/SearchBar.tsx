@@ -11,7 +11,7 @@ const SearchBar = ({
   initialValue = "",
   className = "",
   onSearch,
-  showButton = true,
+  showButton: _showButton = true,
   autoFocus = false
 }) => {
   const [searchTerm, setSearchTerm] = useState(initialValue)
