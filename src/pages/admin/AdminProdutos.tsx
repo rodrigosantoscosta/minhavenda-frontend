@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import type { Product, Category } from '../../types'
 import { Link } from 'react-router-dom'
 import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiPackage } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
@@ -68,14 +69,14 @@ function CreateModal({ open, onClose, categorias, onCreated }) {
 }
 
 export default function AdminProdutos() {
-  const [produtos, setProdutos] = useState([])
-  const [categorias, setCategorias] = useState([])
+  const [produtos, setProdutos] = useState<Product[]>([])
+  const [categorias, setCategorias] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [catFilter, setCatFilter] = useState('')
   const [atoFilter, setAtoFilter] = useState('true')
   const [createOpen, setCreateOpen] = useState(false)
-  const [deleteId, setDeleteId] = useState(null)
+  const [deleteId, setDeleteId] = useState<string | number | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const toast = useToast()
 

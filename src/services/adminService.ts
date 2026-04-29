@@ -20,7 +20,7 @@ interface CancelarPedidoDto {
   motivo: string
 }
 
-interface DashboardData {
+export interface DashboardData {
   totalVendas: number
   totalPedidos: number
   totalClientes: number
@@ -31,7 +31,7 @@ interface DashboardData {
   produtosMaisVendidos: Product[]
 }
 
-interface DREReport {
+export interface DREReport {
   periodo: string
   receitaBruta: number
   deducoes: number
@@ -42,7 +42,7 @@ interface DREReport {
   lucroLiquido: number
 }
 
-interface DespesaReport {
+export interface DespesaReport {
   id: string | number
   data: string
   descricao: string

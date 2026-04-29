@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { Order } from '../../types'
 import { useParams, Link } from 'react-router-dom'
 import { FiArrowLeft, FiCheckCircle, FiCircle, FiClock } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
@@ -91,9 +92,9 @@ function ActionModal({ open, onClose, action, pedidoId, onSuccess }) {
 
 export default function AdminPedidoDetail() {
   const { id } = useParams()
-  const [pedido, setPedido] = useState(null)
+  const [pedido, setPedido] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
-  const [modal, setModal] = useState(null)
+  const [modal, setModal] = useState<string | null>(null)
   const toast = useToast()
 
   useEffect(() => {

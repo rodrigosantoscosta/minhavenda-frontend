@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import type { Product, Stock } from '../../types'
 import { FiPlus, FiMinus, FiSliders, FiSearch, FiAlertTriangle, FiAlertCircle, FiCheckCircle, FiPackage } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
 import adminService from '../../services/adminService'
@@ -289,9 +290,9 @@ function ActionButtons({ row, onAction, compact = false }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function AdminEstoque() {
-  const [rows, setRows]         = useState([])
+  const [rows, setRows]         = useState<(Product & { estoqueLoading?: boolean; estoque?: Stock })[]>([])
   const [loading, setLoading]   = useState(true)
-  const [modal, setModal]       = useState(null)   // { action, produto }
+  const [modal, setModal]       = useState<{ action: string; produto: Product } | null>(null)
   const [search, setSearch]     = useState('')
   const [catFilter, setCatFilter] = useState('')
   const [sevFilter, setSevFilter] = useState('all')
@@ -301,12 +302,12 @@ export default function AdminEstoque() {
   useEffect(() => {
     adminService.getProdutos({ ativo: 'true' })
       .then(prods => {
-        setRows(prods.map(p => ({ ...p, estoqueLoading: true })))
+        setRows(prods.map(p => ({ ...p, estoqueLoading: true as boolean })) as (Product & { estoqueLoading?: boolean; estoque?: Stock })[])
         setLoading(false)
         prods.forEach(p => {
           adminService.getEstoque(p.id)
-            .then(estoque => setRows(rs => rs.map(r => r.id === p.id ? { ...r, estoque, estoqueLoading: false } : r)))
-            .catch(() => setRows(rs => rs.map(r => r.id === p.id ? { ...r, estoqueLoading: false } : r)))
+            .then(estoque => setRows(rs => rs.map(r => r.id === p.id ? { ...r, estoque, estoqueLoading: false } : r) as typeof rs))
+            .catch(() => setRows(rs => rs.map(r => r.id === p.id ? { ...r, estoqueLoading: false } : r) as typeof rs))
         })
       })
       .catch(() => { toast.error('Erro ao carregar produtos'); setLoading(false) })

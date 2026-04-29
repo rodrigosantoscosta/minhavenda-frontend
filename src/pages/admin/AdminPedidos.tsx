@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { Order } from '../../types'
 import { Link } from 'react-router-dom'
 import { FiChevronRight, FiFilter } from 'react-icons/fi'
 
@@ -10,7 +11,7 @@ import { useToast } from '../../components/common/Toast'
 const STATUSES = ['TODOS', 'CRIADO', 'PAGO', 'ENVIADO', 'ENTREGUE', 'CANCELADO']
 
 export default function AdminPedidos() {
-  const [pedidos, setPedidos] = useState([])
+  const [pedidos, setPedidos] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [statusFiltro, setStatusFiltro] = useState('TODOS')
   const toast = useToast()

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { DashboardData } from '../../services/adminService'
 import { Link } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell, PieChart, Pie, Legend, ResponsiveContainer } from 'recharts'
 import { FiAlertTriangle, FiDollarSign, FiShoppingCart, FiClock, FiAlertOctagon } from 'react-icons/fi'
@@ -30,7 +31,7 @@ function KpiCard({ label, value, icon: Icon, color, bg }) {
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState(null)
+  const [stats, setStats] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [degraded, setDegraded] = useState(false)
   const toast = useToast()

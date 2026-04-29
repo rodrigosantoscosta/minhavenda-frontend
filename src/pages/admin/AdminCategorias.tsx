@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { Category } from '../../types'
 import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
 import adminService from '../../services/adminService'
@@ -6,13 +7,13 @@ import { formatDate, PageLoader, EmptyState, AdminCard, ConfirmModal, PageTitle,
 import { useToast } from '../../components/common/Toast'
 
 export default function AdminCategorias() {
-  const [categorias, setCategorias] = useState([])
+  const [categorias, setCategorias] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [newForm, setNewForm] = useState({ nome: '', descricao: '' })
-  const [editId, setEditId] = useState(null)
+  const [editId, setEditId] = useState<string | number | null>(null)
   const [editForm, setEditForm] = useState({ nome: '', descricao: '' })
-  const [deleteId, setDeleteId] = useState(null)
+  const [deleteId, setDeleteId] = useState<string | number | null>(null)
   const [saving, setSaving] = useState(false)
   const toast = useToast()
 

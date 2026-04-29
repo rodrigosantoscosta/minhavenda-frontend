@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type { Category } from '../../types'
 import { FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { get } from '../../services/api'
 import logger from '../../utils/logger'
@@ -19,9 +20,9 @@ const SearchFilters = ({
   onToggle: _onToggle,
   className = ""
 }) => {
-  const [categorias, setCategorias] = useState([])
+  const [categorias, setCategorias] = useState<Category[]>([])
   const [isLoadingCategorias, setIsLoadingCategorias] = useState(false)
-  const [localFilters, setLocalFilters] = useState({
+  const [localFilters, setLocalFilters] = useState<Record<string, unknown>>({
     categoriaId: '',
     precoMin: '',
     precoMax: '',
@@ -34,7 +35,7 @@ const SearchFilters = ({
       try {
         setIsLoadingCategorias(true)
         const response = await get('/categorias')
-        setCategorias(response || [])
+        setCategorias((response as Category[]) || [])
       } catch (error) {
         logger.error('Erro ao carregar categorias', { error: error.message })
         setCategorias([])

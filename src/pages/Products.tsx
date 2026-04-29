@@ -1,5 +1,6 @@
 // src/pages/Products.jsx - LAYOUT COM SIDEBAR DE FILTROS
 import { useState, useEffect } from 'react'
+import type { Product, Category } from '../types'
 import { useSearchParams } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { useToast } from '../components/common/Toast'
@@ -24,8 +25,8 @@ export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   // Estados de dados
-  const [produtos, setProdutos] = useState([])
-  const [categorias, setCategorias] = useState([])
+  const [produtos, setProdutos] = useState<Product[]>([])
+  const [categorias, setCategorias] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
 

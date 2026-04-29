@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type { Order, PaginationInfo } from '../types'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import OrderCard from '../components/common/OrderCard'
@@ -30,15 +31,15 @@ export default function Orders() {
   const navigate = useNavigate()
 
   // Estados da página
-  const [orders, setOrders] = useState([])
+  const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filter, setFilter] = useState('all')
-  const [pagination, setPagination] = useState(null)
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
 
   // Estados de UI
-  const [cancellingOrderId, setCancellingOrderId] = useState(null)
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | number | null>(null)
   const [refreshing, setRefreshing] = useState(false)
 
   // Verificar se usuário está logado

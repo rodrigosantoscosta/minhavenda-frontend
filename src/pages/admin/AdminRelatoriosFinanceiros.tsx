@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, forwardRef } from 'react'
+import type { DREReport, DespesaReport } from '../../services/adminService'
 import { FiCalendar, FiCheck } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
 import adminService from '../../services/adminService'
@@ -115,8 +116,8 @@ export default function AdminRelatoriosFinanceiros() {
   const [activePreset, setActivePreset] = useState('month')
   const [inicio,       setInicio]       = useState(getFirstOfMonth())
   const [fim,          setFim]          = useState(getToday())
-  const [dreData,      setDreData]      = useState(null)
-  const [despesasData, setDespesasData] = useState(null)
+  const [dreData,      setDreData]      = useState<DREReport | null>(null)
+  const [despesasData, setDespesasData] = useState<DespesaReport[] | null>(null)
   const [loading,      setLoading]      = useState(false)
   const toast = useToast()
 

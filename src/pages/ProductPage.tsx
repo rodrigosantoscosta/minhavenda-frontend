@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type { Product } from '../types'
 import { useNavigate } from 'react-router-dom'
 import productService from '../services/productService'
 import ProductCard from '../components/common/products/ProductCard'
@@ -14,9 +15,9 @@ import { useScrollOnPageChange } from '../hooks/useScrollOnPageChange'
  * Carrega produtos do backend com imagens
  */
 export default function ProductPage() {
-  const [produtos, setProdutos] = useState([])
+  const [produtos, setProdutos] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState('grid')
   
   // Paginação

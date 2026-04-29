@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { Product, Category } from '../../types'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { FiArrowLeft, FiSave } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
@@ -11,8 +12,8 @@ export default function AdminEditProduto() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [categorias, setCategorias] = useState([])
-  const [produto, setProduto] = useState(null)
+  const [categorias, setCategorias] = useState<Category[]>([])
+  const [produto, setProduto] = useState<Product | null>(null)
   const [form, setForm] = useState({ nome: '', descricao: '', preco: '', urlImagem: '', pesoKg: '', alturaCm: '', larguraCm: '', comprimentoCm: '', categoriaId: '', ativo: true })
   const toast = useToast()
 

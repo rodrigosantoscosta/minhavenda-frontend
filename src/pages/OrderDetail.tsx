@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type { Order } from '../types'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useNotificationContext } from '../contexts/NotificationContext'
@@ -30,7 +31,7 @@ export default function OrderDetail() {
   const { user } = useAuth()
   const { addNotification } = useNotificationContext()
   
-  const [order, setOrder] = useState(null)
+  const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [paying, setPaying] = useState(false)

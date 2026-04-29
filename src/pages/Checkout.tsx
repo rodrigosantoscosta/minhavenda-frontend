@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import type { Order } from '../types'
 import { useNavigate, Link } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
@@ -36,7 +37,7 @@ export default function Checkout() {
   const [installments, setInstallments] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [createdOrder, setCreatedOrder] = useState(null)
+  const [createdOrder, setCreatedOrder] = useState<Order | null>(null)
   const [error, setError] = useState('')
 
   const formatarValor = (valor) => {

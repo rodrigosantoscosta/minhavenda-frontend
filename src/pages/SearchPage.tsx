@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import type { Product } from '../types'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { FiFilter } from 'react-icons/fi'
@@ -21,7 +22,7 @@ const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
 
-  const [produtos, setProdutos] = useState([])
+  const [produtos, setProdutos] = useState<Product[]>([])
   const [pagination, setPagination] = useState({
     page: 0,
     size: 24,
@@ -32,7 +33,7 @@ const SearchPage = () => {
   })
 
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
 
   const getParamsFromURL = useCallback(() => {

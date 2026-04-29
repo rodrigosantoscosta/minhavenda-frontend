@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react'
+import type { Product } from '../types'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { useToast } from '../components/common/Toast'
@@ -29,8 +30,8 @@ export default function ProductDetail() {
   const { addItem, isInCart, getItemQuantity } = useCart()
   const toast = useToast()
 
-  const [produto, setProduto] = useState(null)
-  const [produtosRelacionados, setProdutosRelacionados] = useState([])
+  const [produto, setProduto] = useState<Product | null>(null)
+  const [produtosRelacionados, setProdutosRelacionados] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [quantidade, setQuantidade] = useState(1)
   const [imagemSelecionada, setImagemSelecionada] = useState(0)

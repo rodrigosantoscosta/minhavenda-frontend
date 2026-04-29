@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type { Product, Category } from '../types'
 import { useCart } from '../contexts/CartContext'
 import productService from '../services/productService'
 import ProductCard from '../components/common/products/ProductCard'
@@ -19,8 +20,8 @@ import {
 export default function Home() {
   const { addItem } = useCart()
 
-  const [produtos, setProdutos] = useState([])
-  const [categorias, setCategorias] = useState([])
+  const [produtos, setProdutos] = useState<Product[]>([])
+  const [categorias, setCategorias] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   
@@ -30,7 +31,7 @@ export default function Home() {
   const pageSize = 12
   useScrollOnPageChange(page)
 
-  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | number | null>(null)
 
   useEffect(() => {
     loadInitialData()
