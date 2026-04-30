@@ -108,7 +108,7 @@ export default function OrderDetail() {
   }
 
   // Format date
-  const formatDate = (date) => {
+  const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: 'long',
@@ -119,8 +119,8 @@ export default function OrderDetail() {
   }
 
   // Get status label
-  const getStatusLabel = (status) => {
-    const labels = {
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
       PENDENTE: 'Pendente',
       PAGO: 'Pago',
       ENVIADO: 'Enviado',
@@ -278,7 +278,7 @@ export default function OrderDetail() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Histórico</h2>
                 <div className="space-y-4">
-                  {order.historico.map((item, index) => (
+                  {order.historico.map((item: { status: string; data: string; descricao?: string }, index: number) => (
                     <div key={index} className="flex gap-3 pb-4 border-b border-gray-200 last:border-0">
                       <div className={`
                         w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium

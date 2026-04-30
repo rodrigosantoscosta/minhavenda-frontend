@@ -1,6 +1,8 @@
 import { useState } from 'react'
 
-export default function ProductInfo({ produto }) {
+import type { Product } from '../../types'
+
+export default function ProductInfo({ produto }: { produto: Product }) {
   const [activeTab, setActiveTab] = useState('descricao')
 
   const tabs = [

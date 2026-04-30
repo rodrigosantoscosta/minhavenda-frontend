@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type React from 'react'
 import type { Order } from '../../types'
 import { useParams, Link } from 'react-router-dom'
 import { FiArrowLeft, FiCheckCircle, FiCircle, FiClock } from 'react-icons/fi'
@@ -13,12 +14,15 @@ import { useToast } from '../../components/common/Toast'
 
 const METODOS_PAGAMENTO = ['CARTAO', 'PIX', 'BOLETO']
 
-function ActionModal({ open, onClose, action, pedidoId, onSuccess }) {
+function ActionModal({ open, onClose, action, pedidoId, onSuccess }: {
+  open: boolean; onClose: () => void; action: string | null
+  pedidoId: string | undefined; onSuccess: (order: Order) => void
+}) {
   const [fields, setFields] = useState({})
   const [loading, setLoading] = useState(false)
   const toast = useToast()
 
-  const set = k => e => setFields(f => ({ ...f, [k]: e.target.value }))
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setFields(f => ({ ...f, [k]: e.target.value }))
 
   const submit = async () => {
     setLoading(true)
@@ -42,7 +46,7 @@ function ActionModal({ open, onClose, action, pedidoId, onSuccess }) {
   const titles = { PAGAR: 'Marcar como Pago', ENVIAR: 'Marcar como Enviado', ENTREGAR: 'Marcar como Entregue', CANCELAR: 'Cancelar Pedido' }
 
   return (
-    <AdminModal open={open} onClose={onClose} title={titles[action] ?? ''} size="sm">
+    <AdminModal open={open} onClose={onClose} title={(action ? titles[action as keyof typeof titles] : '') ?? ''} size="sm">
       <div className="space-y-4">
         {action === 'PAGAR' && (
           <div>

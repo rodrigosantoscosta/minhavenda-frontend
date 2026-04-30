@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import type { CartItem } from '../types'
 import { useCart } from '../contexts/CartContext'
 import Button from '../components/common/Button'
 import EmptyState from '../components/common/EmptyState'
@@ -28,12 +29,12 @@ export default function Cart() {
 
   const items = Array.isArray(cartItems) ? cartItems : []
 
-  const getPrecoValue = (preco) => {
+  const getPrecoValue = (preco: number | { valor?: number } | null | undefined): number => {
     if (typeof preco === 'object' && preco !== null) return preco.valor || 0
     return preco || 0
   }
 
-  const formatarValor = (valor) => {
+  const formatarValor = (valor: number | { valor?: number } | null | undefined) => {
     const preco = getPrecoValue(valor)
     if (typeof preco !== 'number' || isNaN(preco)) return 'R$ 0,00'
     return `R$ ${preco.toFixed(2)}`
@@ -52,13 +53,13 @@ export default function Cart() {
   const total = getTotal(frete)
 
   // FIX: allow increment when stock is null/undefined (unknown = no limit)
-  const handleIncrement = (item) => {
+  const handleIncrement = (item: CartItem) => {
     if (item.estoque == null || item.quantidade < item.estoque) {
       updateQuantity(item.id, item.quantidade + 1)
     }
   }
 
-  const handleDecrement = (item) => {
+  const handleDecrement = (item: CartItem) => {
     if (item.quantidade > 1) {
       updateQuantity(item.id, item.quantidade - 1)
     } else {

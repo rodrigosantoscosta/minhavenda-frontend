@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type React from 'react'
 import type { Category } from '../../types'
 import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
@@ -58,11 +59,11 @@ export default function AdminCategorias() {
     } catch { toast.error('Erro ao excluir') }
   }
 
-  const setNew = k => e => setNewForm(f => ({ ...f, [k]: e.target.value }))
-  const setEdit = k => e => setEditForm(f => ({ ...f, [k]: e.target.value }))
+  const setNew = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setNewForm(f => ({ ...f, [k]: e.target.value }))
+  const setEdit = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setEditForm(f => ({ ...f, [k]: e.target.value }))
 
   const inlineCls = `${inputCls} py-1.5`
-  const ActionBtn = ({ onClick, icon: Icon, color }) => (
+  const ActionBtn = ({ onClick, icon: Icon, color }: { onClick: () => void; icon: React.ElementType; color: string }) => (
     <button onClick={onClick} className="p-1.5 rounded-md transition-colors" style={{ color }}><Icon size={14} /></button>
   )
 

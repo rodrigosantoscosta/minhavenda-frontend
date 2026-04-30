@@ -3,6 +3,17 @@ import Input from '../common/Input'
 import { validarEndereco } from '../../services/checkoutService'
 import { FiMapPin, FiSearch } from 'react-icons/fi'
 
+interface AddressData {
+  cep?: string; rua?: string; numero?: string; complemento?: string
+  bairro?: string; cidade?: string; estado?: string
+}
+interface AddressFormProps {
+  onAddressChange?: (data: { address: AddressData; isValid: boolean; errors: Record<string, string> }) => void
+  initialData?: AddressData
+  errors?: Record<string, string>
+  showTitle?: boolean
+}
+
 /**
  * AddressForm Component
  * 
@@ -14,7 +25,7 @@ export default function AddressForm({
   initialData = {}, 
   errors: externalErrors = {},
   showTitle = true 
-}) {
+}: AddressFormProps) {
   const [formData, setFormData] = useState({
     cep: '',
     rua: '',
@@ -26,7 +37,7 @@ export default function AddressForm({
     ...initialData
   })
 
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSearchingCep, setIsSearchingCep] = useState(false)
   const [cepNotFound, setCepNotFound] = useState(false)
   const [isTouched, setIsTouched] = useState(false)
@@ -39,7 +50,7 @@ export default function AddressForm({
   const validation = useMemo(() => validarEndereco(formData), [formData])
 
   // Memoizar callback do componente pai para evitar loops (MOVIDO PARA CIMA)
-  const memoizedOnAddressChange = useCallback((data) => {
+  const memoizedOnAddressChange = useCallback((data: { address: AddressData; isValid: boolean; errors: Record<string, string> }) => {
     onAddressChange?.(data)
   }, [onAddressChange])
 
@@ -80,7 +91,7 @@ export default function AddressForm({
   }, [formData, isTouched, validation.isValid, memoizedOnAddressChange]) // Executar apenas uma vez no mount
 
   // Lidar com mudanças nos campos (otimizado para evitar múltiplos re-renders)
-  const handleInputChange = useCallback((field, value) => {
+  const handleInputChange = useCallback((field: string, value: string) => {
     // Operação atômica: atualizar todos os estados relacionados de uma vez
     setFormData(prev => {
       const newData = { ...prev, [field]: value }
@@ -193,7 +204,7 @@ export default function AddressForm({
   }, [formData.cep, cepNotFound, isSearchingCep, handleCepSearch]) // Incluir handleCepSearch para evitar warning
 
   // Formatar CEP enquanto digita (memoizado)
-  const handleCepChange = useCallback((value) => {
+  const handleCepChange = useCallback((value: string) => {
     // Remove caracteres não numéricos
     const cepNumbers = value.replace(/\D/g, '')
     
@@ -209,13 +220,13 @@ export default function AddressForm({
   }, [handleInputChange])
 
   // Formatar campos (memoizados)
-  const handleNumeroChange = useCallback((value) => {
+  const handleNumeroChange = useCallback((value: string) => {
     // Permitir apenas números e caracteres comuns
     const cleaned = value.replace(/[^a-zA-Z0-9\s-]/g, '')
     handleInputChange('numero', cleaned)
   }, [handleInputChange])
 
-  const handleEstadoChange = useCallback((value) => {
+  const handleEstadoChange = useCallback((value: string) => {
     // Converter para maiúsculas e limitar a 2 caracteres
     const cleaned = value.toUpperCase().slice(0, 2)
     handleInputChange('estado', cleaned)

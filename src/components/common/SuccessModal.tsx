@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import type { Order } from '../../types'
 import Modal from './Modal'
 import Button from './Button'
 import { 
@@ -18,13 +19,21 @@ import {
  * Modal de sucesso para confirmação de pedido
  * Exibe informações do pedido criado e próximas ações
  */
+interface SuccessModalProps {
+  isOpen: boolean
+  onClose: () => void
+  order: Order & Record<string, unknown>
+  autoCloseDelay?: number
+  showActions?: boolean
+}
+
 export default function SuccessModal({ 
   isOpen, 
   onClose, 
   order, 
   autoCloseDelay = 8000,
   showActions = true 
-}) {
+}: SuccessModalProps) {
   const navigate = useNavigate()
   const onCloseRef = useRef(onClose)
   
@@ -34,7 +43,7 @@ export default function SuccessModal({
   }, [onClose])
 
   // Função auxiliar para extrair valor do preço (objeto ou número)
-  const getPrecoValue = (preco) => {
+  const getPrecoValue = (preco: number | { valor?: number } | null | undefined): number => {
     if (typeof preco === 'object' && preco !== null) {
       return preco.valor || 0
     }
@@ -42,7 +51,7 @@ export default function SuccessModal({
   }
 
   // Função segura para formatar valores
-  const formatarValor = (valor) => {
+  const formatarValor = (valor: number | { valor?: number } | null | undefined) => {
     const preco = getPrecoValue(valor)
     if (typeof preco !== 'number' || isNaN(preco)) {
       return 'R$ 0,00'
@@ -80,7 +89,7 @@ export default function SuccessModal({
   }
 
   // Formatar data
-  const formatDate = (date) => {
+  const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: 'long',
@@ -296,7 +305,7 @@ export function OrderCreatedModal({
   orderId, 
   total,
   ...props 
-}) {
+}: { isOpen: boolean; onClose: () => void; orderId: string | number; total: number; [k: string]: unknown }) {
   const mockOrder = {
     id: orderId,
     dataCriacao: new Date().toISOString(),
@@ -326,7 +335,7 @@ export function PaymentSuccessModal({
   onClose, 
   order, 
   ...props 
-}) {
+}: { isOpen: boolean; onClose: () => void; order: Order & Record<string, unknown>; [k: string]: unknown }) {
   return (
     <SuccessModal
       isOpen={isOpen}

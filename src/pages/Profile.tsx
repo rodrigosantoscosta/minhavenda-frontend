@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/common/Toast'
@@ -43,9 +44,9 @@ export default function Profile() {
     }
   })
 
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     
     if (name.startsWith('endereco.')) {
@@ -58,11 +59,11 @@ export default function Profile() {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
 
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
+    if ((errors as Record<string, string>)[name]) setErrors(prev => ({ ...prev, [name]: '' }))
   }
 
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors: Record<string, string> = {}
     if (!formData.nome || formData.nome.length < 3) {
       newErrors.nome = 'Nome deve ter no mínimo 3 caracteres'
     }

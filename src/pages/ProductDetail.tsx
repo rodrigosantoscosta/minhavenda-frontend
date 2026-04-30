@@ -70,7 +70,7 @@ export default function ProductDetail() {
         ativo: true
       })
       const relacionados = (data.content || data)
-        .filter(p => p.id !== produto.id)
+        .filter((p: Product) => p.id !== produto.id)
         .slice(0, 4)
       setProdutosRelacionados(relacionados)
     } catch (error) {
@@ -101,7 +101,7 @@ export default function ProductDetail() {
     navigate('/carrinho')
   }
 
-  const handleQuantityChange = (novaQuantidade) => {
+  const handleQuantityChange = (novaQuantidade: number) => {
     if (quantidadeEstoque !== null && novaQuantidade > quantidadeEstoque) {
       toast.warning(`Apenas ${quantidadeEstoque} unidades disponíveis`)
       setQuantidade(quantidadeEstoque)

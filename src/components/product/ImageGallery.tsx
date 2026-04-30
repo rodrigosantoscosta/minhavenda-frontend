@@ -2,11 +2,17 @@
 import { useState } from 'react'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
+interface ImageGalleryProps {
+  images?: string[]
+  selectedIndex?: number
+  onSelectImage: (index: number) => void
+}
+
 export default function ImageGallery({ 
   images = [], 
   selectedIndex = 0, 
   onSelectImage 
-}) {
+}: ImageGalleryProps) {
   const [imageError, setImageError] = useState(false)
   
   // Se não houver imagens, usar placeholder

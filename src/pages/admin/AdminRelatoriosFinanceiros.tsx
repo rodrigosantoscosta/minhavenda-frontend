@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect, forwardRef } from 'react'
+import type React from 'react'
 import type { DREReport, DespesaReport } from '../../services/adminService'
 import { FiCalendar, FiCheck } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
@@ -21,7 +22,7 @@ const PRESETS = [
   { label: 'Mês passado', key: 'lastMonth' },
 ]
 
-function dateToISO(d) {
+function dateToISO(d: Date) {
   return d.toISOString().split('T')[0]
 }
 function getToday() {
@@ -33,7 +34,7 @@ function getFirstOfMonth() {
   return dateToISO(d)
 }
 
-function resolvePreset(key) {
+function resolvePreset(key: string) {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   switch (key) {
@@ -67,7 +68,7 @@ function resolvePreset(key) {
 
 // ─── Preset pill ─────────────────────────────────────────────────────────────
 
-const PresetPill = forwardRef(({ label, active, onClick, id }, ref) => (
+const PresetPill = forwardRef<HTMLButtonElement, { label: string; active: boolean; onClick: () => void; id?: string }>(({ label, active, onClick, id }, ref) => (
   <button
     ref={ref}
     id={id}
@@ -89,7 +90,7 @@ const PresetPill = forwardRef(({ label, active, onClick, id }, ref) => (
 
 // ─── Results fade-in ──────────────────────────────────────────────────────────
 
-function ResultsFadeIn({ children }) {
+function ResultsFadeIn({ children }: { children: React.ReactNode }) {
   const ref = useRef(null)
   useEffect(() => {
     if (ref.current) {
@@ -139,13 +140,13 @@ export default function AdminRelatoriosFinanceiros() {
     }
   }, [activeTab, inicio, fim, toast])
 
-  const handleTabChange = (tab) => {
+  const handleTabChange = (tab: string) => {
     setActiveTab(tab)
     setDreData(null)
     setDespesasData(null)
   }
 
-  const handlePreset = (key) => {
+  const handlePreset = (key: string) => {
     const { inicio: i, fim: f } = resolvePreset(key)
     setInicio(i); setFim(f)
     setActivePreset(key)

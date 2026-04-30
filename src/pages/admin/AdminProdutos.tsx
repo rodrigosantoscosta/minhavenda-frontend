@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import type React from 'react'
 import type { Product, Category } from '../../types'
 import { Link } from 'react-router-dom'
 import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiPackage } from 'react-icons/fi'
@@ -10,11 +11,13 @@ import {
 } from '../../utils/adminUtils'
 import { useToast } from '../../components/common/Toast'
 
-function CreateModal({ open, onClose, categorias, onCreated }) {
+function CreateModal({ open, onClose, categorias, onCreated }: {
+  open: boolean; onClose: () => void; categorias: Category[]; onCreated: (p: Product) => void
+}) {
   const [form, setForm] = useState({ nome: '', descricao: '', preco: '', urlImagem: '', pesoKg: '', alturaCm: '', larguraCm: '', comprimentoCm: '', categoriaId: '' })
   const [loading, setLoading] = useState(false)
   const toast = useToast()
-  const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   const submit = async () => {
     if (!form.nome || !form.descricao || !form.preco) { toast.error('Preencha os campos obrigatórios'); return }

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import type { FormEvent, ChangeEvent, KeyboardEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import logger from '../../utils/logger'
@@ -6,6 +7,15 @@ import logger from '../../utils/logger'
 /**
  * SearchBar — aligned to primary-* design tokens, no hardcoded blue-*
  */
+interface SearchBarProps {
+  placeholder?: string
+  initialValue?: string
+  className?: string
+  onSearch?: (term: string) => void | Promise<void>
+  showButton?: boolean
+  autoFocus?: boolean
+}
+
 const SearchBar = ({
   placeholder = "Buscar produtos...",
   initialValue = "",
@@ -13,7 +23,7 @@ const SearchBar = ({
   onSearch,
   showButton = true,
   autoFocus = false
-}) => {
+}: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState(initialValue)
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
@@ -23,7 +33,7 @@ const SearchBar = ({
     setTimeout(() => inputRef.current?.focus(), 100)
   }
 
-  const handleSearch = async (term) => {
+  const handleSearch = async (term: string) => {
     const trimmedTerm = term.trim()
     if (!trimmedTerm) return
     setIsLoading(true)
@@ -40,14 +50,14 @@ const SearchBar = ({
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     handleSearch(searchTerm)
   }
 
-  const handleChange = (e) => setSearchTerm(e.target.value)
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') handleSearch(searchTerm)
   }
 

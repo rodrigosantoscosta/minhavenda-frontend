@@ -7,13 +7,24 @@ import {
   FiMapPin
 } from 'react-icons/fi'
 import { calcularFrete, formatarEndereco } from '../../services/checkoutService'
-
 /**
  * OrderSummary Component
  * 
  * Componente para exibir resumo do pedido no checkout
  * Mostra itens, valores, frete e informações de entrega
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SummaryItem = Record<string, any>
+
+interface OrderSummaryProps {
+  items: SummaryItem[]
+  endereco?: Record<string, string> | null
+  pagamento?: string | null
+  showAddress?: boolean
+  showPayment?: boolean
+  className?: string
+}
+
 export default function OrderSummary({ 
   items, 
   endereco, 
@@ -21,9 +32,9 @@ export default function OrderSummary({
   showAddress = true,
   showPayment = true,
   className = ''
-}) {
+}: OrderSummaryProps) {
   // Função auxiliar para extrair valor do preço (objeto ou número)
-  const getPrecoValue = (preco) => {
+  const getPrecoValue = (preco: number | { valor?: number } | null | undefined): number => {
     if (typeof preco === 'object' && preco !== null) {
       return preco.valor || 0
     }
@@ -56,7 +67,7 @@ export default function OrderSummary({
   const { subtotal, desconto, frete, total } = calcularValores()
 
   // Formatar valores
-  const formatarValor = (valor) => {
+  const formatarValor = (valor: number) => {
     if (typeof valor !== 'number' || isNaN(valor)) {
       return 'R$ 0,00'
     }

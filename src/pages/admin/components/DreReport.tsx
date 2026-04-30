@@ -1,4 +1,6 @@
 import { FiDollarSign, FiTrendingUp, FiTarget, FiPercent } from 'react-icons/fi'
+import type { ElementType } from 'react'
+import type { DREReport } from '../../../services/adminService'
 import { formatDate, formatBRL, T, AdminCard, Th, Tr } from '../../../utils/adminUtils'
 
 const TOOLTIP_STYLE = {
@@ -9,7 +11,7 @@ const TOOLTIP_STYLE = {
   color: '#fff',
 }
 
-function KpiCard({ label, value, icon: Icon, color, bg }) {
+function KpiCard({ label, value, icon: Icon, color, bg }: { label: string; value: string; icon: ElementType; color: string; bg: string }) {
   return (
     <AdminCard className="p-5">
       <div className="flex items-center gap-4">
@@ -30,7 +32,13 @@ function KpiCard({ label, value, icon: Icon, color, bg }) {
   )
 }
 
-export default function DreReport({ data }) {
+interface DreReportData extends DREReport {
+  resumo: { receitaBruta: number; receitaLiquida: number; lucroLiquido: number; margemLucro: number }
+  periodo: { inicio: string; fim: string }
+  linhas: { descricao: string; valor: number; percentual?: number }[]
+}
+
+export default function DreReport({ data }: { data: DreReportData }) {
   const { resumo, periodo, linhas } = data
 
   const kpis = [
@@ -64,7 +72,7 @@ export default function DreReport({ data }) {
     },
   ]
 
-  function rowStyle(linha) {
+  function rowStyle(linha: { descricao: string; valor: number }) {
     const isSubtotal = linha.descricao.includes('Líquida') ||
                        linha.descricao.includes('Bruto') ||
                        linha.descricao.includes('Líquido')
@@ -76,7 +84,7 @@ export default function DreReport({ data }) {
     }
   }
 
-  function valorStyle(valor) {
+  function valorStyle(valor: number) {
     const isNeg = valor < 0
     return {
       color: isNeg ? T.red : T.green,
@@ -113,7 +121,7 @@ export default function DreReport({ data }) {
               </tr>
             </thead>
             <tbody>
-              {linhas.map((linha, i) => (
+              {linhas.map((linha: { descricao: string; valor: number; percentual?: number }, i: number) => (
                 <Tr key={i}>
                   <td
                     className="px-6 py-3 text-sm font-sans"

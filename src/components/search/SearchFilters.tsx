@@ -13,13 +13,21 @@ import logger from '../../utils/logger'
  * @param {function} props.onToggle - Callback para alternar painel
  * @param {string} props.className - Classes CSS adicionais
  */
+interface SearchFiltersProps {
+  filters?: Record<string, unknown>
+  onFiltersChange?: (filters: Record<string, unknown>) => void
+  isOpen?: boolean
+  onToggle?: () => void
+  className?: string
+}
+
 const SearchFilters = ({
   filters = {},
   onFiltersChange,
   isOpen: _isOpen = false,
   onToggle: _onToggle,
   className = ""
-}) => {
+}: SearchFiltersProps) => {
   const [categorias, setCategorias] = useState<Category[]>([])
   const [isLoadingCategorias, setIsLoadingCategorias] = useState(false)
   const [localFilters, setLocalFilters] = useState<Record<string, unknown>>({
@@ -50,12 +58,12 @@ const SearchFilters = ({
     setLocalFilters(prev => ({ ...prev, ...filters }))
   }, [filters])
 
-  const handleFilterChange = (field, value) => {
+  const handleFilterChange = (field: string, value: unknown) => {
     setLocalFilters(prev => ({ ...prev, [field]: value }))
   }
 
   const handleApplyFilters = () => {
-    const cleanedFilters = {}
+    const cleanedFilters: Record<string, unknown> = {}
     Object.entries(localFilters).forEach(([key, value]) => {
       if (value !== '' && value !== null && value !== undefined) {
         cleanedFilters[key] = value
@@ -70,7 +78,7 @@ const SearchFilters = ({
     if (onFiltersChange) onFiltersChange(clearedFilters)
   }
 
-  const handlePrecoChange = (field, value) => {
+  const handlePrecoChange = (field: string, value: string) => {
     let numericValue = value.replace(/[^0-9.,]/g, '')
     if (numericValue.includes(',')) {
       const lastCommaIndex = numericValue.lastIndexOf(',')

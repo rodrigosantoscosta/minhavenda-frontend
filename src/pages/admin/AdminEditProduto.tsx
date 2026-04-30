@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type React from 'react'
 import type { Product, Category } from '../../types'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { FiArrowLeft, FiSave } from 'react-icons/fi'
@@ -17,7 +18,7 @@ export default function AdminEditProduto() {
   const [form, setForm] = useState({ nome: '', descricao: '', preco: '', urlImagem: '', pesoKg: '', alturaCm: '', larguraCm: '', comprimentoCm: '', categoriaId: '', ativo: true })
   const toast = useToast()
 
-  const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   useEffect(() => {
     Promise.all([adminService.getProduto(id), adminService.getCategorias()])
@@ -36,7 +37,7 @@ export default function AdminEditProduto() {
       .finally(() => setLoading(false))
   }, [id])
 
-  const submit = async e => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
     try {
@@ -91,7 +92,7 @@ export default function AdminEditProduto() {
               <p className="text-sm font-semibold text-white">Dimensões e Peso</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[['Peso (kg)', 'pesoKg'], ['Altura (cm)', 'alturaCm'], ['Largura (cm)', 'larguraCm'], ['Comprimento (cm)', 'comprimentoCm']].map(([lbl, k]) => (
-                  <div key={k}><FieldLabel>{lbl}</FieldLabel><input type="number" step="0.01" className={inputCls} style={inputStyle} value={form[k]} onChange={set(k)} /></div>
+                  <div key={k}><FieldLabel>{lbl}</FieldLabel><input type="number" step="0.01" className={inputCls} style={inputStyle} value={form[k as keyof typeof form] as string} onChange={set(k!)} /></div>
                 ))}
               </div>
             </AdminCard>

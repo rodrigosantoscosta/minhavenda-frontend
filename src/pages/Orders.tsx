@@ -86,7 +86,7 @@ export default function Orders() {
   }, [user])
 
   // Lidar com mudança de filtro
-  const handleFilterChange = (newFilter) => {
+  const handleFilterChange = (newFilter: string) => {
     setFilter(newFilter)
     setLoading(true)
     loadOrders(1, newFilter === 'all' ? null : newFilter)
@@ -107,7 +107,7 @@ export default function Orders() {
   }
 
   // Cancelar pedido
-  const handleCancelOrder = async (orderId) => {
+  const handleCancelOrder = async (orderId: string | number) => {
     if (!window.confirm('Tem certeza que deseja cancelar este pedido?')) {
       return
     }
@@ -139,7 +139,7 @@ export default function Orders() {
   ]
 
   // Contar pedidos por status
-  const getStatusCount = (status) => {
+  const getStatusCount = (status: string) => {
     if (status === 'all') return orders.length
     return orders.filter(order => order.status === status).length
   }

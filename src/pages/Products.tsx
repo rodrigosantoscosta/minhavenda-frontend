@@ -1,5 +1,6 @@
 // src/pages/Products.jsx - LAYOUT COM SIDEBAR DE FILTROS
 import { useState, useEffect } from 'react'
+import type React from 'react'
 import type { Product, Category } from '../types'
 import { useSearchParams } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
@@ -95,7 +96,7 @@ export default function Products() {
         nome_asc: 'nome:asc',
         nome_desc: 'nome:desc',
       }
-      params.sort = sortMapping[sortBy] || 'dataCadastro:desc'
+      params.sort = sortMapping[sortBy as keyof typeof sortMapping] || 'dataCadastro:desc'
 
       const data = await productService.getProdutos(params)
 
@@ -125,12 +126,12 @@ export default function Products() {
     }
   }
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     setPage(0)
   }
 
-  const handleCategoryChange = (categoryId) => {
+  const handleCategoryChange = (categoryId: string | number | null) => {
     setSelectedCategory(categoryId)
     setPage(0)
   }
@@ -144,7 +145,7 @@ export default function Products() {
     setPage(0)
   }
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     setPage(newPage - 1)
   }
 

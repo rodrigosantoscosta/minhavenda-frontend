@@ -21,7 +21,7 @@ export default function AdminDLQ() {
       .finally(() => setLoading(false))
   }, [])
 
-  const handleRequeue = async queue => {
+  const handleRequeue = async (queue: string) => {
     setRequeueing(queue)
     try {
       const res = await adminService.requeueDlq(queue)

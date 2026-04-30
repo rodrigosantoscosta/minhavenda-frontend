@@ -40,11 +40,11 @@ const SearchPage = () => {
     return searchService.parsearParamsBusca(searchParams)
   }, [searchParams])
 
-  const updateURL = useCallback((newParams) => {
+  const updateURL = useCallback((newParams: Record<string, unknown>) => {
     setSearchParams(searchService.toURLSearchParams(newParams))
   }, [setSearchParams])
 
-  const buscarProdutos = useCallback(async (params) => {
+  const buscarProdutos = useCallback(async (params: Record<string, unknown>) => {
     try {
       setIsLoading(true)
       setError(null)
@@ -79,15 +79,15 @@ const SearchPage = () => {
     }
   }, [])
 
-  const handleFiltersChange = useCallback((filters) => {
+  const handleFiltersChange = useCallback((filters: Record<string, unknown>) => {
     updateURL({ ...getParamsFromURL(), ...filters, page: 0 })
   }, [getParamsFromURL, updateURL])
 
-  const handleSortChange = useCallback((sort) => {
+  const handleSortChange = useCallback((sort: string) => {
     updateURL({ ...getParamsFromURL(), sort, page: 0 })
   }, [getParamsFromURL, updateURL])
 
-  const handlePageChange = useCallback((newPage) => {
+  const handlePageChange = useCallback((newPage: number) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
     updateURL({ ...getParamsFromURL(), page: newPage - 1 })
   }, [getParamsFromURL, updateURL])

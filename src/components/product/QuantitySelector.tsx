@@ -1,12 +1,22 @@
 import { FiMinus, FiPlus } from 'react-icons/fi'
 
+import type { ChangeEvent } from 'react'
+
+interface QuantitySelectorProps {
+  value?: number
+  onChange: (val: number) => void
+  min?: number
+  max?: number
+  disabled?: boolean
+}
+
 export default function QuantitySelector({ 
   value = 1, 
   onChange, 
   min = 1, 
   max = 99,
   disabled = false 
-}) {
+}: QuantitySelectorProps) {
   
   const handleDecrement = () => {
     if (value > min) {
@@ -20,7 +30,7 @@ export default function QuantitySelector({
     }
   }
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(e.target.value) || min
     
     if (newValue < min) {

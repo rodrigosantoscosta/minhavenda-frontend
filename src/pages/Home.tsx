@@ -108,16 +108,16 @@ export default function Home() {
     }
   }
 
-  const handleAddToCart = (produto) => {
+  const handleAddToCart = (produto: Product) => {
     addItem(produto, 1)
   }
 
-  const handleCategoryChange = (categoryId) => {
+  const handleCategoryChange = (categoryId: string | number | null) => {
     setSelectedCategory(categoryId)
     setPage(0)
   }
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     setPage(newPage - 1)
   }
 

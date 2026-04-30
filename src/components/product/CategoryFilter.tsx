@@ -2,11 +2,19 @@
  * CategoryFilter — horizontal scroll pills with fade hint and active lift.
  * Skill: specific transition properties, shadows-as-borders, scale on press.
  */
+import type { Category } from '../../types'
+
+interface CategoryFilterProps {
+  categorias?: Category[]
+  selectedCategory?: string | number | null
+  onCategoryChange: (id: string | number | null) => void
+}
+
 export default function CategoryFilter({
   categorias = [],
   selectedCategory,
   onCategoryChange
-}) {
+}: CategoryFilterProps) {
   if (categorias.length === 0) return null
 
   const pillBase = [

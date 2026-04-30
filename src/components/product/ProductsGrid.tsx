@@ -1,5 +1,14 @@
 import ProductCard from '../common/products/ProductCard'
+import type { Product } from '../../types'
 import ProductCardSkeleton from './ProductCardSkeleton'
+
+interface ProductsGridProps {
+  produtos?: Product[]
+  onAddToCart?: (produto: Product) => void
+  loading?: boolean
+  columns?: number
+  viewMode?: string
+}
 
 export default function ProductsGrid({ 
   produtos = [], 
@@ -7,7 +16,7 @@ export default function ProductsGrid({
   loading = false,
   columns = 3,
   viewMode = 'grid'
-}) {
+}: ProductsGridProps) {
   const gridClass = columns === 4
     ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
     : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'

@@ -161,7 +161,7 @@ export default function StatusBadge({
     square:  'rounded-none'
   }
 
-  const currentVariant = variantConfig[variant] || variantConfig.default
+  const currentVariant = variantConfig[variant as keyof typeof variantConfig] || variantConfig.default
 
   const baseClasses = `
     inline-flex items-center gap-2 font-medium

@@ -1,6 +1,17 @@
 import { useState } from 'react'
+import type { FocusEvent } from 'react'
 import { ChevronUpDownIcon } from '@heroicons/react/24/outline'
 import searchService from '../../services/searchService'
+
+interface SortOption { value: string; label: string }
+
+interface SortOptionsProps {
+  value?: string
+  onChange?: (value: string) => void
+  className?: string
+  showLabel?: boolean
+  options?: SortOption[]
+}
 
 /**
  * Componente SortOptions - Opções de ordenação
@@ -17,7 +28,7 @@ const SortOptions = ({
   className = '',
   showLabel = true,
   options
-}) => {
+}: SortOptionsProps) => {
   const [isOpen, setIsOpen] = useState(false)
   
   // Opções padrão ou customizadas
@@ -30,7 +41,7 @@ const SortOptions = ({
    * Handle change da ordenação
    * @param {Object} option - Opção selecionada
    */
-  const handleSortChange = (option) => {
+  const handleSortChange = (option: SortOption) => {
     if (onChange) {
       onChange(option.value)
     }
@@ -47,7 +58,7 @@ const SortOptions = ({
   /**
    * Fechar dropdown ao clicar fora
    */
-  const handleBlur = (e) => {
+  const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
     // Verificar se o clique foi fora do dropdown
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setIsOpen(false)

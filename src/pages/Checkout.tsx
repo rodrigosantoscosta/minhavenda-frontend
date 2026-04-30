@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import type React from 'react'
 import type { Order } from '../types'
 import { useNavigate, Link } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
@@ -40,7 +41,7 @@ export default function Checkout() {
   const [createdOrder, setCreatedOrder] = useState<Order | null>(null)
   const [error, setError] = useState('')
 
-  const formatarValor = (valor) => {
+  const formatarValor = (valor: number) => {
     if (typeof valor !== 'number' || isNaN(valor)) return 'R$ 0,00'
     return `R$ ${valor.toFixed(2)}`
   }
@@ -82,7 +83,7 @@ export default function Checkout() {
 
   const { subtotal, desconto, frete, total } = calcularValores()
 
-  const calcularParcelas = (valorTotal) => {
+  const calcularParcelas = (valorTotal: number) => {
     const maxParcelas = valorTotal >= 100 ? 12 : 6
     const parcelas = []
     for (let i = 1; i <= maxParcelas; i++) {
@@ -114,13 +115,13 @@ export default function Checkout() {
     return true
   }
 
-  const handleAddressChange = useCallback(({ address, isValid, errors }) => {
+  const handleAddressChange = useCallback(({ address, isValid, errors }: { address: Record<string, string>; isValid: boolean; errors: Record<string, string> }) => {
     setEndereco(address)
     setEnderecoValido(isValid)
     setEnderecoErrors(errors)
   }, [])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     if (!validateForm()) return

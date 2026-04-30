@@ -75,11 +75,11 @@ export default function ProductPage() {
     fetchProdutos()
   }, [currentPage])
 
-  const handleAddToCart = (produto) => {
+  const handleAddToCart = (produto: Product) => {
     toast.success(`${produto.nome} adicionado ao carrinho!`)
   }
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: number) => {
     if (newPage >= 0 && newPage < totalPages) {
       setCurrentPage(newPage)
     }

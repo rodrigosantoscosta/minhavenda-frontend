@@ -1,3 +1,5 @@
+import type { IconType } from 'react-icons'
+import type { Category } from '../../types'
 import { FiGrid, FiMonitor, FiShoppingBag , FiBook, FiHome, FiWatch, FiHeadphones, FiCamera } from 'react-icons/fi'
 
 // Mapa de ícones para categorias
@@ -11,14 +13,20 @@ const categoryIcons = {
   'default': FiGrid
 }
 
+interface FeaturedCategoriesProps {
+  categorias?: Category[]
+  onCategorySelect: (id: string | number | null) => void
+  selectedCategory?: string | number | null
+}
+
 export default function FeaturedCategories({ 
   categorias = [], 
   onCategorySelect,
   selectedCategory 
-}) {
-  const getCategoryIcon = (categoryName) => {
+}: FeaturedCategoriesProps) {
+  const getCategoryIcon = (categoryName: string): IconType => {
     const name = categoryName?.toLowerCase() || ''
-    const Icon = categoryIcons[name] || categoryIcons.default
+    const Icon = (categoryIcons as Record<string, IconType>)[name] || categoryIcons.default
     return Icon
   }
 

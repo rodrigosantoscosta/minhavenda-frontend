@@ -36,7 +36,7 @@ export default function Header() {
     return user.nome.split(' ')[0]
   }
 
-  const handleSearch = (term) => {
+  const handleSearch = (term: string) => {
     navigate(`/busca?q=${encodeURIComponent(term)}`)
     setMobileMenuOpen(false)
   }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { ElementType } from 'react'
 import type { DashboardData } from '../../services/adminService'
 import { Link } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell, PieChart, Pie, Legend, ResponsiveContainer } from 'recharts'
@@ -14,7 +15,7 @@ const STATUS_COLORS = {
 
 const TOOLTIP_STYLE = { background: '#0D0E12', border: '1px solid #1E2028', borderRadius: 8, fontSize: 12, color: '#fff' }
 
-function KpiCard({ label, value, icon: Icon, color, bg }) {
+function KpiCard({ label, value, icon: Icon, color, bg }: { label: string; value: string | number; icon: ElementType; color: string; bg: string }) {
   return (
     <AdminCard className="p-6">
       <div className="flex items-start justify-between">
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
                   <YAxis tick={{ fill: '#6B7280', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                    {chartData.map(d => <Cell key={d.status} fill={STATUS_COLORS[d.status] ?? '#6B7280'} />)}
+                    {chartData.map(d => <Cell key={d.status} fill={STATUS_COLORS[d.status as keyof typeof STATUS_COLORS] ?? '#6B7280'} />)}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -104,7 +105,7 @@ export default function AdminDashboard() {
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
                   <Pie data={chartData} dataKey="count" nameKey="status" cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3}>
-                    {chartData.map(d => <Cell key={d.status} fill={STATUS_COLORS[d.status] ?? '#6B7280'} />)}
+                    {chartData.map(d => <Cell key={d.status} fill={STATUS_COLORS[d.status as keyof typeof STATUS_COLORS] ?? '#6B7280'} />)}
                   </Pie>
                   <Legend formatter={v => <span style={{ color: '#9CA3AF', fontSize: 12 }}>{v}</span>} />
                   <Tooltip contentStyle={TOOLTIP_STYLE} />
@@ -134,7 +135,7 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.estoqueBaixo.map(item => (
+                  {stats.estoqueBaixo.map((item: { produtoId: string | number; nome: string; quantidade: number }) => (
                     <Tr key={item.produtoId}>
                       <td className="px-6 py-3 text-sm font-sans text-white">{item.nome}</td>
                       <td className="px-6 py-3">

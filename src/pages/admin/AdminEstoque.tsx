@@ -11,7 +11,7 @@ import { useToast } from '../../components/common/Toast'
 
 // ─── Severity helpers ────────────────────────────────────────────────────────
 
-function getSeverity(qty) {
+function getSeverity(qty: number | undefined | null) {
   if (qty === undefined || qty === null) return 'unknown'
   if (qty <= 5)  return 'critical'
   if (qty <= 20) return 'low'
@@ -53,7 +53,7 @@ const SEVERITY = {
   },
 }
 
-function SeverityBadge({ qty, size = 'sm' }) {
+function SeverityBadge({ qty, size = 'sm' }: { qty: number | undefined | null; size?: string }) {
   const s = getSeverity(qty)
   const cfg = SEVERITY[s]
   const sizeClass = size === 'sm' ? 'text-[11px] px-2 py-0.5' : 'text-xs px-2.5 py-1'
@@ -65,7 +65,7 @@ function SeverityBadge({ qty, size = 'sm' }) {
   )
 }
 
-function QtyBadge({ qty, loading }) {
+function QtyBadge({ qty, loading }: { qty: number | undefined | null; loading: boolean }) {
   if (loading) return <span className="text-xs font-sans" style={{ color: T.muted }}>…</span>
   if (qty === undefined || qty === null) return <span className="text-xs font-sans" style={{ color: T.muted }}>—</span>
   const s = getSeverity(qty)
@@ -83,7 +83,9 @@ function QtyBadge({ qty, loading }) {
 
 // ─── Summary bar ─────────────────────────────────────────────────────────────
 
-function SummaryBar({ rows, activeFilter, onFilter }) {
+type EstoqueRow = Product & { estoqueLoading?: boolean; estoque?: Stock }
+
+function SummaryBar({ rows, activeFilter, onFilter }: { rows: EstoqueRow[]; activeFilter: string; onFilter: (f: string) => void }) {
   const loaded = rows.filter(r => !r.estoqueLoading && r.estoque)
   const counts = {
     critical: loaded.filter(r => getSeverity(r.estoque?.quantidade) === 'critical').length,
@@ -158,7 +160,10 @@ function SummaryBar({ rows, activeFilter, onFilter }) {
 
 // ─── Stock action modal ───────────────────────────────────────────────────────
 
-function StockModal({ open, onClose, action, produto, onSuccess }) {
+function StockModal({ open, onClose, action, produto, onSuccess }: {
+  open: boolean; onClose: () => void; action: string | null
+  produto: EstoqueRow | null; onSuccess: (result: Stock) => void
+}) {
   const [qty, setQty] = useState('')
   const [loading, setLoading] = useState(false)
   const toast = useToast()
@@ -192,7 +197,7 @@ function StockModal({ open, onClose, action, produto, onSuccess }) {
   const accentColor = action === 'ADICIONAR' ? T.green : action === 'REMOVER' ? T.red : T.sub
 
   return (
-    <AdminModal open={open} onClose={handleClose} title={action ? titles[action] : ''} size="sm">
+    <AdminModal open={open} onClose={handleClose} title={action ? titles[action as keyof typeof titles] : ''} size="sm">
       <div className="space-y-4">
         {/* Product name */}
         <div
@@ -244,7 +249,7 @@ function StockModal({ open, onClose, action, produto, onSuccess }) {
 
 // ─── Action buttons ───────────────────────────────────────────────────────────
 
-function ActionButtons({ row, onAction, compact = false }) {
+function ActionButtons({ row, onAction, compact = false }: { row: EstoqueRow; onAction: (action: string, row: EstoqueRow) => void; compact?: boolean }) {
   const btns = [
     { action: 'ADICIONAR', icon: FiPlus,    color: T.green, label: 'Adicionar' },
     { action: 'REMOVER',   icon: FiMinus,   color: T.red,   label: 'Remover'  },
@@ -306,18 +311,18 @@ export default function AdminEstoque() {
         setLoading(false)
         prods.forEach(p => {
           adminService.getEstoque(p.id)
-            .then(estoque => setRows(rs => rs.map(r => r.id === p.id ? { ...r, estoque, estoqueLoading: false } : r) as typeof rs))
+            .then((estoque: Stock) => setRows(rs => rs.map(r => r.id === p.id ? { ...r, estoque, estoqueLoading: false } : r) as typeof rs))
             .catch(() => setRows(rs => rs.map(r => r.id === p.id ? { ...r, estoqueLoading: false } : r) as typeof rs))
         })
       })
       .catch(() => { toast.error('Erro ao carregar produtos'); setLoading(false) })
   }, [])
 
-  const handleSuccess = estoque => {
+  const handleSuccess = (estoque: Stock) => {
     setRows(rs => rs.map(r => r.id === estoque.produtoId ? { ...r, estoque } : r))
   }
 
-  const handleAction = (action, row) => setModal({ action, produto: row })
+  const handleAction = (action: string, row: EstoqueRow) => setModal({ action, produto: row })
 
   // Unique categories for filter dropdown
   const categories = useMemo(() => {

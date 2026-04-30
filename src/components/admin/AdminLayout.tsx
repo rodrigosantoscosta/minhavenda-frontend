@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import {
@@ -28,7 +30,7 @@ const T = {
   accentBg:'rgba(249,115,22,0.12)',
 }
 
-function SidebarContent({ onNavClick, onLogout }) {
+function SidebarContent({ onNavClick, onLogout }: { onNavClick: () => void; onLogout: () => void }) {
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -98,7 +100,7 @@ function SidebarContent({ onNavClick, onLogout }) {
   )
 }
 
-export default function AdminLayout({ children }) {
+export default function AdminLayout({ children }: { children: ReactNode }) {
   const { logout } = useAuth()
   const navigate   = useNavigate()
   const location   = useLocation()

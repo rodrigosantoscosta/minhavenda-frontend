@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/common/Toast'
@@ -24,19 +25,19 @@ export default function Register() {
   
   const { register, loading } = useAuth()
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
       [name]: value
     }))
-    if (errors[name]) {
+    if ((errors as Record<string, string>)[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
   }
 
   const validate = () => {
-    const newErrors = {}
+    const newErrors: Record<string, string> = {}
     
     if (!formData.nome.trim()) {
       newErrors.nome = 'Nome é obrigatório'
@@ -72,7 +73,7 @@ export default function Register() {
     return Object.keys(newErrors).length === 0
   }
 
-  const getPasswordStrength = (password) => {
+  const getPasswordStrength = (password: string) => {
     if (!password) return { strength: 0, label: '', color: '' }
     let strength = 0
     if (password.length >= 6) strength++
@@ -89,7 +90,7 @@ export default function Register() {
   const passwordStrength = getPasswordStrength(formData.senha)
 
   // FIX: handle result and navigate on success; show error toast on failure
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!validate()) return
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type React from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle } from 'react-icons/fi'
@@ -29,10 +30,10 @@ export default function Login() {
     }
   }, [])
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }))
+    if ((errors as Record<string, string>)[name]) setErrors((prev) => ({ ...prev, [name]: '' }))
     if (serverError) {
       setServerError('')
       sessionStorage.removeItem('loginError')
@@ -40,7 +41,7 @@ export default function Login() {
   }
 
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors: Record<string, string> = {}
     if (!formData.email) {
       newErrors.email = 'Email é obrigatório'
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -51,7 +52,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setServerError('')
@@ -71,7 +72,7 @@ export default function Login() {
     setServerError(error)
   }
 
-  const inputClass = (hasError) => `
+  const inputClass = (hasError: boolean) => `
     w-full pl-10 pr-4 py-3 border rounded-xl font-sans text-sm text-gray-900
     placeholder-gray-400 bg-white
     focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500

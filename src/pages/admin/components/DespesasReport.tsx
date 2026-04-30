@@ -1,5 +1,6 @@
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts'
 import { FiDollarSign, FiTag } from 'react-icons/fi'
+import type { DespesaReport } from '../../../services/adminService'
 import { formatDate, formatBRL, T, AdminCard, Th, Tr } from '../../../utils/adminUtils'
 
 const TOOLTIP_STYLE = {
@@ -20,10 +21,18 @@ const CATEGORY_COLORS = {
   OTHER:         '#6B7280',
 }
 
-export default function DespesasReport({ data }) {
+interface DespesasReportProps {
+  data: {
+    despesas: (DespesaReport & { total: number })[]
+    periodo: { inicio: string; fim: string }
+    total: number
+  }
+}
+
+export default function DespesasReport({ data }: DespesasReportProps) {
   const { despesas, periodo, total } = data
 
-  const chartData = despesas.map(d => ({
+  const chartData = despesas.map((d: DespesaReport & { total: number }) => ({
     categoria: d.categoria,
     total: d.total,
   }))
@@ -73,10 +82,10 @@ export default function DespesasReport({ data }) {
                   outerRadius={85}
                   paddingAngle={3}
                 >
-                  {chartData.map(entry => (
+                  {chartData.map((entry: { categoria: string; total: number }) => (
                     <Cell
                       key={entry.categoria}
-                      fill={CATEGORY_COLORS[entry.categoria] ?? T.muted}
+                      fill={CATEGORY_COLORS[entry.categoria as keyof typeof CATEGORY_COLORS] ?? T.muted}
                     />
                   ))}
                 </Pie>
@@ -119,7 +128,7 @@ export default function DespesasReport({ data }) {
                           <div className="flex items-center gap-2">
                             <span
                               className="w-3 h-3 rounded-full flex-shrink-0"
-                              style={{ backgroundColor: CATEGORY_COLORS[d.categoria] ?? T.muted }}
+                              style={{ backgroundColor: CATEGORY_COLORS[d.categoria as keyof typeof CATEGORY_COLORS] ?? T.muted }}
                             />
                             {d.categoria}
                           </div>

@@ -396,8 +396,8 @@ export default function TestComponents() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <ProductCard
               product={produtoExemplo}
-              onAddToCart={(p) => toast.success(`${p.nome} adicionado!`)}
-              onToggleFavorite={(p) => toast.info(`${p.nome} favoritado!`)}
+              onAddToCart={(p: { nome: string }) => toast.success(`${p.nome} adicionado!`)}
+              onToggleFavorite={(p: { nome: string }) => toast.info(`${p.nome} favoritado!`)}
             />
           </div>
         </div>
@@ -490,7 +490,7 @@ export default function TestComponents() {
               <h3 className="text-lg font-semibold mb-2">Testes:</h3>
               <div className="space-y-2">
                 {(() => {
-                  const getPrecoValue = (preco) => {
+                  const getPrecoValue = (preco: number | { valor?: number } | null | undefined): number => {
                     if (typeof preco === 'object' && preco !== null) {
                       return preco.valor || 0
                     }

@@ -16,7 +16,7 @@ export default function AdminPedidos() {
   const [statusFiltro, setStatusFiltro] = useState('TODOS')
   const toast = useToast()
 
-  const load = (s) => {
+  const load = (s: string) => {
     setLoading(true)
     const req = s === 'TODOS' ? adminService.getPedidos() : adminService.getPedidosByStatus(s)
     req
