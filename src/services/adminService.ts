@@ -29,6 +29,9 @@ export interface DashboardData {
   ticketMedio: number
   pedidosRecentes: Order[]
   produtosMaisVendidos: Product[]
+  receitaTotal: number
+  pedidosPorStatus: Record<string, number>
+  estoqueBaixo: { produtoId: string | number; nome: string; quantidade: number }[]
 }
 
 export interface DREReport {

@@ -63,18 +63,19 @@ export default function ProductDetail() {
 
   const loadProdutosRelacionados = async () => {
     try {
-      const data = await productService.getProdutos({
-        categoriaId: produto.categoria.id,
+      const raw = await productService.getProdutos({
+        categoriaId: produto?.categoria?.id,
         page: 0,
         size: 4,
         ativo: true
       })
+      const data = raw as any
       const relacionados = (data.content || data)
-        .filter((p: Product) => p.id !== produto.id)
+        .filter((p: Product) => p.id !== produto?.id)
         .slice(0, 4)
       setProdutosRelacionados(relacionados)
     } catch (error) {
-      logger.error('Erro ao carregar produtos relacionados', { error: error.message, categoriaId: produto?.categoria?.id })
+      logger.error('Erro ao carregar produtos relacionados', { error: (error as Error).message, categoriaId: produto?.categoria?.id })
     }
   }
 
@@ -117,7 +118,7 @@ export default function ProductDetail() {
 
   const handleShare = () => {
     if (navigator.share) {
-      navigator.share({ title: produto.nome, text: produto.descricao, url: window.location.href })
+      navigator.share({ title: produto?.nome, text: produto?.descricao, url: window.location.href })
     } else {
       navigator.clipboard.writeText(window.location.href)
       toast.success('Link copiado para área de transferência')
@@ -137,7 +138,7 @@ export default function ProductDetail() {
     )
   }
 
-  const precoBase = typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco
+  const precoBase = typeof produto.preco === 'object' ? (produto.preco as any)?.valor : produto.preco
   const precoPromocional = produto.precoPromocional ?? null
   // FIX 1: null means unknown/unlimited — do NOT default to 1
   const quantidadeEstoque = produto.quantidadeEstoque ?? null

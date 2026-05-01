@@ -23,20 +23,20 @@ function CreateModal({ open, onClose, categorias, onCreated }: {
     if (!form.nome || !form.descricao || !form.preco) { toast.error('Preencha os campos obrigatórios'); return }
     setLoading(true)
     try {
-      const body = { nome: form.nome, descricao: form.descricao, preco: parseFloat(form.preco) }
+      const body: Record<string, unknown> = { nome: form.nome, descricao: form.descricao, preco: parseFloat(form.preco) }
       if (form.urlImagem)     body.urlImagem     = form.urlImagem
       if (form.categoriaId)   body.categoriaId   = parseInt(form.categoriaId)
       if (form.pesoKg)        body.pesoKg        = parseFloat(form.pesoKg)
       if (form.alturaCm)      body.alturaCm      = parseFloat(form.alturaCm)
       if (form.larguraCm)     body.larguraCm     = parseFloat(form.larguraCm)
       if (form.comprimentoCm) body.comprimentoCm = parseFloat(form.comprimentoCm)
-      const produto = await adminService.criarProduto(body)
+      const produto = await adminService.criarProduto(body as Parameters<typeof adminService.criarProduto>[0])
       onCreated(produto)
       toast.success('Produto criado!')
       onClose()
       setForm({ nome: '', descricao: '', preco: '', urlImagem: '', pesoKg: '', alturaCm: '', larguraCm: '', comprimentoCm: '', categoriaId: '' })
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Erro ao criar produto')
+      toast.error((err as any)?.response?.data?.message || 'Erro ao criar produto')
     } finally { setLoading(false) }
   }
 
@@ -56,7 +56,7 @@ function CreateModal({ open, onClose, categorias, onCreated }: {
         <div className="col-span-2">
           <FieldLabel>URL da Imagem</FieldLabel>
           <input className={inputCls} style={inputStyle} value={form.urlImagem} onChange={set('urlImagem')} placeholder="https://..." />
-          {form.urlImagem && <img src={form.urlImagem} alt="preview" className="mt-2 h-16 w-16 object-cover rounded-xl" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />}
+          {form.urlImagem && <img src={form.urlImagem} alt="preview" className="mt-2 h-16 w-16 object-cover rounded-xl" style={{ border: '1px solid #1E2028' }} onError={e => (e.target as HTMLImageElement).style.display = 'none'} />}
         </div>
         <div><FieldLabel>Peso (kg)</FieldLabel><input type="number" step="0.01" className={inputCls} style={inputStyle} value={form.pesoKg} onChange={set('pesoKg')} /></div>
         <div><FieldLabel>Altura (cm)</FieldLabel><input type="number" className={inputCls} style={inputStyle} value={form.alturaCm} onChange={set('alturaCm')} /></div>
@@ -85,7 +85,7 @@ export default function AdminProdutos() {
 
   const load = useCallback(() => {
     setLoading(true)
-    const params = {}
+    const params: Record<string, unknown> = {}
     if (search)    params.nome = search
     if (catFilter) params.categoriaId = catFilter
     if (atoFilter) params.ativo = atoFilter
@@ -147,7 +147,7 @@ export default function AdminProdutos() {
               <AdminCard key={p.id} className="p-4">
                 <div className="flex items-start gap-3">
                   {p.urlImagem
-                    ? <img src={p.urlImagem} alt={p.nome} className="w-12 h-12 rounded-xl object-cover shrink-0" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />
+                    ? <img src={p.urlImagem} alt={p.nome} className="w-12 h-12 rounded-xl object-cover shrink-0" style={{ border: '1px solid #1E2028' }} onError={e => (e.target as HTMLImageElement).style.display = 'none'} />
                     : <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: '#1E2028' }}><FiPackage size={18} style={{ color: '#6B7280' }} /></div>}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-white truncate">{p.nome}</p>
@@ -178,7 +178,7 @@ export default function AdminProdutos() {
                       <Tr key={p.id}>
                         <td className="px-5 py-3 w-12">
                           {p.urlImagem
-                            ? <img src={p.urlImagem} alt={p.nome} className="w-10 h-10 rounded-xl object-cover" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />
+                            ? <img src={p.urlImagem} alt={p.nome} className="w-10 h-10 rounded-xl object-cover" style={{ border: '1px solid #1E2028' }} onError={e => (e.target as HTMLImageElement).style.display = 'none'} />
                             : <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#1E2028' }}><FiPackage size={16} style={{ color: '#6B7280' }} /></div>}
                         </td>
                         <td className="px-5 py-3">

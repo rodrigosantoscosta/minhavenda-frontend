@@ -18,7 +18,7 @@ function ActionModal({ open, onClose, action, pedidoId, onSuccess }: {
   open: boolean; onClose: () => void; action: string | null
   pedidoId: string | undefined; onSuccess: (order: Order) => void
 }) {
-  const [fields, setFields] = useState({})
+  const [fields, setFields] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const toast = useToast()
 
@@ -36,7 +36,7 @@ function ActionModal({ open, onClose, action, pedidoId, onSuccess }: {
       toast.success('Ação realizada com sucesso!')
       onClose()
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Erro ao processar ação')
+      toast.error((err as any)?.response?.data?.message || 'Erro ao processar ação')
     } finally {
       setLoading(false)
       setFields({})
@@ -133,7 +133,7 @@ export default function AdminPedidoDetail() {
               <FiArrowLeft size={20} />
             </Link>
             <PageTitle>Pedido</PageTitle>
-            <span className="font-mono text-sm shrink-0" style={{ color: '#9CA3AF' }}>{pedido.id.slice(0, 8).toUpperCase()}</span>
+            <span className="font-mono text-sm shrink-0" style={{ color: '#9CA3AF' }}>{String(pedido.id).slice(0, 8).toUpperCase()}</span>
             <StatusBadge status={pedido.status} />
           </div>
           <div className="flex flex-wrap gap-2">

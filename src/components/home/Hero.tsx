@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom'
-import Button from '../common/Button'
 import { FiShoppingBag, FiTruck, FiTag } from 'react-icons/fi'
 
 export default function Hero() {

@@ -129,20 +129,20 @@ export function CartProvider({ children }: { children: ReactNode }): React.JSX.E
 
       const backendItems: ExtendedCartItem[] = (backendCart.itens || []).map(item => ({
         id: item.produtoId,
-        nome: (item as Record<string, unknown>).produtoNome as string,
+        nome: (item as unknown as Record<string, unknown>).produtoNome as string,
         preco: item.precoUnitario,
         precoOriginal: item.precoUnitario,
         quantidade: item.quantidade,
         estoque: null, // validated server-side; null = no client-side limit
-        imagem: (item as Record<string, unknown>).produtoImagem as string || '',
-        categoria: (item as Record<string, unknown>).categoriaNome as string || 'Sem categoria',
+        imagem: (item as unknown as Record<string, unknown>).produtoImagem as string || '',
+        categoria: (item as unknown as Record<string, unknown>).categoriaNome as string || 'Sem categoria',
         itemId: item.id
-      }))
+      })) as ExtendedCartItem[]
 
       setCart(backendCart)
       setItems(backendItems)
 
-      const localItems = storageUtil.getItem('cart') || []
+      const localItems = (storageUtil.getItem('cart') as ExtendedCartItem[]) || []
       if (localItems.length > 0 && backendItems.length === 0) {
         logger.info({ localItemCount: localItems.length }, 'Syncing local cart to backend')
         await syncCartWithBackend(localItems)
@@ -158,10 +158,10 @@ export function CartProvider({ children }: { children: ReactNode }): React.JSX.E
         setCart(null)
         setItems([])
 
-        const localItems = storageUtil.getItem('cart') || []
-        if (localItems.length > 0) {
-          logger.info({ localItemCount: localItems.length }, 'Syncing local items after 404')
-          await syncCartWithBackend(localItems)
+        const localItems2 = (storageUtil.getItem('cart') as ExtendedCartItem[]) || []
+        if (localItems2.length > 0) {
+          logger.info({ localItemCount: localItems2.length }, 'Syncing local items after 404')
+          await syncCartWithBackend(localItems2)
         }
       } else {
         loadCartFromLocalStorage()
@@ -220,15 +220,17 @@ export function CartProvider({ children }: { children: ReactNode }): React.JSX.E
 
         const backendItems: ExtendedCartItem[] = (backendCart.itens || []).map(item => ({
           id: item.produtoId,
-          nome: (item as Record<string, unknown>).produtoNome as string,
+          produtoId: item.produtoId,
+          precoUnitario: item.precoUnitario,
+          nome: (item as unknown as Record<string, unknown>).produtoNome as string,
           preco: item.precoUnitario,
           precoOriginal: item.precoUnitario,
           quantidade: item.quantidade,
           estoque: null, // validated server-side; null = no client-side limit
-          imagem: (item as Record<string, unknown>).produtoImagem as string || '',
-          categoria: (item as Record<string, unknown>).categoriaNome as string || 'Sem categoria',
+          imagem: (item as unknown as Record<string, unknown>).produtoImagem as string || '',
+          categoria: (item as unknown as Record<string, unknown>).categoriaNome as string || 'Sem categoria',
           itemId: item.id
-        }))
+        })) as ExtendedCartItem[]
 
         setCart(backendCart)
         setItems(backendItems)
@@ -275,13 +277,15 @@ export function CartProvider({ children }: { children: ReactNode }): React.JSX.E
 
           const newItem: ExtendedCartItem = {
             id: produto.id,
+            produtoId: produto.id,
+            precoUnitario: precoValue,
             nome: produto.nome,
             preco: produto.precoPromocional ?? precoValue,
             precoOriginal: precoOriginalValue,
             quantidade: quantidade,
             estoque: estoqueDisponivel,
             imagem: produto.urlImagem || '',
-            categoria: produto.categoria?.nome || (produto as Record<string, string>).categoriaNome || 'Sem categoria',
+            categoria: produto.categoria?.nome || (produto as unknown as Record<string, string>).categoriaNome || 'Sem categoria',
           }
 
           const updatedItems = [...items, newItem]
@@ -330,15 +334,17 @@ export function CartProvider({ children }: { children: ReactNode }): React.JSX.E
 
         const backendItems: ExtendedCartItem[] = (backendCart.itens || []).map(item => ({
           id: item.produtoId,
-          nome: (item as Record<string, unknown>).produtoNome as string,
+          produtoId: item.produtoId,
+          precoUnitario: item.precoUnitario,
+          nome: (item as unknown as Record<string, unknown>).produtoNome as string,
           preco: item.precoUnitario,
           precoOriginal: item.precoUnitario,
           quantidade: item.quantidade,
-          estoque: null, // validated server-side; null = no client-side limit
-          imagem: (item as Record<string, unknown>).produtoImagem as string || '',
-          categoria: (item as Record<string, unknown>).categoriaNome as string || 'Sem categoria',
+          estoque: null,
+          imagem: (item as unknown as Record<string, unknown>).produtoImagem as string || '',
+          categoria: (item as unknown as Record<string, unknown>).categoriaNome as string || 'Sem categoria',
           itemId: item.id
-        }))
+        })) as ExtendedCartItem[]
 
         setCart(backendCart)
         setItems(backendItems)
@@ -415,15 +421,17 @@ export function CartProvider({ children }: { children: ReactNode }): React.JSX.E
 
             const backendItems: ExtendedCartItem[] = (backendCart.itens || []).map(i => ({
               id: i.produtoId,
-              nome: (i as Record<string, unknown>).produtoNome as string,
+              produtoId: i.produtoId,
+              precoUnitario: i.precoUnitario,
+              nome: (i as unknown as Record<string, unknown>).produtoNome as string,
               preco: i.precoUnitario,
               precoOriginal: i.precoUnitario,
               quantidade: i.quantidade,
               estoque: null,
-              imagem: (i as Record<string, unknown>).produtoImagem as string || '',
-              categoria: (i as Record<string, unknown>).categoriaNome as string || 'Sem categoria',
+              imagem: (i as unknown as Record<string, unknown>).produtoImagem as string || '',
+              categoria: (i as unknown as Record<string, unknown>).categoriaNome as string || 'Sem categoria',
               itemId: i.id
-            }))
+            })) as ExtendedCartItem[]
 
             setCart(backendCart)
             setItems(backendItems)

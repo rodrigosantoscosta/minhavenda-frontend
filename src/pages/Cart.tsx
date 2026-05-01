@@ -131,7 +131,7 @@ export default function Cart() {
                       src={item.imagem || 'https://placehold.co/600x400/e5e7eb/9ca3af?text=Sem+imagem'}
                       alt={item.nome}
                       className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                      onError={(e) => { e.target.src = 'https://placehold.co/600x400/e5e7eb/9ca3af?text=Sem+imagem' }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/600x400/e5e7eb/9ca3af?text=Sem+imagem' }}
                     />
                   </div>
 

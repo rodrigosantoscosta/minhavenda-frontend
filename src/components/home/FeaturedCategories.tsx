@@ -1,6 +1,6 @@
 import type { IconType } from 'react-icons'
 import type { Category } from '../../types'
-import { FiGrid, FiMonitor, FiShoppingBag , FiBook, FiHome, FiWatch, FiHeadphones, FiCamera } from 'react-icons/fi'
+import { FiGrid, FiMonitor, FiBook, FiHome, FiWatch, FiHeadphones, FiCamera } from 'react-icons/fi'
 
 // Mapa de ícones para categorias
 const categoryIcons = {

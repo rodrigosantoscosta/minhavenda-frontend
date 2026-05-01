@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.JSX.E
         setTokenExpiresAt(expiration)
 
         // Log com tempo restante
-        const timeLeft = expiration - Date.now()
+        const timeLeft = (expiration ?? 0) - Date.now()
         const minutesLeft = Math.floor(timeLeft / 1000 / 60)
 
         logger.info({
@@ -225,7 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.JSX.E
       setTokenExpiresAt(expiration)
       setShowExpirationWarning(false) // Reset aviso
 
-      const timeLeft = expiration - Date.now()
+      const timeLeft = (expiration ?? 0) - Date.now()
       const minutesLeft = Math.floor(timeLeft / 1000 / 60)
 
       logger.info({
@@ -296,7 +296,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.JSX.E
       setTokenExpiresAt(expiration)
       setShowExpirationWarning(false)
 
-      const timeLeft = expiration - Date.now()
+      const timeLeft = (expiration ?? 0) - Date.now()
       const minutesLeft = Math.floor(timeLeft / 1000 / 60)
 
       logger.info({

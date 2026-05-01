@@ -50,7 +50,7 @@ export default function AdminDashboard() {
   if (loading) return <AdminLayout><PageLoader /></AdminLayout>
 
   const chartData = stats
-    ? Object.entries(stats.pedidosPorStatus).map(([status, count]) => ({ status, count }))
+    ? Object.entries(stats.pedidosPorStatus).map(([status, count]) => ({ status, count: count as number }))
     : []
 
   const totalPedidos = chartData.reduce((s, d) => s + d.count, 0)

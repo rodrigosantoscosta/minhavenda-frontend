@@ -5,7 +5,7 @@ import AdminLayout from '../../components/admin/AdminLayout'
 import adminService from '../../services/adminService'
 import {
   formatDateTime, PageLoader, EmptyState, AdminCard, AdminModal,
-  PageTitle, Th, Tr, inputCls, inputStyle, FieldLabel, BtnPrimary, BtnSecondary, T,
+  PageTitle, Th, Tr, inputCls, inputStyle, FieldLabel, BtnSecondary, T,
 } from '../../utils/adminUtils'
 import { useToast } from '../../components/common/Toast'
 
@@ -188,7 +188,7 @@ function StockModal({ open, onClose, action, produto, onSuccess }: {
       setQty('')
       onClose()
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Erro ao atualizar estoque')
+      toast.error((err as any)?.response?.data?.message || 'Erro ao atualizar estoque')
     } finally { setLoading(false) }
   }
 
@@ -401,8 +401,6 @@ export default function AdminEstoque() {
                 <EmptyState message="Nenhum produto corresponde ao filtro" />
               ) : filtered.map(row => {
                 const qty = row.estoque?.quantidade
-                const sev = getSeverity(qty)
-                const cfg = SEVERITY[sev]
                 return (
                   <AdminCard key={row.id} className="p-4">
                     {/* Top row: severity + qty */}

@@ -44,7 +44,7 @@ export default function AddressForm({
   
   // Cache para buscas de CEP e ref para evitar requisições duplicadas
   const cepCacheRef = useRef(new Map())
-  const searchControllerRef = useRef(null)
+  const searchControllerRef = useRef<AbortController | null>(null)
 
   // Memoizar validação para evitar recálculos desnecessários (MOVIDO PARA CIMA)
   const validation = useMemo(() => validarEndereco(formData), [formData])
@@ -156,7 +156,7 @@ export default function AddressForm({
     try {
       // API de CEP real com AbortController
       const response = await fetch(`https://viacep.com.br/ws/${currentCep}/json/`, {
-        signal: searchControllerRef.current.signal
+        signal: searchControllerRef.current?.signal
       })
       
       if (!response.ok) throw new Error('Erro na requisição')

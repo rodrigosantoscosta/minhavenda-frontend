@@ -15,8 +15,8 @@ export default function Login() {
   const location = useLocation()
   const { login, loading } = useAuth()
 
-  const [formData, setFormData]       = useState({ email: '', senha: '' })
-  const [errors, setErrors]           = useState({})
+  const [formData, setFormData]       = useState<{ email: string; senha: string }>({ email: '', senha: '' })
+  const [errors, setErrors]           = useState<Record<string, string>>({})
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError]  = useState('')
 

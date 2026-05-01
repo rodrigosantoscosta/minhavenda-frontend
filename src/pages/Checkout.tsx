@@ -64,13 +64,13 @@ export default function Checkout() {
 
   const calcularValores = () => {
     const subtotal = items.reduce((total, item) => {
-      const precoItem = typeof item.preco === 'object' ? item.preco.valor : item.preco
+      const precoItem = typeof item.preco === 'object' ? (item.preco as any)?.valor : item.preco
       return total + ((precoItem || 0) * item.quantidade)
     }, 0)
 
     const desconto = items.reduce((total, item) => {
-      const precoItem = typeof item.preco === 'object' ? item.preco.valor : item.preco
-      const precoOriginalItem = typeof item.precoOriginal === 'object' ? item.precoOriginal.valor : item.precoOriginal
+      const precoItem = typeof item.preco === 'object' ? (item.preco as any)?.valor : item.preco
+      const precoOriginalItem = typeof item.precoOriginal === 'object' ? (item.precoOriginal as any)?.valor : item.precoOriginal
       const preco = precoItem || 0
       const precoOriginal = precoOriginalItem || preco
       return precoOriginal > preco ? total + ((precoOriginal - preco) * item.quantidade) : total
@@ -156,7 +156,7 @@ export default function Checkout() {
 
       registerOrderStatus(order.id, order.status || 'PENDENTE')
 
-      const shortId = order.id?.slice(-6) || order.id
+      const shortId = String(order.id ?? '').slice(-6) || order.id
       addNotification({
         type: 'new_order',
         title: 'Pedido realizado com sucesso',

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import type { AxiosResponse } from 'axios'
 import api from './api'
 import jwtHelper from '../utils/jwtHelper'
 import logger from '../utils/logger'
@@ -9,6 +8,11 @@ interface LoginResult {
   token: string
   refreshToken: string
   user: User
+  nome?: string
+  email?: string
+  id?: string | number
+  tipo?: string
+  role?: string
 }
 
 interface JwtPayload {

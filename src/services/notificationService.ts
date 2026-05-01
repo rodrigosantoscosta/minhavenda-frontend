@@ -1,6 +1,5 @@
 import storageUtil from '../utils/storageUtil'
 import logger from '../utils/logger'
-import type { Notification } from '../types'
 
 /**
  * notificationService

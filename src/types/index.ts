@@ -13,8 +13,12 @@ export interface User {
   id: string | number | null
   nome: string | null
   email: string | null
+  name?: string
   role: UserRole | null
   tipo: UserRole | null
+  telefone?: string
+  cpf?: string
+  endereco?: Record<string, string>
 }
 
 export interface LoginRequest {
@@ -58,15 +62,34 @@ export interface Product {
   id: string | number
   nome: string
   descricao: string
+  descricaoDetalhada?: string
   preco: number
   precoOriginal?: number
   urlImagem?: string
+  imagem?: string
+  precoPromocional?: number
   categoriaId: string | number
+  categoriaNome?: string
   categoria?: Category
   estoque?: number
   ativo: boolean
   dataCriacao: string
   slug?: string
+  // physical dimensions
+  pesoKg?: number
+  peso?: number
+  alturaCm?: number
+  larguraCm?: number
+  comprimentoCm?: number
+  dimensoes?: string
+  // extended info
+  especificacoes?: Record<string, string> | string
+  avaliacoes?: unknown[]
+  imagens?: string[]
+  quantidadeEstoque?: number
+  numeroAvaliacoes?: number
+  vendidos?: number
+  dataCadastro?: string
 }
 
 export interface CreateProductRequest {
@@ -111,6 +134,7 @@ export interface Category {
   ativo: boolean
   dataCriacao: string
   produtos?: Product[]
+  totalProdutos?: number
 }
 
 export interface CreateCategoryRequest {
@@ -139,6 +163,10 @@ export interface CartItem {
   id?: string | number
   produtoId: string | number
   produto?: Product
+  nome?: string
+  imagem?: string
+  preco?: number
+  precoOriginal?: number
   quantidade: number
   precoUnitario: number
   subtotal?: number
@@ -175,10 +203,12 @@ export interface OrderItem {
   id: string | number
   produtoId: string | number
   produtoNome?: string
+  nome?: string
   produto?: Product
   quantidade: number
   precoUnitario: number
   subtotal: number
+  imagem?: string
 }
 
 export interface OrderAddress {
@@ -188,6 +218,7 @@ export interface OrderAddress {
   cidade: string
   estado: string
   cep: string
+  complemento?: string
 }
 
 export interface OrderPayment {
@@ -202,6 +233,12 @@ export interface OrderValues {
   total: number
 }
 
+export interface OrderHistoryEntry {
+  status: string
+  data: string
+  descricao?: string
+}
+
 export interface Order {
   id: string | number
   dataCriacao: string
@@ -209,7 +246,7 @@ export interface Order {
   itens: OrderItem[]
   endereco?: OrderAddress | null
   enderecoEntrega?: string
-  pagamento: OrderPayment
+  pagamento: OrderPayment & { parcelas?: number; valor?: number }
   valores: OrderValues
   quantidadeItens: number
   usuario?: User
@@ -221,6 +258,13 @@ export interface Order {
   valorFrete?: number
   valorTotal?: number
   subtotal?: number
+  total?: number
+  historico?: OrderHistoryEntry[]
+  codigoRastreio?: string
+  transportadora?: string
+  dataEnvio?: string
+  dataEntrega?: string
+  dataAtualizacao?: string
 }
 
 export interface CreateOrderRequest {
@@ -260,6 +304,7 @@ export interface Stock {
   quantidade: number
   minimo?: number
   dataAtualizacao: string
+  atualizadoEm?: string
 }
 
 export interface AddStockRequest {

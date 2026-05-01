@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../../../contexts/CartContext'
 import Button from '../Button'
@@ -43,7 +43,7 @@ export default function ProductCard({ produto, viewMode: _viewMode = 'grid' }: P
   }
 
   // NestJS returns preco as a plain number; guard against legacy { valor } shape
-  const precoBase = typeof produto.preco === 'object' ? produto.preco?.valor : produto.preco
+  const precoBase = typeof produto.preco === 'object' ? (produto.preco as any)?.valor : produto.preco
   const precoPromocional = produto.precoPromocional ?? null
 
   // FIX: do NOT default to 1 — use null to mean "unknown/no limit", 0 means out of stock

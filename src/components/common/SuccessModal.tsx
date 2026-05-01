@@ -6,7 +6,6 @@ import Button from './Button'
 import { 
   FiCheckCircle, 
   FiPackage, 
-  FiTruck, 
   FiClock,
   FiArrowRight,
   FiShoppingBag,

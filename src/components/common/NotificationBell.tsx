@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FiBell, FiPackage, FiXCircle, FiRefreshCw } from 'react-icons/fi'
 import { useNotificationContext } from '../../contexts/NotificationContext'

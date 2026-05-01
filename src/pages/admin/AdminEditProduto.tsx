@@ -41,18 +41,18 @@ export default function AdminEditProduto() {
     e.preventDefault()
     setSaving(true)
     try {
-      const body = { nome: form.nome, descricao: form.descricao, preco: parseFloat(form.preco), ativo: form.ativo }
+      const body: Record<string, unknown> = { nome: form.nome, descricao: form.descricao, preco: parseFloat(form.preco as string), ativo: form.ativo }
       if (form.urlImagem)     body.urlImagem     = form.urlImagem
-      if (form.categoriaId)   body.categoriaId   = parseInt(form.categoriaId)
-      if (form.pesoKg)        body.pesoKg        = parseFloat(form.pesoKg)
-      if (form.alturaCm)      body.alturaCm      = parseFloat(form.alturaCm)
-      if (form.larguraCm)     body.larguraCm     = parseFloat(form.larguraCm)
-      if (form.comprimentoCm) body.comprimentoCm = parseFloat(form.comprimentoCm)
+      if (form.categoriaId)   body.categoriaId   = parseInt(form.categoriaId as string)
+      if (form.pesoKg)        body.pesoKg        = parseFloat(form.pesoKg as string)
+      if (form.alturaCm)      body.alturaCm      = parseFloat(form.alturaCm as string)
+      if (form.larguraCm)     body.larguraCm     = parseFloat(form.larguraCm as string)
+      if (form.comprimentoCm) body.comprimentoCm = parseFloat(form.comprimentoCm as string)
       await adminService.atualizarProduto(id, body)
       toast.success('Produto atualizado!')
       navigate('/admin/produtos')
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Erro ao salvar')
+      toast.error((err as any)?.response?.data?.message || 'Erro ao salvar')
     } finally { setSaving(false) }
   }
 
@@ -103,7 +103,7 @@ export default function AdminEditProduto() {
             <AdminCard className="p-6">
               <p className="text-sm font-semibold text-white mb-3">Imagem</p>
               {form.urlImagem && (
-                <img src={form.urlImagem} alt="preview" className="w-full aspect-square object-cover rounded-xl mb-3" style={{ border: '1px solid #1E2028' }} onError={e => e.target.style.display = 'none'} />
+                <img src={form.urlImagem} alt="preview" className="w-full aspect-square object-cover rounded-xl mb-3" style={{ border: '1px solid #1E2028' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
               )}
               <FieldLabel>URL da Imagem</FieldLabel>
               <input className={inputCls} style={inputStyle} value={form.urlImagem} onChange={set('urlImagem')} placeholder="https://..." />

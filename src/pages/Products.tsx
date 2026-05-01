@@ -60,11 +60,11 @@ export default function Products() {
 
   // Atualizar URL
   useEffect(() => {
-    const params = {}
+    const params: Record<string, string> = {}
     if (searchTerm) params.busca = searchTerm
-    if (selectedCategory) params.categoriaId = selectedCategory
-    if (minPrice) params.precoMin = minPrice
-    if (maxPrice) params.precoMax = maxPrice
+    if (selectedCategory) params.categoriaId = String(selectedCategory)
+    if (minPrice) params.precoMin = String(minPrice)
+    if (maxPrice) params.precoMax = String(maxPrice)
     if (sortBy && sortBy !== 'recentes') params.ordem = sortBy
     setSearchParams(params)
   }, [searchTerm, selectedCategory, minPrice, maxPrice, sortBy])
@@ -83,11 +83,11 @@ export default function Products() {
     try {
       page === 0 ? setLoading(true) : setLoadingMore(true)
 
-      const params = { page, size: pageSize, ativo: true }
+      const params: Record<string, unknown> = { page, size: pageSize, ativo: true }
       if (searchTerm) params.termo = searchTerm
       if (selectedCategory) params.categoriaId = selectedCategory
-      if (minPrice) params.precoMin = parseFloat(minPrice)
-      if (maxPrice) params.precoMax = parseFloat(maxPrice)
+      if (minPrice) params.precoMin = parseFloat(minPrice as string)
+      if (maxPrice) params.precoMax = parseFloat(maxPrice as string)
 
       const sortMapping = {
         recentes: 'dataCadastro:desc',
@@ -98,9 +98,10 @@ export default function Products() {
       }
       params.sort = sortMapping[sortBy as keyof typeof sortMapping] || 'dataCadastro:desc'
 
-      const data = await productService.getProdutos(params)
+      const raw = await productService.getProdutos(params)
+      const data = raw as any
 
-      let produtosArray = []
+      let produtosArray: Product[] = []
       if (data?.content && Array.isArray(data.content)) {
         produtosArray = data.content
         setTotalPages(data.totalPages || 0)
@@ -117,7 +118,7 @@ export default function Products() {
 
       setProdutos(produtosArray)
     } catch (error) {
-      logger.error('Erro ao carregar produtos', { error: error.message })
+      logger.error('Erro ao carregar produtos', { error: (error as Error).message })
       toast.error('Erro ao carregar produtos')
       setProdutos([])
     } finally {

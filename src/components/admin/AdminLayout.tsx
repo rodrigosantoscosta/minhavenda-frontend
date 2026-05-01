@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { useState } from 'react'
-import type { ReactNode } from 'react'
+import React, { useState } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import {
@@ -100,7 +99,7 @@ function SidebarContent({ onNavClick, onLogout }: { onNavClick: () => void; onLo
   )
 }
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { logout } = useAuth()
   const navigate   = useNavigate()
   const location   = useLocation()

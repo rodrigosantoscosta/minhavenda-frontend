@@ -3,7 +3,6 @@ import type { Order, PaginationInfo } from '../types'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import OrderCard from '../components/common/OrderCard'
-import StatusBadge from '../components/common/StatusBadge'
 import Button from '../components/common/Button'
 import Loading from '../components/common/Loading'
 import EmptyState from '../components/common/EmptyState'
@@ -54,7 +53,7 @@ export default function Orders() {
     try {
       setError('')
       
-      const options = {
+      const options: Record<string, unknown> = {
         page,
         limit: 10
       }

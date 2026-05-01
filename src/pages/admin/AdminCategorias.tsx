@@ -4,7 +4,7 @@ import type { Category } from '../../types'
 import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiX } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
 import adminService from '../../services/adminService'
-import { formatDate, PageLoader, EmptyState, AdminCard, ConfirmModal, PageTitle, Th, Tr, inputCls, inputStyle, FieldLabel, BtnPrimary } from '../../utils/adminUtils'
+import { formatDate, PageLoader, EmptyState, AdminCard, ConfirmModal, PageTitle, Th, Tr, inputCls, inputStyle, BtnPrimary } from '../../utils/adminUtils'
 import { useToast } from '../../components/common/Toast'
 
 export default function AdminCategorias() {
@@ -34,7 +34,7 @@ export default function AdminCategorias() {
       setNewForm({ nome: '', descricao: '' })
       setCreating(false)
       toast.success('Categoria criada!')
-    } catch (err) { toast.error(err?.response?.data?.message || 'Erro ao criar') }
+    } catch (err) { toast.error((err as any)?.response?.data?.message || 'Erro ao criar') }
     finally { setSaving(false) }
   }
 

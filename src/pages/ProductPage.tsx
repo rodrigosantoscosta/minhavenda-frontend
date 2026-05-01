@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
 import type { Product } from '../types'
-import { useNavigate } from 'react-router-dom'
 import productService from '../services/productService'
 import ProductCard from '../components/common/products/ProductCard'
 import { useToast } from '../components/common/Toast'
-import { LoadingContainer } from '../components/common/Loading'
 import Button from '../components/common/Button'
-import { FiFilter, FiGrid, FiList, FiRefreshCw } from 'react-icons/fi'
+import { FiGrid, FiList, FiRefreshCw } from 'react-icons/fi'
 import { useScrollOnPageChange } from '../hooks/useScrollOnPageChange'
 
 /**
@@ -28,7 +26,6 @@ export default function ProductPage() {
   useScrollOnPageChange(currentPage)
 
   const toast = useToast()
-  const navigate = useNavigate()
 
   /**
    * Buscar produtos do backend
@@ -44,7 +41,7 @@ export default function ProductPage() {
         ativo: true
       }
 
-      const response = await productService.getProdutos(params)
+      const response = await productService.getProdutos(params) as any
       
       // Suportar resposta paginada ou lista simples
       if (response?.content) {

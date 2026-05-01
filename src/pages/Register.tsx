@@ -17,8 +17,9 @@ export default function Register() {
     email: '',
     senha: '',
     confirmarSenha: '',
+    terms: false,
   })
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false)

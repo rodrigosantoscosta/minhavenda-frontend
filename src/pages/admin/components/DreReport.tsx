@@ -3,13 +3,6 @@ import type { ElementType } from 'react'
 import type { DREReport } from '../../../services/adminService'
 import { formatDate, formatBRL, T, AdminCard, Th, Tr } from '../../../utils/adminUtils'
 
-const TOOLTIP_STYLE = {
-  background: T.card,
-  border: `1px solid ${T.border}`,
-  borderRadius: 8,
-  fontSize: 12,
-  color: '#fff',
-}
 
 function KpiCard({ label, value, icon: Icon, color, bg }: { label: string; value: string; icon: ElementType; color: string; bg: string }) {
   return (

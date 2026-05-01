@@ -12,7 +12,7 @@ interface ProductsGridProps {
 
 export default function ProductsGrid({ 
   produtos = [], 
-  onAddToCart, 
+  onAddToCart: _onAddToCart, 
   loading = false,
   columns = 3,
   viewMode = 'grid'

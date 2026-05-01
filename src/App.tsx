@@ -15,7 +15,7 @@ import { ProtectedRoute, PublicRoute, AdminRoute } from './components/common/Pro
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import Products from './pages/Products'
+
 import ProductDetail from './pages/ProductDetail'
 import SearchPage from './pages/SearchPage'
 import NotFound from './pages/NotFound'

@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
+import type { Product } from '../../types'
 import ProductCard from '../common/products/ProductCard' 
 import { FiChevronRight } from 'react-icons/fi'
 
-export default function RelatedProducts({ produtos = [] }) {
+export default function RelatedProducts({ produtos = [] }: { produtos?: Product[] }) {
   if (produtos.length === 0) return null
 
   return (

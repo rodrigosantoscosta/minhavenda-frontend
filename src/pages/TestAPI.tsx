@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
+import type { Product } from '../types'
 import productService from '../services/productService'
 
 export default function TestAPI() {
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadProducts() {

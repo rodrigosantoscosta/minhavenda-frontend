@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import type { Product, Category } from '../types'
 import { useCart } from '../contexts/CartContext'
 import productService from '../services/productService'
-import ProductCard from '../components/common/products/ProductCard'
 import CategoryFilter from '../components/product/CategoryFilter'
 import ProductsGrid from '../components/product/ProductsGrid'
 import Pagination from '../components/common/Pagination'
@@ -12,10 +11,7 @@ import EmptyState from '../components/common/EmptyState'
 import Button from '../components/common/Button'
 import logger from '../utils/logger'
 
-import { 
-  FiShoppingBag, 
-  FiPackage
-} from 'react-icons/fi'
+import { FiShoppingBag } from 'react-icons/fi'
 
 export default function Home() {
   const { addItem } = useCart()
@@ -81,9 +77,10 @@ export default function Home() {
       }
       if (selectedCategory) params.categoriaId = selectedCategory
 
-      const data = await productService.getProdutos(params)
+      const raw = await productService.getProdutos(params)
+      const data = raw as any
 
-      let produtosArray = []
+      let produtosArray: Product[] = []
       if (data?.content && Array.isArray(data.content)) {
         produtosArray = data.content
         setTotalPages(data.totalPages || 0)

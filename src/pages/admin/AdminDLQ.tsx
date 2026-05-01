@@ -6,17 +6,17 @@ import { PageLoader, AdminCard, PageTitle, BtnPrimary } from '../../utils/adminU
 import { useToast } from '../../components/common/Toast'
 
 export default function AdminDLQ() {
-  const [queues, setQueues] = useState([])
+  const [queues, setQueues] = useState<string[]>([])
   const [dica, setDica] = useState('')
   const [managementUI, setManagementUI] = useState('http://localhost:15672')
   const [loading, setLoading] = useState(true)
-  const [requeueing, setRequeueing] = useState(null)   // queue name being requeued
+  const [requeueing, setRequeueing] = useState<string | null>(null)
   const [requeueingAll, setRequeuingAll] = useState(false)
   const toast = useToast()
 
   useEffect(() => {
     adminService.getDlqQueues()
-      .then(data => { setQueues(data.dlqs ?? []); setDica(data.dica ?? ''); setManagementUI(data.managementUI ?? 'http://localhost:15672') })
+      .then(data => { const d = data as any; setQueues(d.dlqs ?? []); setDica(d.dica ?? ''); setManagementUI(d.managementUI ?? 'http://localhost:15672') })
       .catch(() => toast.error('Erro ao carregar DLQs'))
       .finally(() => setLoading(false))
   }, [])
@@ -24,19 +24,19 @@ export default function AdminDLQ() {
   const handleRequeue = async (queue: string) => {
     setRequeueing(queue)
     try {
-      const res = await adminService.requeueDlq(queue)
+      const res = await adminService.requeueDlq(queue) as any
       if (res.erro) { toast.error(`Erro: ${res.erro}`) }
       else toast.success(`${res.mensagensReenfileiradas} mensagem(ns) reprocessada(s) de ${queue}`)
-    } catch (err) { toast.error(err?.response?.data?.message || 'Erro ao reprocessar') }
+    } catch (err) { toast.error((err as any)?.response?.data?.message || 'Erro ao reprocessar') }
     finally { setRequeueing(null) }
   }
 
   const handleRequeueAll = async () => {
     setRequeuingAll(true)
     try {
-      const res = await adminService.requeueAllDlq()
+      const res = await adminService.requeueAllDlq() as any
       toast.success(`Total: ${res.totalMensagensReenfileiradas} mensagem(ns) reprocessada(s)`)
-    } catch (err) { toast.error(err?.response?.data?.message || 'Erro ao reprocessar') }
+    } catch (err) { toast.error((err as any)?.response?.data?.message || 'Erro ao reprocessar') }
     finally { setRequeuingAll(false) }
   }
 

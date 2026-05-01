@@ -16,10 +16,15 @@ import { calcularFrete, formatarEndereco } from '../../services/checkoutService'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SummaryItem = Record<string, any>
 
+interface Pagamento {
+  metodo?: string
+  parcelas?: number
+}
+
 interface OrderSummaryProps {
   items: SummaryItem[]
   endereco?: Record<string, string> | null
-  pagamento?: string | null
+  pagamento?: Pagamento | string | null
   showAddress?: boolean
   showPayment?: boolean
   className?: string
@@ -117,7 +122,7 @@ export default function OrderSummary({
                   alt={item.nome}
                   className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-lg bg-gray-100"
                   onError={(e) => {
-                    e.target.src = 'https://placehold.co/600x400/transparent/F00'
+                    (e.target as HTMLImageElement).src = 'https://placehold.co/600x400/transparent/F00'
                   }}
                 />
               </div>
@@ -250,9 +255,9 @@ export default function OrderSummary({
               </div>
               <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
                 <p className="font-medium capitalize">
-                  {pagamento.metodo?.replace('_', ' ') || 'Pix'}
+                  {typeof pagamento === 'object' && pagamento ? pagamento.metodo?.replace('_', ' ') : String(pagamento || 'Pix')}
                 </p>
-                {pagamento.parcelas && (
+                {typeof pagamento === 'object' && pagamento?.parcelas && (
                   <p className="text-xs text-gray-500 mt-1">
                     {pagamento.parcelas}x de {formatarValor(total / pagamento.parcelas)}
                   </p>

@@ -4,7 +4,7 @@ import type { DREReport, DespesaReport } from '../../services/adminService'
 import { FiCalendar, FiCheck } from 'react-icons/fi'
 import AdminLayout from '../../components/admin/AdminLayout'
 import adminService from '../../services/adminService'
-import { T, PageTitle, AdminCard, PageLoader, EmptyState } from '../../utils/adminUtils'
+import { T, PageTitle, AdminCard, PageLoader } from '../../utils/adminUtils'
 import { useToast } from '../../components/common/Toast'
 import DreReport from './components/DreReport'
 import DespesasReport from './components/DespesasReport'
@@ -91,7 +91,7 @@ const PresetPill = forwardRef<HTMLButtonElement, { label: string; active: boolea
 // ─── Results fade-in ──────────────────────────────────────────────────────────
 
 function ResultsFadeIn({ children }: { children: React.ReactNode }) {
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (ref.current) {
       ref.current.style.opacity = '0'
