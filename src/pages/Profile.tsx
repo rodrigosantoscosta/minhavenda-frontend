@@ -84,7 +84,7 @@ export default function Profile() {
       toast.success('Perfil atualizado com sucesso!')
       setIsEditing(false)
     } catch (error) {
-      logger.error('Erro ao atualizar perfil', { error: error.message })
+      logger.error({ error: (error as Error).message }, 'Erro ao atualizar perfil')
       toast.error('Erro ao atualizar perfil. Tente novamente.')
     } finally {
       setLoading(false)
@@ -125,7 +125,7 @@ export default function Profile() {
           toast.error('CEP não encontrado')
         }
       } catch (error) {
-        logger.error('Erro ao buscar CEP', { error: error.message, cep })
+        logger.error({ error: (error as Error).message, cep }, 'Erro ao buscar CEP')
         toast.error('Erro ao buscar CEP')
       }
     }

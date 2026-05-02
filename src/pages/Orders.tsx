@@ -69,8 +69,8 @@ export default function Orders() {
       setCurrentPage(page)
 
     } catch (err) {
-      logger.error('Erro ao carregar pedidos', { error: err.message })
-      setError(err.message || 'Não foi possível carregar seus pedidos. Tente novamente.')
+      logger.error({ error: (err as Error).message }, 'Erro ao carregar pedidos')
+      setError((err as Error).message || 'Não foi possível carregar seus pedidos. Tente novamente.')
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -120,8 +120,8 @@ export default function Orders() {
       await handleRefresh()
       
     } catch (err) {
-      logger.error('Erro ao cancelar pedido', { error: err.message, orderId })
-      setError(err.message || 'Não foi possível cancelar o pedido. Tente novamente.')
+      logger.error({ error: (err as Error).message, orderId }, 'Erro ao cancelar pedido')
+      setError((err as Error).message || 'Não foi possível cancelar o pedido. Tente novamente.')
     } finally {
       setCancellingOrderId(null)
     }

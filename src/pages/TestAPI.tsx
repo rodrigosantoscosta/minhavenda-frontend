@@ -14,7 +14,7 @@ export default function TestAPI() {
         const data = await productService.getProducts()
         setProducts(data.content || [])
       } catch (err) {
-        setError(err.message)
+        setError((err as Error).message)
       } finally {
         setLoading(false)
       }

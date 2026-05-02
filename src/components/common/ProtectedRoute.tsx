@@ -46,7 +46,7 @@ export function ProtectedRoute({ children, requiredRole = null }: ProtectedRoute
   }
 
   // Está autenticado, renderizar children
-  return children
+  return <>{children}</>
 }
 
 /**
@@ -98,7 +98,7 @@ export function PublicRoute({ children, redirectTo = '/' }: PublicRouteProps): R
     return <Navigate to={redirectTo} replace />
   }
 
-  return children
+  return <>{children}</>
 }
 
 

@@ -223,7 +223,7 @@ export interface OrderAddress {
 
 export interface OrderPayment {
   metodo: string
-  status: 'PENDENTE' | 'PAGO' | 'CANCELADO' | 'ESTORNADO'
+  status: OrderStatus | 'ESTORNADO'
 }
 
 export interface OrderValues {
@@ -265,6 +265,8 @@ export interface Order {
   dataEnvio?: string
   dataEntrega?: string
   dataAtualizacao?: string
+  rastreamento?: unknown
+  estimativaEntrega?: string | null
 }
 
 export interface CreateOrderRequest {

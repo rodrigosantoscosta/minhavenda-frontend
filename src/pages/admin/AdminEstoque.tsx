@@ -183,7 +183,7 @@ function StockModal({ open, onClose, action, produto, onSuccess }: {
       if (action === 'ADICIONAR') result = await adminService.adicionarEstoque(produto.id, n)
       if (action === 'REMOVER')   result = await adminService.removerEstoque(produto.id, n)
       if (action === 'AJUSTAR')   result = await adminService.ajustarEstoque(produto.id, n)
-      onSuccess(result)
+      onSuccess(result as Stock)
       toast.success('Estoque atualizado!')
       setQty('')
       onClose()
@@ -319,7 +319,7 @@ export default function AdminEstoque() {
   }, [])
 
   const handleSuccess = (estoque: Stock) => {
-    setRows(rs => rs.map(r => r.id === estoque.produtoId ? { ...r, estoque } : r))
+    setRows(rs => rs.map(r => r.id === estoque.produtoId ? { ...r, estoque } : r) as typeof rs)
   }
 
   const handleAction = (action: string, row: EstoqueRow) => setModal({ action, produto: row })
@@ -411,7 +411,7 @@ export default function AdminEstoque() {
                         <p className="text-xs font-sans mt-0.5" style={{ color: T.muted }}>{row.categoriaNome || 'Sem categoria'}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <QtyBadge qty={qty} loading={row.estoqueLoading} />
+                        <QtyBadge qty={qty} loading={!!row.estoqueLoading} />
                         {row.estoque?.atualizadoEm && (
                           <p className="text-[10px] font-mono mt-1.5" style={{ color: T.muted }}>
                             {formatDateTime(row.estoque.atualizadoEm)}
@@ -441,7 +441,7 @@ export default function AdminEstoque() {
                           <Th>Status</Th>
                           <Th>Quantidade</Th>
                           <Th>Atualizado em</Th>
-                          <Th></Th>
+                          <Th>{''}</Th>
                         </tr>
                       </thead>
                       <tbody>
@@ -467,7 +467,7 @@ export default function AdminEstoque() {
 
                               {/* Qty */}
                               <td className="px-5 py-3.5">
-                                <QtyBadge qty={qty} loading={row.estoqueLoading} />
+                                <QtyBadge qty={qty} loading={!!row.estoqueLoading} />
                               </td>
 
                               {/* Updated at */}
@@ -495,8 +495,8 @@ export default function AdminEstoque() {
       <StockModal
         open={!!modal}
         onClose={() => setModal(null)}
-        action={modal?.action}
-        produto={modal?.produto}
+        action={modal?.action ?? null}
+        produto={modal?.produto ?? null}
         onSuccess={handleSuccess}
       />
     </AdminLayout>

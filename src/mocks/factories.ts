@@ -52,7 +52,7 @@ interface MockCategory extends Category {
   slug: string
 }
 
-interface MockProduct extends Omit<Product, 'categoriaId'> {
+interface MockProduct extends Omit<Product, 'categoriaId' | 'imagens' | 'precoPromocional' | 'numeroAvaliacoes' | 'vendidos' | 'quantidadeEstoque'> {
   imagens: string[]
   categoria: MockCategory
   categoriaNome: string

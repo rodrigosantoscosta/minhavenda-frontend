@@ -103,7 +103,7 @@ export default function Register() {
       navigate('/', { replace: true })
     } else {
       const message = result.error || 'Erro ao criar conta. Tente novamente.'
-      logger.warn('Registration failed', { error: message })
+      logger.warn({ error: message }, 'Registration failed')
       toast.error(message)
     }
   }

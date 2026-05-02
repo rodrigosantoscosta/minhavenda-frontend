@@ -48,7 +48,7 @@ export default function Checkout() {
 
   useEffect(() => {
     if (!user || !user.email) {
-      logger.warn('Usuário não autenticado ou dados incompletos', { hasUser: !!user, email: user?.email })
+      logger.warn({ hasUser: !!user, email: user?.email }, 'Usuário não autenticado ou dados incompletos')
       navigate('/login?redirect=/checkout')
     }
   }, [user, navigate])
@@ -115,10 +115,10 @@ export default function Checkout() {
     return true
   }
 
-  const handleAddressChange = useCallback(({ address, isValid, errors }: { address: Record<string, string>; isValid: boolean; errors: Record<string, string> }) => {
+  const handleAddressChange = useCallback(({ address, isValid, errors: addrErrors }: { address: Record<string, string>; isValid: boolean; errors?: Record<string, string> }) => {
     setEndereco(address)
     setEnderecoValido(isValid)
-    setEnderecoErrors(errors)
+    setEnderecoErrors(addrErrors)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,16 +152,16 @@ export default function Checkout() {
         }
       }
 
-      const order = await createOrder(orderData)
+      const order = await createOrder(orderData as any)
 
-      registerOrderStatus(order.id, order.status || 'PENDENTE')
+      registerOrderStatus(String(order.id), order.status || 'PENDENTE')
 
       const shortId = String(order.id ?? '').slice(-6) || order.id
       addNotification({
         type: 'new_order',
         title: 'Pedido realizado com sucesso',
         message: `Pedido #${shortId} foi criado. Acompanhe o status pelo sino.`,
-        orderId: order.id,
+        orderId: String(order.id),
       })
 
       setCreatedOrder(order)
@@ -174,8 +174,8 @@ export default function Checkout() {
       await clearCart()
 
     } catch (err) {
-      logger.error('Erro ao criar pedido', { error: err.message, stack: err.stack })
-      setError(err.message || 'Ocorreu um erro ao processar seu pedido. Tente novamente.')
+      logger.error({ error: (err as Error).message, stack: (err as Error).stack }, 'Erro ao criar pedido')
+      setError((err as Error).message || 'Ocorreu um erro ao processar seu pedido. Tente novamente.')
     } finally {
       setIsSubmitting(false)
     }
@@ -363,7 +363,7 @@ export default function Checkout() {
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={handleSuccessModalClose}
-        order={createdOrder}
+        order={createdOrder as any}
         autoCloseDelay={0}
       />
     </div>

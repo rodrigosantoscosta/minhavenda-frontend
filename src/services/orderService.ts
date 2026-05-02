@@ -1,7 +1,7 @@
 import { get, post } from './api'
 import logger from '../utils/logger'
 import { generateMockOrders as fakerGenerateMockOrders } from '../mocks/factories'
-import type { Order, OrderPaginationResult, OrderFilter, CancelOrderRequest, OrderStatus } from '../types'
+import type { Order, OrderItem, OrderPaginationResult, CancelOrderRequest, OrderStatus } from '../types'
 
 /**
  * Mapear status do backend para o formato do frontend.
@@ -155,8 +155,9 @@ async function getOrderDetailsAPI(orderId: string | number): Promise<Order> {
     id: response.id,
     dataCriacao: response.dataCriacao,
     status: mapStatus(response.status as string),
-    itens: response.itens ? response.itens.map(item => ({
+    itens: response.itens ? (response.itens.map(item => ({
       id: item.id,
+      produtoId: item.produtoId,
       produto: {
         id: item.produtoId,
         nome: item.produtoNome,
@@ -165,7 +166,7 @@ async function getOrderDetailsAPI(orderId: string | number): Promise<Order> {
       quantidade: item.quantidade,
       precoUnitario: item.precoUnitario,
       subtotal: item.subtotal,
-    })) : [],
+    })) as OrderItem[]) : [],
     endereco: (response as Order).enderecoEntrega ? {
       rua: (response as Order).enderecoEntrega as string,
       numero: '',
@@ -337,28 +338,28 @@ function generateOrderHistory(order: Order): OrderHistoryEntry[] {
   }]
   if (['PAGO', 'ENVIADO', 'ENTREGUE'].includes(order.status)) {
     history.push({
-      data: new Date(order.dataCriacao).getTime() + 3600000,
+      data: new Date(new Date(order.dataCriacao).getTime() + 3600000).toISOString(),
       status: 'PAGO',
       descricao: 'Pagamento confirmado',
     })
   }
   if (['ENVIADO', 'ENTREGUE'].includes(order.status)) {
     history.push({
-      data: new Date(order.dataCriacao).getTime() + 7200000,
+      data: new Date(new Date(order.dataCriacao).getTime() + 7200000).toISOString(),
       status: 'ENVIADO',
       descricao: 'Pedido enviado para transportadora',
     })
   }
   if (order.status === 'ENTREGUE') {
     history.push({
-      data: new Date(order.dataCriacao).getTime() + 86400000,
+      data: new Date(new Date(order.dataCriacao).getTime() + 86400000).toISOString(),
       status: 'ENTREGUE',
       descricao: 'Pedido entregue com sucesso',
     })
   }
   if (order.status === 'CANCELADO') {
     history.push({
-      data: new Date(order.dataCriacao).getTime() + 3600000,
+      data: new Date(new Date(order.dataCriacao).getTime() + 3600000).toISOString(),
       status: 'CANCELADO',
       descricao: order.motivoCancelamento || 'Pedido cancelado pelo usuário',
     })

@@ -185,7 +185,7 @@ export default function AddressForm({
         setErrors(prev => ({ ...prev, cep: '' }))
       }
     } catch (error) {
-      if (error.name !== 'AbortError') {
+      if ((error as Error).name !== 'AbortError') {
         setCepNotFound(true)
         setErrors(prev => ({ ...prev, cep: 'Erro ao buscar CEP' }))
       }

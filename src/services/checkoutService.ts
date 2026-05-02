@@ -1,6 +1,6 @@
 import { post, get } from './api'
 import logger from '../utils/logger'
-import type { Order, OrderItem, CheckoutRequest, OrderAddress } from '../types'
+import type { Order, OrderItem, OrderStatus, CheckoutRequest, OrderAddress, User } from '../types'
 
 /**
  * CheckoutService
@@ -101,7 +101,7 @@ async function createOrderMock(orderData: OrderData): Promise<Order> {
   const newOrder: Order = {
     id: `PED${String(mockOrderIdCounter++).padStart(6, '0')}`,
     dataCriacao: new Date().toISOString(),
-    status: 'PENDENTE',
+    status: 'PENDENTE' as OrderStatus,
     itens: orderData.items.map(item => {
       const precoItem = typeof item.preco === 'object' ? item.preco.valor : item.preco
       return {
@@ -121,8 +121,8 @@ async function createOrderMock(orderData: OrderData): Promise<Order> {
     endereco: orderData.endereco,
     pagamento: {
       metodo: orderData.pagamento?.metodo || 'PIX',
-      status: (orderData.pagamento?.status as Order['pagamento']['status']) || 'PENDENTE',
       ...orderData.pagamento,
+      status: ((orderData.pagamento?.status || 'PENDENTE') as OrderStatus),
     },
     valores: {
       subtotal: orderData.valores?.subtotal || calcularSubtotal(orderData.items),
@@ -212,21 +212,21 @@ async function createOrderAPI(orderData: OrderData): Promise<Order> {
       // Garantir que temos os dados do frontend
       pagamento: {
         metodo: orderData.pagamento?.metodo || 'PIX',
-        status: (orderData.pagamento?.status as Order['pagamento']['status']) || 'PENDENTE',
         ...orderData.pagamento,
+        status: ((orderData.pagamento?.status || 'PENDENTE') as OrderStatus),
       },
       // Mapear campos do backend para frontend
       total: (pedido as Order).valorTotal || pedidoDetalhado.valorTotal,
       valores: {
-        subtotal: (pedido as Order).subtotal || pedidoDetalhado.subtotal,
-        desconto: (pedido as Order).valorDesconto || pedidoDetalhado.valorDesconto,
-        frete: (pedido as Order).valorFrete || pedidoDetalhado.valorFrete,
-        total: (pedido as Order).valorTotal || pedidoDetalhado.valorTotal,
+        subtotal: (pedido as Order).subtotal || pedidoDetalhado.subtotal || 0,
+        desconto: (pedido as Order).valorDesconto || pedidoDetalhado.valorDesconto || 0,
+        frete: (pedido as Order).valorFrete || pedidoDetalhado.valorFrete || 0,
+        total: (pedido as Order).valorTotal || pedidoDetalhado.valorTotal || 0,
       },
       // Garantir campos de endereço
       endereco: orderData.endereco,
       // Garantir dados do usuário
-      usuario: orderData.usuario,
+      usuario: orderData.usuario as User | undefined,
     }
 
     logger.info({ pedidoId: pedido.id }, 'Detalhes do pedido obtidos com sucesso')
@@ -250,18 +250,18 @@ async function createOrderAPI(orderData: OrderData): Promise<Order> {
       })),
       pagamento: {
         metodo: orderData.pagamento?.metodo || 'PIX',
-        status: (orderData.pagamento?.status as Order['pagamento']['status']) || 'PENDENTE',
         ...orderData.pagamento,
+        status: ((orderData.pagamento?.status || 'PENDENTE') as OrderStatus),
       },
       valores: {
-        subtotal: (pedido as Order).subtotal,
-        desconto: (pedido as Order).valorDesconto,
-        frete: (pedido as Order).valorFrete,
-        total: (pedido as Order).valorTotal,
+        subtotal: (pedido as Order).subtotal || 0,
+        desconto: (pedido as Order).valorDesconto || 0,
+        frete: (pedido as Order).valorFrete || 0,
+        total: (pedido as Order).valorTotal || 0,
       },
       total: (pedido as Order).valorTotal,
       endereco: orderData.endereco,
-      usuario: orderData.usuario,
+      usuario: orderData.usuario as User | undefined,
       quantidadeItens: orderData.items.reduce((sum, item) => sum + item.quantidade, 0),
     }
   }

@@ -25,7 +25,7 @@ const SearchFilters = ({
   filters = {},
   onFiltersChange,
   isOpen: _isOpen = false,
-  onToggle: _onToggle,
+  onToggle: _onToggleFilter,
   className = ""
 }: SearchFiltersProps) => {
   const [categorias, setCategorias] = useState<Category[]>([])
@@ -45,7 +45,7 @@ const SearchFilters = ({
         const response = await get('/categorias')
         setCategorias((response as Category[]) || [])
       } catch (error) {
-        logger.error('Erro ao carregar categorias', { error: error.message })
+        logger.error({ error: (error as Error).message }, 'Erro ao carregar categorias')
         setCategorias([])
       } finally {
         setIsLoadingCategorias(false)
@@ -104,7 +104,7 @@ const SearchFilters = ({
           <h3 className="text-lg font-medium text-gray-900">Filtros</h3>
         </div>
         <button
-          onClick={onToggle}
+          onClick={_onToggleFilter}
           className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Fechar filtros"
         >
@@ -118,7 +118,7 @@ const SearchFilters = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
           <select
-            value={localFilters.categoriaId || ''}
+            value={(localFilters.categoriaId as string) || ''}
             onChange={(e) => handleFilterChange('categoriaId', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md hover:border-primary-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-[border-color,box-shadow] duration-150"
             disabled={isLoadingCategorias}
@@ -143,7 +143,7 @@ const SearchFilters = ({
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                 <input
                   type="text"
-                  value={localFilters.precoMin || ''}
+                  value={(localFilters.precoMin as string) || ''}
                   onChange={(e) => handlePrecoChange('precoMin', e.target.value)}
                   placeholder="0,00"
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-primary-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-[border-color,box-shadow] duration-150"
@@ -156,7 +156,7 @@ const SearchFilters = ({
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
                 <input
                   type="text"
-                  value={localFilters.precoMax || ''}
+                  value={(localFilters.precoMax as string) || ''}
                   onChange={(e) => handlePrecoChange('precoMax', e.target.value)}
                   placeholder="0,00"
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-primary-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-[border-color,box-shadow] duration-150"
@@ -191,17 +191,17 @@ const SearchFilters = ({
             <div className="space-y-1">
               {localFilters.categoriaId && (
                 <p className="text-xs text-gray-600">
-                  Categoria: {categorias.find(c => c.id === parseInt(localFilters.categoriaId))?.nome || 'Selecionada'}
+                  Categoria: {categorias.find(c => c.id === parseInt(localFilters.categoriaId as string))?.nome || 'Selecionada'}
                 </p>
               )}
               {localFilters.precoMin && (
                 <p className="text-xs text-gray-600">
-                  Preço mínimo: R$ {parseFloat(localFilters.precoMin).toFixed(2)}
+                  Preço mínimo: R$ {parseFloat(localFilters.precoMin as string).toFixed(2)}
                 </p>
               )}
               {localFilters.precoMax && (
                 <p className="text-xs text-gray-600">
-                  Preço máximo: R$ {parseFloat(localFilters.precoMax).toFixed(2)}
+                  Preço máximo: R$ {parseFloat(localFilters.precoMax as string).toFixed(2)}
                 </p>
               )}
             </div>

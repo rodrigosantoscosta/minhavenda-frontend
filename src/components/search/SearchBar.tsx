@@ -44,7 +44,7 @@ const SearchBar = ({
         navigate(`/busca?q=${encodeURIComponent(trimmedTerm)}`)
       }
     } catch (error) {
-      logger.error('Erro ao executar busca', { error: error.message, termo: trimmedTerm })
+      logger.error({ error: (error as Error).message, termo: trimmedTerm }, 'Erro ao executar busca')
     } finally {
       setIsLoading(false)
     }

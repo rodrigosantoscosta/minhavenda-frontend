@@ -23,7 +23,9 @@ const SearchPage = () => {
   const navigate = useNavigate()
 
   const [produtos, setProdutos] = useState<Product[]>([])
-  const [pagination, setPagination] = useState({
+  const [pagination, setPagination] = useState<{
+    page: number; size: number; totalElements: number; totalPages: number; first: boolean; last: boolean
+  }>({
     page: 0,
     size: 24,
     totalElements: 0,
@@ -40,11 +42,13 @@ const SearchPage = () => {
     return searchService.parsearParamsBusca(searchParams)
   }, [searchParams])
 
-  const updateURL = useCallback((newParams: Record<string, unknown>) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updateURL = useCallback((newParams: any) => {
     setSearchParams(searchService.toURLSearchParams(newParams))
   }, [setSearchParams])
 
-  const buscarProdutos = useCallback(async (params: Record<string, unknown>) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const buscarProdutos = useCallback(async (params: any) => {
     try {
       setIsLoading(true)
       setError(null)
@@ -70,8 +74,8 @@ const SearchPage = () => {
 
       logger.info({ totalProdutos: response?.totalElements, termo: params.termo }, 'Busca concluída')
     } catch (err) {
-      logger.error({ error: err, params }, 'Erro ao buscar produtos')
-      setError(err.message || 'Erro ao carregar produtos')
+      logger.error({ error: (err as Error).message, params }, 'Erro ao buscar produtos')
+      setError((err as Error).message || 'Erro ao carregar produtos')
       setProdutos([])
       setPagination({ page: 0, size: 24, totalElements: 0, totalPages: 0, first: true, last: true })
     } finally {
@@ -118,8 +122,7 @@ const SearchPage = () => {
                 : 'Use a barra de busca no header para encontrar produtos.'
             }
             icon={<MagnifyingGlassIcon className="h-12 w-12 text-gray-400" />}
-            actionLabel="Limpar busca"
-            onAction={() => navigate('/busca')}
+            action={<button onClick={() => navigate('/busca')} className="mt-2 text-primary-600 underline">Limpar busca</button>}
           />
         </div>
       </div>
@@ -181,7 +184,7 @@ const SearchPage = () => {
           <div className="flex-1 min-w-0">
             {isLoading ? (
               <div className="py-16">
-                <Loading message="Buscando produtos..." />
+                <Loading />
               </div>
             ) : error ? (
               <div className="py-16">
@@ -189,8 +192,7 @@ const SearchPage = () => {
                   title="Erro na busca"
                   description={error}
                   icon={<MagnifyingGlassIcon className="h-12 w-12 text-red-400" />}
-                  actionLabel="Tentar novamente"
-                  onAction={() => buscarProdutos(currentParams)}
+                  action={<button onClick={() => buscarProdutos(currentParams)} className="mt-2 text-primary-600 underline">Tentar novamente</button>}
                 />
               </div>
             ) : (

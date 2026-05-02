@@ -25,7 +25,7 @@ function KpiCard({ label, value, icon: Icon, color, bg }: { label: string; value
   )
 }
 
-interface DreReportData extends DREReport {
+interface DreReportData extends Omit<DREReport, 'periodo'> {
   resumo: { receitaBruta: number; receitaLiquida: number; lucroLiquido: number; margemLucro: number }
   periodo: { inicio: string; fim: string }
   linhas: { descricao: string; valor: number; percentual?: number }[]

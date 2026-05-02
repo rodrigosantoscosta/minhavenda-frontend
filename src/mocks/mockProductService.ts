@@ -96,7 +96,7 @@ export const getProdutos = async (params: ProductFilterParams = {}): Promise<Pag
 
 // ─── getProdutoById ────────────────────────────────────────────────────────────
 
-interface ProdutoDetail extends MockProduct {
+interface ProdutoDetail extends Omit<MockProduct, 'especificacoes'> {
   especificacoes: Array<{ chave: string; valor: string }>
 }
 

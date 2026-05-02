@@ -51,8 +51,8 @@ export default function OrderDetail() {
       const orderData = await getOrderDetails(id)
       setOrder(orderData)
     } catch (err) {
-      logger.error('Erro ao carregar detalhes do pedido', { error: err.message, orderId: id })
-      setError(err.message || 'Não foi possível carregar os detalhes do pedido.')
+      logger.error({ error: (err as Error).message, orderId: id }, 'Erro ao carregar detalhes do pedido')
+      setError((err as Error).message || 'Não foi possível carregar os detalhes do pedido.')
     } finally {
       setLoading(false)
     }
@@ -75,8 +75,8 @@ export default function OrderDetail() {
       await payOrder(id)
       await loadOrderDetails() // Recarregar dados
     } catch (err) {
-      logger.error('Erro ao pagar pedido', { error: err.message, orderId: id })
-      setError(err.message || 'Não foi possível processar o pagamento.')
+      logger.error({ error: (err as Error).message, orderId: id }, 'Erro ao pagar pedido')
+      setError((err as Error).message || 'Não foi possível processar o pagamento.')
     } finally {
       setPaying(false)
     }
@@ -100,8 +100,8 @@ export default function OrderDetail() {
       })
       await loadOrderDetails()
     } catch (err) {
-      logger.error('Erro ao cancelar pedido', { error: err.message, orderId: id })
-      setError(err.message || 'Não foi possível cancelar o pedido.')
+      logger.error({ error: (err as Error).message, orderId: id }, 'Erro ao cancelar pedido')
+      setError((err as Error).message || 'Não foi possível cancelar o pedido.')
     } finally {
       setCancelling(false)
     }

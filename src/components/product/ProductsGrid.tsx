@@ -8,6 +8,7 @@ interface ProductsGridProps {
   loading?: boolean
   columns?: number
   viewMode?: string
+  className?: string
 }
 
 export default function ProductsGrid({ 
@@ -15,7 +16,8 @@ export default function ProductsGrid({
   onAddToCart: _onAddToCart, 
   loading = false,
   columns = 3,
-  viewMode = 'grid'
+  viewMode: _viewMode = 'grid',
+  className: _className = '',
 }: ProductsGridProps) {
   const gridClass = columns === 4
     ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'

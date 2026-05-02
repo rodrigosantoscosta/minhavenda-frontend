@@ -53,7 +53,7 @@ export default function ProductDetail() {
       const quantidadeCarrinho = getItemQuantity(id)
       if (quantidadeCarrinho > 0) setQuantidade(quantidadeCarrinho)
     } catch (error) {
-      logger.error('Erro ao carregar produto', { error: error.message, produtoId: id })
+      logger.error({ error: (error as Error).message, produtoId: id }, 'Erro ao carregar produto')
       toast.error('Produto não encontrado')
       navigate('/produtos')
     } finally {
@@ -75,7 +75,7 @@ export default function ProductDetail() {
         .slice(0, 4)
       setProdutosRelacionados(relacionados)
     } catch (error) {
-      logger.error('Erro ao carregar produtos relacionados', { error: (error as Error).message, categoriaId: produto?.categoria?.id })
+      logger.error({ error: (error as Error).message, categoriaId: produto?.categoria?.id }, 'Erro ao carregar produtos relacionados')
     }
   }
 
@@ -185,7 +185,7 @@ export default function ProductDetail() {
               >
                 {produto.categoria?.nome}
               </Link>
-              {produto.destaque && <Badge variant="warning" size="sm">Destaque</Badge>}
+              {produto.ativo && <Badge variant="warning" size="sm">Destaque</Badge>}
               {desconto > 0 && <Badge variant="danger" size="sm">-{desconto}%</Badge>}
             </div>
 
@@ -197,7 +197,7 @@ export default function ProductDetail() {
                   <FiStar
                     key={i}
                     size={20}
-                    className={i < (produto.avaliacao || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}
+                    className={i < ((produto.avaliacoes?.length || 0) > 0 ? 4 : 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}
                   />
                 ))}
               </div>

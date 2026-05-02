@@ -74,7 +74,7 @@ export default function Products() {
       const data = await productService.getCategorias()
       setCategorias(Array.isArray(data) ? data : [])
     } catch (error) {
-      logger.error('Erro ao carregar categorias', { error: error.message })
+      logger.error({ error: (error as Error).message }, 'Erro ao carregar categorias')
       toast.error('Erro ao carregar categorias')
     }
   }
@@ -118,7 +118,7 @@ export default function Products() {
 
       setProdutos(produtosArray)
     } catch (error) {
-      logger.error('Erro ao carregar produtos', { error: (error as Error).message })
+      logger.error({ error: (error as Error).message }, 'Erro ao carregar produtos')
       toast.error('Erro ao carregar produtos')
       setProdutos([])
     } finally {

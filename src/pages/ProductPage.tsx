@@ -59,7 +59,7 @@ export default function ProductPage() {
       }
 
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Erro ao carregar produtos'
+      const errorMessage = (err as any)?.response?.data?.message || 'Erro ao carregar produtos'
       setError(errorMessage)
       toast.error(errorMessage)
       setProdutos([])

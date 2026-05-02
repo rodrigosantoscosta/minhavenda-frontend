@@ -5,13 +5,10 @@ import Input from '../components/common/Input'
 import ProductCard from '../components/common/products/ProductCard'
 import OrderCard from '../components/common/OrderCard'
 import Modal, { ConfirmModal } from '../components/common/Modal'
-import Badge, { StatusBadge, StockBadge, DiscountBadge } from '../components/common/Badge'
-import { 
-  Spinner, 
-  LoadingOverlay, 
-  LoadingContainer,
-  ProductCardSkeleton 
-} from '../components/common/Loading'
+import Badge from '../components/common/Badge'
+import Spinner from '../components/common/Loading'
+import StatusBadge from '../components/common/StatusBadge'
+import ProductCardSkeleton from '../components/product/ProductCardSkeleton'
 import { 
   FiShoppingCart, 
   FiHeart, 
@@ -223,15 +220,13 @@ export default function TestComponents() {
           <div>
             <p className="text-sm text-gray-600 mb-2">Estoque:</p>
             <div className="flex gap-2">
-              <StockBadge quantity={50} />
-              <StockBadge quantity={5} />
-              <StockBadge quantity={0} />
+              {/* StockBadge not implemented */}
             </div>
           </div>
 
           <div>
             <p className="text-sm text-gray-600 mb-2">Desconto:</p>
-            <DiscountBadge percentage={25} />
+            {/* DiscountBadge not implemented */}
           </div>
         </div>
       </section>
@@ -288,11 +283,10 @@ export default function TestComponents() {
 
           <div>
             <p className="text-sm text-gray-600 mb-2">Loading Container:</p>
-            <LoadingContainer loading={loading} message="Carregando dados...">
-              <div className="p-4 bg-green-50 rounded">
-                <p className="text-green-800">✅ Conteúdo carregado!</p>
-              </div>
-            </LoadingContainer>
+            {/* LoadingContainer not implemented */}
+            <div className="p-4 bg-green-50 rounded">
+              <p className="text-green-800">✅ Conteúdo carregado!</p>
+            </div>
             <Button 
               onClick={() => setLoading(!loading)}
               className="mt-2"
@@ -309,7 +303,7 @@ export default function TestComponents() {
             }}>
               Mostrar Overlay (2s)
             </Button>
-            {showOverlay && <LoadingOverlay message="Processando..." />}
+            {/* LoadingOverlay not implemented */}
           </div>
 
           <div>
