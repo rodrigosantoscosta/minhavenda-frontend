@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FiBell, FiPackage, FiXCircle, FiRefreshCw } from 'react-icons/fi'
 import { useNotificationContext } from '../../contexts/NotificationContext'
@@ -42,7 +42,7 @@ export default function NotificationBell(): React.JSX.Element {
 
   // Clicar numa notificação: marcar como lida e navegar para o pedido
   function handleItemClick(notification: NotificationItem): void {
-    markAsRead(notification.id)
+    markAsRead(String(notification.id))
     setOpen(false)
     if (notification.orderId) {
       navigate(`/pedido/${notification.orderId}`)
@@ -105,7 +105,7 @@ export default function NotificationBell(): React.JSX.Element {
                 <p className="text-sm text-gray-500">Nenhuma notificação</p>
               </div>
             ) : (
-              notifications.map((notif: NotificationItem) => (
+              (notifications as NotificationItem[]).map((notif) => (
                 <button
                   key={notif.id}
                   onClick={() => handleItemClick(notif)}

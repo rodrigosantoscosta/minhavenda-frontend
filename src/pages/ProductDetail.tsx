@@ -48,9 +48,9 @@ export default function ProductDetail() {
   const loadProduto = async () => {
     try {
       setLoading(true)
-      const data = await productService.getProdutoById(id)
+      const data = await productService.getProdutoById(id ?? '')
       setProduto(data)
-      const quantidadeCarrinho = getItemQuantity(id)
+      const quantidadeCarrinho = getItemQuantity(id ?? '')
       if (quantidadeCarrinho > 0) setQuantidade(quantidadeCarrinho)
     } catch (error) {
       logger.error({ error: (error as Error).message, produtoId: id }, 'Erro ao carregar produto')
@@ -68,7 +68,7 @@ export default function ProductDetail() {
         page: 0,
         size: 4,
         ativo: true
-      })
+      } as any)
       const data = raw as any
       const relacionados = (data.content || data)
         .filter((p: Product) => p.id !== produto?.id)
@@ -171,7 +171,7 @@ export default function ProductDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <div>
             <ImageGallery
-              images={produto.imagens || [produto.imagem]}
+              images={produto.imagens || (produto.imagem ? [produto.imagem] : [])}
               selectedIndex={imagemSelecionada}
               onSelectImage={setImagemSelecionada}
             />

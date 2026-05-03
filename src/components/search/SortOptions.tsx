@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { FocusEvent } from 'react'
+import React from 'react'
 import { ChevronUpDownIcon } from '@heroicons/react/24/outline'
 import searchService from '../../services/searchService'
 
@@ -58,7 +58,7 @@ const SortOptions = ({
   /**
    * Fechar dropdown ao clicar fora
    */
-  const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
+  const handleBlur = (e: React.FocusEvent<HTMLButtonElement>) => {
     // Verificar se o clique foi fora do dropdown
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setIsOpen(false)

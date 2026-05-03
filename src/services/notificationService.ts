@@ -231,7 +231,7 @@ function scheduleReconnect(
  */
 export function startPolling(
   addNotification: (notification: SseNotification) => void,
-  token: string,
+  token?: string,
 ): void {
   if (abortController !== null) return // já conectado
 

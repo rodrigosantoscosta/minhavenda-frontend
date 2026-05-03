@@ -2,7 +2,7 @@ import axios from 'axios'
 import api from './api'
 import jwtHelper from '../utils/jwtHelper'
 import logger from '../utils/logger'
-import type { User, LoginRequest, RegisterRequest, AuthResponse, TokenPair } from '../types'
+import type { User, RegisterRequest, AuthResponse, TokenPair } from '../types'
 
 interface LoginResult {
   token: string

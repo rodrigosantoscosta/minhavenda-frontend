@@ -21,7 +21,7 @@ export default function AdminEditProduto() {
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm(f => ({ ...f, [k]: e.target.value }))
 
   useEffect(() => {
-    Promise.all([adminService.getProduto(id), adminService.getCategorias()])
+    Promise.all([adminService.getProduto(id ?? ''), adminService.getCategorias()])
       .then(([p, cats]) => {
         setProduto(p)
         setCategorias(cats)
@@ -48,7 +48,7 @@ export default function AdminEditProduto() {
       if (form.alturaCm)      body.alturaCm      = parseFloat(form.alturaCm as string)
       if (form.larguraCm)     body.larguraCm     = parseFloat(form.larguraCm as string)
       if (form.comprimentoCm) body.comprimentoCm = parseFloat(form.comprimentoCm as string)
-      await adminService.atualizarProduto(id, body)
+      await adminService.atualizarProduto(id ?? '', body)
       toast.success('Produto atualizado!')
       navigate('/admin/produtos')
     } catch (err) {

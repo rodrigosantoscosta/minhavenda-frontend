@@ -496,7 +496,7 @@ export default function AdminEstoque() {
         open={!!modal}
         onClose={() => setModal(null)}
         action={modal?.action ?? null}
-        produto={modal?.produto ?? null}
+        produto={(modal?.produto ?? null) as EstoqueRow | null}
         onSuccess={handleSuccess}
       />
     </AdminLayout>

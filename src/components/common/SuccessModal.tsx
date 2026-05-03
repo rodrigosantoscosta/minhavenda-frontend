@@ -309,8 +309,10 @@ export function OrderCreatedModal({
     id: orderId,
     dataCriacao: new Date().toISOString(),
     total,
-    valores: { total },
-    pagamento: { metodo: 'PIX' },
+    valores: { subtotal: total, desconto: 0, frete: 0, total },
+    pagamento: { metodo: 'PIX', status: 'PENDENTE' as any },
+    quantidadeItens: 0,
+    status: 'PENDENTE' as any,
     itens: []
   }
 
@@ -318,7 +320,7 @@ export function OrderCreatedModal({
     <SuccessModal
       isOpen={isOpen}
       onClose={onClose}
-      order={mockOrder}
+      order={mockOrder as any}
       {...props}
     />
   )

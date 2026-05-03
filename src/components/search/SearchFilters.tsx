@@ -189,17 +189,17 @@ const SearchFilters = ({
           <div className="pt-4 border-t border-gray-200">
             <p className="text-sm font-medium text-gray-700 mb-2">Filtros ativos:</p>
             <div className="space-y-1">
-              {localFilters.categoriaId && (
+              {!!localFilters.categoriaId && (
                 <p className="text-xs text-gray-600">
                   Categoria: {categorias.find(c => c.id === parseInt(localFilters.categoriaId as string))?.nome || 'Selecionada'}
                 </p>
               )}
-              {localFilters.precoMin && (
+              {!!localFilters.precoMin && (
                 <p className="text-xs text-gray-600">
                   Preço mínimo: R$ {parseFloat(localFilters.precoMin as string).toFixed(2)}
                 </p>
               )}
-              {localFilters.precoMax && (
+              {!!localFilters.precoMax && (
                 <p className="text-xs text-gray-600">
                   Preço máximo: R$ {parseFloat(localFilters.precoMax as string).toFixed(2)}
                 </p>

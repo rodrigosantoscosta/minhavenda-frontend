@@ -96,7 +96,7 @@ export default function DespesasReport({ data }: DespesasReportProps) {
                 />
                 <Tooltip
                   contentStyle={TOOLTIP_STYLE}
-                  formatter={(value) => formatBRL(value)}
+                  formatter={(value) => formatBRL(value as number)}
                 />
               </PieChart>
             </ResponsiveContainer>

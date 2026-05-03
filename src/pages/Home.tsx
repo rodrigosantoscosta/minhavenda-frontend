@@ -68,7 +68,7 @@ export default function Home() {
       if (page === 0) setLoading(true)
       else setLoadingMore(true)
 
-      const params = {
+      const params: Record<string, unknown> = {
         page,
         size: pageSize,
         sort: 'dataCadastro',
@@ -77,7 +77,7 @@ export default function Home() {
       }
       if (selectedCategory) params.categoriaId = selectedCategory
 
-      const raw = await productService.getProdutos(params)
+      const raw = await productService.getProdutos(params as any)
       const data = raw as any
 
       let produtosArray: Product[] = []

@@ -31,7 +31,7 @@ export default function Checkout() {
   
   const items = useMemo(() => Array.isArray(cartItems) ? cartItems : [], [cartItems])
 
-  const [endereco, setEndereco] = useState({})
+  const [endereco, setEndereco] = useState<Record<string, string> | undefined>(undefined)
   const [enderecoValido, setEnderecoValido] = useState(false)
   const [enderecoErrors, setEnderecoErrors] = useState({})
   const [paymentMethod, setPaymentMethod] = useState('PIX')
@@ -116,9 +116,11 @@ export default function Checkout() {
   }
 
   const handleAddressChange = useCallback(({ address, isValid, errors: addrErrors }: { address: Record<string, string>; isValid: boolean; errors?: Record<string, string> }) => {
-    setEndereco(address)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (address) setEndereco(address as any)
     setEnderecoValido(isValid)
-    setEnderecoErrors(addrErrors)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setEnderecoErrors(addrErrors as any)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -228,7 +230,7 @@ export default function Checkout() {
           
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <AddressForm onAddressChange={handleAddressChange} errors={enderecoErrors} />
+              <AddressForm onAddressChange={handleAddressChange as any} errors={enderecoErrors} />
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

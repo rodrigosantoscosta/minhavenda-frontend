@@ -26,7 +26,7 @@ export default function Header() {
   const { addNotification } = useNotificationContext()
 
   useEffect(() => {
-    if (isAuthenticated) startPolling(addNotification)
+    if (isAuthenticated) startPolling(addNotification as any)
     else stopPolling()
     return () => stopPolling()
   }, [isAuthenticated, addNotification])

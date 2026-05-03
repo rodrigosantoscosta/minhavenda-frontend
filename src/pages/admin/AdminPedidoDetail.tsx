@@ -28,11 +28,12 @@ function ActionModal({ open, onClose, action, pedidoId, onSuccess }: {
     setLoading(true)
     try {
       let result
-      if (action === 'PAGAR')    result = await adminService.pagarPedido(pedidoId, { metodoPagamento: fields.metodoPagamento || 'PIX' })
-      if (action === 'ENVIAR')   result = await adminService.enviarPedido(pedidoId, { codigoRastreio: fields.codigoRastreio || '', transportadora: fields.transportadora || '' })
-      if (action === 'ENTREGAR') result = await adminService.entregarPedido(pedidoId)
-      if (action === 'CANCELAR') result = await adminService.cancelarPedido(pedidoId, { motivo: fields.motivo || '' })
-      onSuccess(result)
+      const pid = pedidoId ?? ''
+      if (action === 'PAGAR')    result = await adminService.pagarPedido(pid, { metodoPagamento: (fields.metodoPagamento || 'PIX') as 'PIX' | 'BOLETO' | 'CARTAO' })
+      if (action === 'ENVIAR')   result = await adminService.enviarPedido(pid, { codigoRastreio: fields.codigoRastreio || '', transportadora: fields.transportadora || '' })
+      if (action === 'ENTREGAR') result = await adminService.entregarPedido(pid)
+      if (action === 'CANCELAR') result = await adminService.cancelarPedido(pid, { motivo: fields.motivo || '' })
+      onSuccess(result as Order)
       toast.success('Ação realizada com sucesso!')
       onClose()
     } catch (err) {
@@ -102,7 +103,7 @@ export default function AdminPedidoDetail() {
   const toast = useToast()
 
   useEffect(() => {
-    adminService.getPedido(id)
+    adminService.getPedido(id ?? '')
       .then(setPedido)
       .catch(() => toast.error('Pedido não encontrado'))
       .finally(() => setLoading(false))

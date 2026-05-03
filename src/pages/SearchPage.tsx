@@ -53,17 +53,18 @@ const SearchPage = () => {
       setIsLoading(true)
       setError(null)
 
-      const response = await searchService.buscarProdutos(params)
+      const raw = await searchService.buscarProdutos(params)
+      const response = raw as any
 
       if (response?.content !== undefined) {
         setProdutos(response.content || [])
         setPagination({
-          page: response.number ?? 0,
-          size: response.size ?? 24,
-          totalElements: response.totalElements ?? 0,
-          totalPages: response.totalPages ?? 0,
-          first: response.first ?? true,
-          last: response.last ?? true,
+          page: (response.number ?? 0) as number,
+          size: (response.size ?? 24) as number,
+          totalElements: (response.totalElements ?? 0) as number,
+          totalPages: (response.totalPages ?? 0) as number,
+          first: (response.first ?? true) as boolean,
+          last: (response.last ?? true) as boolean,
         })
       } else if (Array.isArray(response)) {
         setProdutos(response)
@@ -173,7 +174,7 @@ const SearchPage = () => {
 
             {/* Filtros */}
             <SearchFilters
-              filters={currentParams}
+              filters={currentParams as Record<string, unknown>}
               onFiltersChange={handleFiltersChange}
               isOpen={showFilters}
               onToggle={() => setShowFilters(!showFilters)}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type React from 'react'
+import type { User } from '../types'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/common/Toast'
@@ -80,7 +81,7 @@ export default function Profile() {
     try {
       setLoading(true)
       await new Promise(resolve => setTimeout(resolve, 1000))
-      updateUser(formData)
+      updateUser({ ...user, ...formData } as User)
       toast.success('Perfil atualizado com sucesso!')
       setIsEditing(false)
     } catch (error) {

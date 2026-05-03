@@ -40,7 +40,7 @@ export default function Products() {
 
   // Filtros
   const [searchTerm, setSearchTerm] = useState(searchParams.get('busca') || '')
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('categoriaId') || null)
+  const [selectedCategory, setSelectedCategory] = useState<string | number | null>(searchParams.get('categoriaId') || null)
   const [minPrice, setMinPrice] = useState(searchParams.get('precoMin') || '')
   const [maxPrice, setMaxPrice] = useState(searchParams.get('precoMax') || '')
   const [sortBy, setSortBy] = useState(searchParams.get('ordem') || 'recentes')

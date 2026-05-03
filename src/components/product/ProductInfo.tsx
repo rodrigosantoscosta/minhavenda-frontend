@@ -107,7 +107,7 @@ export default function ProductInfo({ produto }: { produto: Product }) {
                       Disponibilidade
                     </td>
                     <td className="py-3 text-sm text-gray-700">
-                      {produto.estoque > 0 ? 'Em estoque' : 'Indisponível'}
+                      {(produto.estoque ?? 0) > 0 ? 'Em estoque' : 'Indisponível'}
                     </td>
                   </tr>
                   <tr>

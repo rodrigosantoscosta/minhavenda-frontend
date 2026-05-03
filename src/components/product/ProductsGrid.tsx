@@ -7,7 +7,7 @@ interface ProductsGridProps {
   onAddToCart?: (produto: Product) => void
   loading?: boolean
   columns?: number
-  viewMode?: string
+  viewMode?: 'grid' | 'list'
   className?: string
 }
 
@@ -39,7 +39,7 @@ export default function ProductsGrid({
         <ProductCard
           key={produto.id}
           produto={produto}
-          viewMode={viewMode}
+          viewMode={_viewMode}
         />
       ))}
     </div>

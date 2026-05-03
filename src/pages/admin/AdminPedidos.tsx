@@ -80,7 +80,7 @@ export default function AdminPedidos() {
                 <table className="w-full">
                   <thead>
                     <tr>
-                      <Th>ID</Th><Th>Status</Th><Th>Total</Th><Th>Itens</Th><Th>Data</Th><Th>Pagamento</Th><Th></Th>
+                      <Th>ID</Th><Th>Status</Th><Th>Total</Th><Th>Itens</Th><Th>Data</Th><Th>Pagamento</Th><Th>{''}</Th>
                     </tr>
                   </thead>
                   <tbody>
@@ -90,8 +90,8 @@ export default function AdminPedidos() {
                           <span
                             className="font-mono text-xs cursor-pointer transition-colors hover:text-white"
                             style={{ color: '#9CA3AF' }}
-                            title={p.id}
-                            onClick={() => { navigator.clipboard.writeText(p.id); toast.success('ID copiado!') }}
+                            title={String(p.id)}
+                            onClick={() => { navigator.clipboard.writeText(String(p.id)); toast.success('ID copiado!') }}
                           >
                             {shortId(p.id)}
                           </span>

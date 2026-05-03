@@ -11,8 +11,8 @@ export default function TestAPI() {
     async function loadProducts() {
       try {
         setLoading(true)
-        const data = await productService.getProducts()
-        setProducts(data.content || [])
+        const raw = await productService.getProdutos() as any
+        setProducts(raw.content || raw || [])
       } catch (err) {
         setError((err as Error).message)
       } finally {
@@ -54,7 +54,7 @@ export default function TestAPI() {
             >
               <h3 className="font-semibold">{product.nome}</h3>
               <p className="text-sm text-gray-600">
-                R$ {product.preco?.valor || product.preco}
+                R$ {(product.preco as any)?.valor || product.preco}
               </p>
             </div>
           ))}

@@ -41,9 +41,9 @@ interface UseNotificationsReturn {
  * Tipos suportados: 'new_order' | 'status_change' | 'cancelled'
  */
 export function useNotifications(): UseNotificationsReturn {
-  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    return storageUtil.getItem<NotificationItem[]>(STORAGE_KEY, [])
-  })
+  const [notifications, setNotifications] = useState<NotificationItem[]>(
+    (storageUtil.getItem(STORAGE_KEY) as NotificationItem[]) || []
+  )
 
   // Sincronizar para o localStorage sempre que o estado mudar
   useEffect(() => {

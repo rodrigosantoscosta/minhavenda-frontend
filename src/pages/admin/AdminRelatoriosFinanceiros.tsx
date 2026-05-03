@@ -346,7 +346,7 @@ export default function AdminRelatoriosFinanceiros() {
         {loading && <PageLoader />}
 
         {!loading && activeTab === 'DRE' && dreData && (
-          <ResultsFadeIn><DreReport data={dreData} /></ResultsFadeIn>
+          <ResultsFadeIn><DreReport data={dreData as any} /></ResultsFadeIn>
         )}
 
         {!loading && activeTab === 'DRE' && !dreData && (
@@ -359,7 +359,7 @@ export default function AdminRelatoriosFinanceiros() {
         )}
 
         {!loading && activeTab === 'Despesas' && despesasData && (
-          <ResultsFadeIn><DespesasReport data={despesasData} /></ResultsFadeIn>
+          <ResultsFadeIn><DespesasReport data={despesasData as any} /></ResultsFadeIn>
         )}
 
         {!loading && activeTab === 'Despesas' && !despesasData && (

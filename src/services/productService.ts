@@ -60,8 +60,8 @@ interface ProductService {
 }
 
 const productService: ProductService = {
-  getProdutos:    withFallback(_getProdutos,    mock.getProdutos as typeof _getProdutos),
-  getProdutoById: withFallback(_getProdutoById, mock.getProdutoById as typeof _getProdutoById),
+  getProdutos:    withFallback(_getProdutos,    mock.getProdutos as unknown as typeof _getProdutos),
+  getProdutoById: withFallback(_getProdutoById, mock.getProdutoById as unknown as typeof _getProdutoById),
   getCategorias:  withFallback(_getCategorias,  mock.getCategorias as typeof _getCategorias),
 }
 

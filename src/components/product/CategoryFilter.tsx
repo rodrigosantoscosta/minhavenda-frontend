@@ -53,11 +53,11 @@ export default function CategoryFilter({
             className={`${pillBase} ${selectedCategory === cat.id ? pillActive : pillInactive}`}
           >
             {cat.nome}
-            {cat.totalProdutos > 0 && (
+            {(cat.totalProdutos ?? 0) > 0 && (
               <span className={`ml-1.5 text-[11px] tabular-nums ${
                 selectedCategory === cat.id ? 'opacity-70' : 'text-gray-400'
               }`}>
-                {cat.totalProdutos}
+                {cat.totalProdutos ?? 0}
               </span>
             )}
           </button>

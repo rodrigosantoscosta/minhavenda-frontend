@@ -72,10 +72,6 @@ export default function ProductPage() {
     fetchProdutos()
   }, [currentPage])
 
-  const handleAddToCart = (produto: Product) => {
-    toast.success(`${produto.nome} adicionado ao carrinho!`)
-  }
-
   const handlePageChange = (newPage: number) => {
     if (newPage >= 0 && newPage < totalPages) {
       setCurrentPage(newPage)
@@ -173,8 +169,7 @@ export default function ProductPage() {
               {produtos.map((produto) => (
                 <ProductCard
                   key={produto.id}
-                  product={produto}
-                  onAddToCart={handleAddToCart}
+                  produto={produto}
                 />
               ))}
             </div>

@@ -49,7 +49,7 @@ export default function Orders() {
   }, [user, navigate])
 
   // Carregar pedidos
-  const loadOrders = async (page = 1, statusFilter = null) => {
+  const loadOrders = async (page = 1, statusFilter: string | null = null) => {
     try {
       setError('')
       
@@ -149,7 +149,7 @@ export default function Orders() {
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center min-h-[60vh]">
-            <Loading size="lg" text="Carregando seus pedidos..." />
+            <Loading />
           </div>
         </div>
       </div>

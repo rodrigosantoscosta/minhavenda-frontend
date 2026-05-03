@@ -25,7 +25,7 @@ export default function TestComponents() {
   const [showModal, setShowModal] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [showOverlay, setShowOverlay] = useState(false)
+  const [_showOverlay, setShowOverlay] = useState(false)
 
   // Produto de exemplo
   const produtoExemplo = {
@@ -201,8 +201,8 @@ export default function TestComponents() {
           <div>
             <p className="text-sm text-gray-600 mb-2">Com Dot:</p>
             <div className="flex gap-2">
-              <Badge variant="success" dot>Ativo</Badge>
-              <Badge variant="danger" dot>Inativo</Badge>
+              <Badge variant="success">Ativo</Badge>
+              <Badge variant="danger">Inativo</Badge>
             </div>
           </div>
 
@@ -252,7 +252,7 @@ export default function TestComponents() {
               Error Toast
             </Button>
             <Button 
-              variant="warning"
+              variant="secondary"
               onClick={() => toast.warning('Atenção: estoque baixo!')}
             >
               Warning Toast
@@ -274,10 +274,10 @@ export default function TestComponents() {
           <div>
             <p className="text-sm text-gray-600 mb-2">Spinners:</p>
             <div className="flex items-center gap-4">
-              <Spinner size="sm" />
-              <Spinner size="md" />
-              <Spinner size="lg" />
-              <Spinner size="xl" />
+              <Spinner />
+              <Spinner />
+              <Spinner />
+              <Spinner />
             </div>
           </div>
 
@@ -389,9 +389,7 @@ export default function TestComponents() {
           <h3 className="text-lg font-semibold mb-3">Product Card:</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <ProductCard
-              product={produtoExemplo}
-              onAddToCart={(p: { nome: string }) => toast.success(`${p.nome} adicionado!`)}
-              onToggleFavorite={(p: { nome: string }) => toast.info(`${p.nome} favoritado!`)}
+              produto={produtoExemplo as any}
             />
           </div>
         </div>
@@ -399,7 +397,7 @@ export default function TestComponents() {
         <div>
           <h3 className="text-lg font-semibold mb-3">Order Card:</h3>
           <div className="max-w-2xl">
-            <OrderCard order={pedidoExemplo} />
+            <OrderCard order={pedidoExemplo as any} />
           </div>
         </div>
       </section>
@@ -529,19 +527,23 @@ export default function TestComponents() {
                 order={{
                   id: 'PED123456',
                   dataCriacao: '2026-01-24T10:00:00Z',
-                  status: 'ENTREGUE',
-                  total: { valor: 599.90 },
+                  status: 'ENTREGUE' as any,
+                  total: 599.90,
                   itens: [
-                    { id: 1, produto: { nome: 'Produto Teste', imagem: 'https://via.placeholder.com/60' }, quantidade: 2 }
+                    { id: 1, produtoId: 1, produto: { nome: 'Produto Teste', imagem: 'https://via.placeholder.com/60' } as any, quantidade: 2, precoUnitario: 299.95, subtotal: 599.90 }
                   ],
+                  pagamento: { metodo: 'PIX', status: 'PAGO' as any },
+                  valores: { subtotal: 599.90, desconto: 0, frete: 0, total: 599.90 },
+                  quantidadeItens: 1,
                   endereco: {
                     rua: 'Rua das Flores',
                     numero: '123',
                     bairro: 'Centro',
                     cidade: 'São Paulo',
-                    estado: 'SP'
+                    estado: 'SP',
+                    cep: '01234-567'
                   }
-                }}
+                } as any}
               />
             </div>
             
@@ -551,17 +553,20 @@ export default function TestComponents() {
                 order={{
                   id: 'PED123457',
                   dataCriacao: '2026-01-24T11:00:00Z',
-                  status: 'PAGO',
-                  valores: { total: 299.90 },
+                  status: 'PAGO' as any,
+                  valores: { total: 299.90, subtotal: 299.90, desconto: 0, frete: 0 },
+                  pagamento: { metodo: 'CARTAO', status: 'PAGO' as any },
+                  quantidadeItens: 1,
                   itens: [
-                    { id: 2, produto: { nome: 'Produto Teste 2', imagem: 'https://via.placeholder.com/60' }, quantidade: 1 }
+                    { id: 2, produtoId: 2, produto: { nome: 'Produto Teste 2', imagem: 'https://via.placeholder.com/60' } as any, quantidade: 1, precoUnitario: 299.90, subtotal: 299.90 }
                   ],
                   endereco: {
                     rua: 'Rua das Acácias',
                     numero: '456',
                     bairro: 'Jardins',
                     cidade: 'São Paulo',
-                    estado: 'SP'
+                    estado: 'SP',
+                    cep: '01234-567'
                   }
                 }}
               />

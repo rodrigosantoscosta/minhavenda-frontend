@@ -30,7 +30,7 @@ function CreateModal({ open, onClose, categorias, onCreated }: {
       if (form.alturaCm)      body.alturaCm      = parseFloat(form.alturaCm)
       if (form.larguraCm)     body.larguraCm     = parseFloat(form.larguraCm)
       if (form.comprimentoCm) body.comprimentoCm = parseFloat(form.comprimentoCm)
-      const produto = await adminService.criarProduto(body as Parameters<typeof adminService.criarProduto>[0])
+      const produto = await adminService.criarProduto(body as unknown as Parameters<typeof adminService.criarProduto>[0])
       onCreated(produto)
       toast.success('Produto criado!')
       onClose()
@@ -100,7 +100,7 @@ export default function AdminProdutos() {
   const handleDelete = async () => {
     setDeleteLoading(true)
     try {
-      await adminService.excluirProduto(deleteId)
+      await adminService.excluirProduto(deleteId!)
       setProdutos(ps => ps.filter(p => p.id !== deleteId))
       toast.success('Produto excluído')
       setDeleteId(null)
@@ -171,7 +171,7 @@ export default function AdminProdutos() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead><tr>
-                    <Th></Th><Th>Nome</Th><Th>Categoria</Th><Th>Preço</Th><Th>Status</Th><Th>Ações</Th>
+                    <Th>{''}</Th><Th>Nome</Th><Th>Categoria</Th><Th>Preço</Th><Th>Status</Th><Th>Ações</Th>
                   </tr></thead>
                   <tbody>
                     {produtos.map(p => (

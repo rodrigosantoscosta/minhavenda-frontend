@@ -74,8 +74,8 @@ class SearchService {
 
     if (termo)        queryParams.termo       = termo
     if (categoriaId)  queryParams.categoriaId = categoriaId
-    if (precoMin !== undefined && precoMin !== '') queryParams.precoMin = precoMin
-    if (precoMax !== undefined && precoMax !== '') queryParams.precoMax = precoMax
+    if (precoMin !== undefined && precoMin !== ('' as unknown as number)) queryParams.precoMin = precoMin
+    if (precoMax !== undefined && precoMax !== ('' as unknown as number)) queryParams.precoMax = precoMax
 
     logger.info({ queryParams }, 'SearchService.buscarProdutos')
 

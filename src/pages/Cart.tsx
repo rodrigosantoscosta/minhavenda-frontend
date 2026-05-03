@@ -55,15 +55,15 @@ export default function Cart() {
   // FIX: allow increment when stock is null/undefined (unknown = no limit)
   const handleIncrement = (item: CartItem) => {
     if (item.estoque == null || item.quantidade < item.estoque) {
-      updateQuantity(item.id, item.quantidade + 1)
+      updateQuantity(item.id!, item.quantidade + 1)
     }
   }
 
   const handleDecrement = (item: CartItem) => {
     if (item.quantidade > 1) {
-      updateQuantity(item.id, item.quantidade - 1)
+      updateQuantity(item.id!, item.quantidade - 1)
     } else {
-      removeItem(item.id)
+      removeItem(item.id!)
     }
   }
 

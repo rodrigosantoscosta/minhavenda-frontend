@@ -48,7 +48,7 @@ export default function OrderDetail() {
   const loadOrderDetails = async () => {
     try {
       setError('')
-      const orderData = await getOrderDetails(id)
+      const orderData = await getOrderDetails(id ?? '')
       setOrder(orderData)
     } catch (err) {
       logger.error({ error: (err as Error).message, orderId: id }, 'Erro ao carregar detalhes do pedido')
@@ -72,7 +72,7 @@ export default function OrderDetail() {
 
     setPaying(true)
     try {
-      await payOrder(id)
+      await payOrder(id ?? '')
       await loadOrderDetails() // Recarregar dados
     } catch (err) {
       logger.error({ error: (err as Error).message, orderId: id }, 'Erro ao pagar pedido')
@@ -90,13 +90,13 @@ export default function OrderDetail() {
 
     setCancelling(true)
     try {
-      await cancelOrder(id)
+      await cancelOrder(id ?? '')
       const shortId = id?.slice(-6) || id
       addNotification({
         type: 'cancelled',
         title: 'Pedido cancelado',
         message: `Pedido #${shortId} foi cancelado com sucesso.`,
-        orderId: id,
+        orderId: id ?? '',
       })
       await loadOrderDetails()
     } catch (err) {
@@ -136,7 +136,7 @@ export default function OrderDetail() {
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center min-h-[60vh]">
-            <Loading size="lg" text="Carregando detalhes do pedido..." />
+            <Loading />
           </div>
         </div>
       </div>

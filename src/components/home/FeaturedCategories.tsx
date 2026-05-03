@@ -73,12 +73,12 @@ export default function FeaturedCategories({
             `}>
               {categoria.nome}
             </span>
-            {categoria.totalProdutos > 0 && (
+            {(categoria.totalProdutos ?? 0) > 0 && (
               <span className={`
                 text-xs mt-1 transition-colors
                 ${isSelected ? 'text-primary-100' : 'text-gray-500'}
               `}>
-                {categoria.totalProdutos} {categoria.totalProdutos === 1 ? 'produto' : 'produtos'}
+                {categoria.totalProdutos ?? 0} {categoria.totalProdutos === 1 ? 'produto' : 'produtos'}
               </span>
             )}
           </button>

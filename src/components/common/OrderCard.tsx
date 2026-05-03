@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FiPackage, FiClock, FiTruck, FiCheck } from 'react-icons/fi'
+import { FiPackage } from 'react-icons/fi'
 import Badge from './Badge'
 import Button from './Button'
 import type { Order } from '../../types'
@@ -29,16 +29,7 @@ export default function OrderCard({ order, showCancelButton = false, onCancel, c
 
   // FIX: CRIADO added as alias for PENDENTE — raw backend status may leak through
   // before mapStatus() runs (e.g. from Checkout notification, SSE events)
-  const statusIcons: Record<string, React.JSX.Element | null> = {
-    CRIADO:   <FiClock className="w-5 h-5" />,
-    PENDENTE: <FiClock className="w-5 h-5" />,
-    PAGO:     <FiCheck className="w-5 h-5" />,
-    ENVIADO:  <FiTruck className="w-5 h-5" />,
-    ENTREGUE: <FiCheck className="w-5 h-5" />,
-    CANCELADO: null,
-  }
-
-  const formatDate = (date: string): string => {
+    const formatDate = (date: string): string => {
     return new Date(date).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: 'long',
@@ -86,7 +77,7 @@ export default function OrderCard({ order, showCancelButton = false, onCancel, c
             <p className="text-sm text-gray-500">{formatDate(dataCriacao)}</p>
           </div>
         </div>
-        <Badge variant={getStatusVariant(status) as any} leftIcon={statusIcons[status]}>
+        <Badge variant={getStatusVariant(status) as any}>
           {getStatusLabel(status)}
         </Badge>
       </div>

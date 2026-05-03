@@ -29,7 +29,7 @@ export default function AdminCategorias() {
     if (!newForm.nome) { toast.error('Nome é obrigatório'); return }
     setSaving(true)
     try {
-      const cat = await adminService.criarCategoria({ nome: newForm.nome, descricao: newForm.descricao, ativo: true })
+      const cat = await adminService.criarCategoria({ nome: newForm.nome, descricao: newForm.descricao } as any)
       setCategorias(cs => [...cs, cat])
       setNewForm({ nome: '', descricao: '' })
       setCreating(false)
@@ -52,7 +52,7 @@ export default function AdminCategorias() {
 
   const handleDelete = async () => {
     try {
-      await adminService.excluirCategoria(deleteId)
+      await adminService.excluirCategoria(deleteId!)
       setCategorias(cs => cs.filter(c => c.id !== deleteId))
       toast.success('Categoria excluída!')
       setDeleteId(null)
@@ -127,10 +127,10 @@ export default function AdminCategorias() {
                                 {c.ativo ? 'Ativo' : 'Inativo'}
                               </span>
                             </td>
-                            <td className="px-5 py-3 text-xs font-mono" style={{ color: '#9CA3AF' }}>{formatDate(c.dataCadastro)}</td>
+                            <td className="px-5 py-3 text-xs font-mono" style={{ color: '#9CA3AF' }}>{formatDate((c as any).dataCadastro)}</td>
                             <td className="px-5 py-3">
                               <div className="flex items-center gap-1">
-                                <ActionBtn onClick={() => { setEditId(c.id); setEditForm({ nome: c.nome, descricao: c.descricao }) }} icon={FiEdit2} color="#6B7280" />
+                                <ActionBtn onClick={() => { setEditId(c.id); setEditForm({ nome: c.nome, descricao: c.descricao || '' }) }} icon={FiEdit2} color="#6B7280" />
                                 <ActionBtn onClick={() => setDeleteId(c.id)} icon={FiTrash2} color="#6B7280" />
                               </div>
                             </td>
