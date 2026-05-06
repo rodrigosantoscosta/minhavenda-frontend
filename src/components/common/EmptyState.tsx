@@ -8,22 +8,22 @@ export interface EmptyStateProps {
 }
 
 /**
- * EmptyState — better visual hierarchy with staggered entrance.
- * Skill: split + stagger, text-balance on heading, text-pretty on description.
+ * EmptyState — staggered entrance, zinc/slate token alignment.
+ * Skill: text-balance heading, text-pretty description, layered soft rings.
  */
 export default function EmptyState({ icon, title, description, action }: EmptyStateProps): React.JSX.Element {
   return (
     <div className="flex flex-col items-center text-center py-20 px-4">
 
-      {/* Icon in a soft circle with depth */}
+      {/* Icon in a soft circle with depth — muted palette */}
       {icon && (
         <div
           className="relative mb-7 animate-fadeInUp"
           style={{ animationDelay: '0ms' }}
         >
           {/* Outer soft ring */}
-          <div className="absolute inset-0 rounded-full bg-gray-100 scale-125 opacity-50" />
-          <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 text-gray-400">
+          <div className="absolute inset-0 rounded-full bg-muted scale-125 opacity-50" />
+          <div className="relative flex items-center justify-center w-20 h-20 rounded-full bg-muted text-muted-foreground">
             {icon}
           </div>
         </div>
@@ -32,7 +32,7 @@ export default function EmptyState({ icon, title, description, action }: EmptySt
       {/* Title — skill: text-balance */}
       {title && (
         <h3
-          className="font-display font-bold text-xl text-gray-900 mb-3 text-balance animate-fadeInUp"
+          className="font-display font-bold text-xl text-foreground mb-3 text-balance animate-fadeInUp"
           style={{ animationDelay: '80ms' }}
         >
           {title}
@@ -42,7 +42,7 @@ export default function EmptyState({ icon, title, description, action }: EmptySt
       {/* Description — skill: text-pretty */}
       {description && (
         <p
-          className="font-sans text-gray-500 text-sm leading-relaxed mb-8 max-w-sm text-pretty animate-fadeInUp"
+          className="font-sans text-muted-foreground text-sm leading-relaxed mb-8 max-w-sm text-pretty animate-fadeInUp"
           style={{ animationDelay: '160ms' }}
         >
           {description}

@@ -21,11 +21,13 @@ export default function CategoryFilter({
     'px-4 py-1.5 rounded-full font-sans font-medium text-sm whitespace-nowrap',
     'transition-[background-color,color,box-shadow,transform] duration-150',
     'active:scale-[0.96]',
-    'focus:outline-none focus:ring-2 focus:ring-primary-500/40',
+    'focus:outline-none focus:ring-2 focus:ring-ring/40',
   ].join(' ')
 
-  const pillActive   = 'bg-primary-600 text-white shadow-card'
-  const pillInactive = 'bg-white text-gray-600 shadow-card hover:shadow-card-hover hover:text-gray-900'
+  // Active: primary (near-black zinc) with primary-foreground text
+  const pillActive   = 'bg-primary text-primary-foreground shadow-card'
+  // Inactive: card bg with muted text, lifts on hover
+  const pillInactive = 'bg-card text-muted-foreground shadow-card hover:shadow-card-hover hover:text-foreground'
 
   return (
     // Skill: right-side fade hint via mask-image to signal overflow
@@ -55,7 +57,7 @@ export default function CategoryFilter({
             {cat.nome}
             {(cat.totalProdutos ?? 0) > 0 && (
               <span className={`ml-1.5 text-[11px] tabular-nums ${
-                selectedCategory === cat.id ? 'opacity-70' : 'text-gray-400'
+                selectedCategory === cat.id ? 'opacity-70' : 'text-muted-foreground'
               }`}>
                 {cat.totalProdutos ?? 0}
               </span>
