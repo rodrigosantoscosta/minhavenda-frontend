@@ -75,7 +75,7 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <EmptyState
             icon={<FiShoppingCart size={64} />}
@@ -96,12 +96,12 @@ export default function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Meu Carrinho</h1>
-          <p className="text-gray-600">
+          <h1 className="font-display text-3xl font-bold text-foreground mb-2">Meu Carrinho</h1>
+          <p className="font-sans text-muted-foreground">
             {getTotalItems()} {getTotalItems() === 1 ? 'item' : 'itens'} no carrinho
           </p>
         </div>
@@ -123,7 +123,7 @@ export default function Cart() {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow"
+                className="bg-card rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow border border-border"
               >
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
@@ -137,8 +137,8 @@ export default function Cart() {
 
                   <div className="flex-1 min-w-0">
                     <div className="mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900 truncate">{item.nome}</h3>
-                      <p className="text-sm text-gray-500">{item.categoria}</p>
+                      <h3 className="font-display text-lg font-semibold text-foreground truncate">{item.nome}</h3>
+                      <p className="font-sans text-sm text-muted-foreground">{item.categoria}</p>
                     </div>
 
                     <div className="mb-4">
@@ -147,25 +147,25 @@ export default function Cart() {
                         const preco = getPrecoValue(item.preco)
                         return precoOriginal > preco ? (
                           <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500 line-through">{formatarValor(precoOriginal)}</span>
-                            <span className="text-lg font-bold text-primary-600">{formatarValor(preco)}</span>
+                            <span className="text-sm text-muted-foreground line-through">{formatarValor(precoOriginal)}</span>
+                            <span className="text-lg font-bold text-foreground">{formatarValor(preco)}</span>
                             <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
                               {Math.round(((precoOriginal - preco) / precoOriginal) * 100)}% OFF
                             </span>
                           </div>
                         ) : (
-                          <span className="text-lg font-bold text-gray-900">{formatarValor(preco)}</span>
+                          <span className="text-lg font-bold text-foreground">{formatarValor(preco)}</span>
                         )
                       })()}
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <label className="text-sm text-gray-600">Quantidade:</label>
-                        <div className="flex items-center border border-gray-300 rounded-lg">
+                        <label className="text-sm text-muted-foreground">Quantidade:</label>
+                        <div className="flex items-center border border-border rounded-lg">
                           <button
                             onClick={() => handleDecrement(item)}
-                            className="p-2 hover:bg-gray-100 transition-colors"
+                            className="p-2 hover:bg-muted transition-colors"
                             aria-label="Diminuir quantidade"
                           >
                             <FiMinus size={16} />
@@ -177,7 +177,7 @@ export default function Cart() {
                           <button
                             onClick={() => handleIncrement(item)}
                             disabled={item.estoque != null && item.quantidade >= item.estoque}
-                            className="p-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2 hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Aumentar quantidade"
                           >
                             <FiPlus size={16} />
@@ -185,7 +185,7 @@ export default function Cart() {
                         </div>
                         {/* FIX: only show stock count when it's known */}
                         {item.estoque != null && (
-                          <span className="text-xs text-gray-500">{item.estoque} disponíveis</span>
+                          <span className="text-xs text-muted-foreground">{item.estoque} disponíveis</span>
                         )}
                       </div>
 
@@ -198,10 +198,10 @@ export default function Cart() {
                       </button>
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="mt-3 pt-3 border-t border-border">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Subtotal:</span>
-                        <span className="text-lg font-bold text-gray-900">
+                        <span className="text-sm text-muted-foreground">Subtotal:</span>
+                        <span className="text-lg font-bold text-foreground">
                           {formatarValor(getPrecoValue(item.preco) * item.quantidade)}
                         </span>
                       </div>
@@ -215,10 +215,10 @@ export default function Cart() {
           {/* Resumo do Pedido */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Resumo do Pedido</h2>
+              <h2 className="text-xl font-bold text-foreground mb-4">Resumo do Pedido</h2>
 
               <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-gray-700">
+                <div className="flex justify-between text-foreground/80">
                   <span>Subtotal ({getTotalItems()} itens)</span>
                   <span>{formatarValor(subtotal)}</span>
                 </div>
@@ -230,7 +230,7 @@ export default function Cart() {
                   </div>
                 )}
 
-                <div className="flex justify-between text-gray-700">
+                <div className="flex justify-between text-foreground/80">
                   <span className="flex items-center gap-1"><FiTruck size={16} />Frete</span>
                   <span>
                     {frete === 0
@@ -241,18 +241,18 @@ export default function Cart() {
                 </div>
 
                 {frete > 0 && subtotal < 200 && (
-                  <div className="bg-primary-50 border border-primary-200 rounded-xl p-3">
-                    <p className="text-sm text-primary-800">
+                  <div className="bg-muted border border-border rounded-xl p-3">
+                    <p className="text-sm text-foreground">
                       Faltam <strong>{formatarValor(200 - subtotal)}</strong> para frete grátis!
                     </p>
                   </div>
                 )}
 
-                <div className="border-t border-gray-200 my-3"></div>
+                <div className="border-t border-border my-3"></div>
 
-                <div className="flex justify-between text-lg font-bold text-gray-900">
+                <div className="flex justify-between text-lg font-bold text-foreground">
                   <span>Total</span>
-                  <span className="text-primary-600">{formatarValor(total)}</span>
+                  <span className="text-foreground">{formatarValor(total)}</span>
                 </div>
               </div>
 
@@ -267,17 +267,17 @@ export default function Cart() {
                 </Button>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
-                <div className="flex items-start gap-2 text-sm text-gray-600">
-                  <FiTruck className="mt-0.5 text-primary-600 flex-shrink-0" />
+              <div className="mt-6 pt-6 border-t border-border space-y-3">
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <FiTruck className="mt-0.5 text-foreground flex-shrink-0" />
                   <span>Entrega em até 7 dias úteis</span>
                 </div>
-                <div className="flex items-start gap-2 text-sm text-gray-600">
-                  <FiLock className="mt-0.5 text-primary-600 flex-shrink-0" />
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <FiLock className="mt-0.5 text-foreground flex-shrink-0" />
                   <span>Ambiente 100% seguro</span>
                 </div>
-                <div className="flex items-start gap-2 text-sm text-gray-600">
-                  <FiTag className="mt-0.5 text-primary-600 flex-shrink-0" />
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <FiTag className="mt-0.5 text-foreground flex-shrink-0" />
                   <span>Melhores preços do mercado</span>
                 </div>
               </div>

@@ -133,7 +133,7 @@ export default function OrderDetail() {
   // Loading
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center min-h-[60vh]">
             <Loading />
@@ -146,13 +146,13 @@ export default function OrderDetail() {
   // Error
   if (error || !order) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            <h1 className="text-2xl font-bold text-foreground mb-4">
               Pedido Não Encontrado
             </h1>
-            <p className="text-gray-600 mb-8">
+            <p className="text-muted-foreground mb-8">
               {error || 'O pedido que você procura não existe ou não está disponível.'}
             </p>
             <Link to="/pedidos">
@@ -168,7 +168,7 @@ export default function OrderDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -182,28 +182,28 @@ export default function OrderDetail() {
             </Link>
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-card rounded-lg shadow-sm border border-border p-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3 mb-4 md:mb-0">
-                <div className="p-3 bg-primary-50 rounded-lg">
-                  <FiPackage className="w-6 h-6 text-primary-600" />
+                <div className="p-3 bg-muted rounded-lg">
+                  <FiPackage className="w-6 h-6 text-foreground" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
+                  <h1 className="text-2xl font-bold text-foreground">
                     Pedido #{order.id}
                   </h1>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {formatDate(order.dataCriacao)}
                   </p>
                 </div>
               </div>
               
               {/* Status Badge */}
-              <div className="bg-gray-100 rounded-lg px-4 py-2">
+              <div className="bg-muted rounded-lg px-4 py-2">
                 <span className={`text-sm font-medium capitalize ${
                   order.status === 'ENTREGUE' ? 'text-green-700' :
                   order.status === 'CANCELADO' ? 'text-red-700' :
-                  order.status === 'ENVIADO' ? 'text-primary-700' :
+                  order.status === 'ENVIADO' ? 'text-foreground' :
                   'text-amber-700'
                 }`}>
                   {getStatusLabel(order.status)}
@@ -220,29 +220,29 @@ export default function OrderDetail() {
           <div className="lg:col-span-2 space-y-6">
             
             {/* Itens do Pedido */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Itens do Pedido</h2>
+            <div className="bg-card rounded-lg shadow-sm border border-border p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Itens do Pedido</h2>
               <div className="space-y-4">
                 {order.itens?.map((item) => (
-                  <div key={item.id} className="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
+                  <div key={item.id} className="flex gap-4 pb-4 border-b border-border last:border-0">
                     <img
                       src={item.produto?.imagem || 'https://via.placeholder.com/80'}
                       alt={item.produto?.nome}
-                      className="w-20 h-20 object-cover rounded-lg bg-gray-100"
+                      className="w-20 h-20 object-cover rounded-lg bg-muted"
                     />
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">
+                      <h3 className="font-medium text-foreground">
                         {item.produto?.nome || item.nome}
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         Quantidade: {item.quantidade}
                       </p>
-                      <p className="text-sm font-medium text-primary-600">
+                      <p className="text-sm font-medium text-foreground">
                         R$ {item.precoUnitario?.toFixed(2) || '0,00'}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-foreground">
                         R$ {(item.precoUnitario * item.quantidade)?.toFixed(2) || '0,00'}
                       </p>
                     </div>
@@ -253,12 +253,12 @@ export default function OrderDetail() {
 
             {/* Endereço de Entrega */}
             {order.endereco && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="bg-card rounded-lg shadow-sm border border-border p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
                   <FiMapPin className="inline mr-2" />
                   Endereço de Entrega
                 </h2>
-                <div className="text-gray-700">
+                <div className="text-foreground/80">
                   {typeof order.endereco === 'string' ? (
                     <p>{order.endereco}</p>
                   ) : (
@@ -275,18 +275,18 @@ export default function OrderDetail() {
 
             {/* Histórico do Pedido */}
             {order.historico && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Histórico</h2>
+              <div className="bg-card rounded-lg shadow-sm border border-border p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-4">Histórico</h2>
                 <div className="space-y-4">
                   {order.historico.map((item: { status: string; data: string; descricao?: string }, index: number) => (
-                    <div key={index} className="flex gap-3 pb-4 border-b border-gray-200 last:border-0">
+                    <div key={index} className="flex gap-3 pb-4 border-b border-border last:border-0">
                       <div className={`
                         w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
                         ${item.status === 'ENTREGUE' ? 'bg-green-100 text-green-700' :
                           item.status === 'CANCELADO' ? 'bg-red-100 text-red-700' :
-                          item.status === 'ENVIADO' ? 'bg-primary-100 text-primary-700' :
+                          item.status === 'ENVIADO' ? 'bg-muted text-foreground' :
                           item.status === 'PAGO' ? 'bg-green-100 text-green-700' :
-                          'bg-gray-100 text-gray-700'
+                          'bg-muted text-foreground/80'
                         }
                       `}>
                         {item.status === 'ENTREGUE' ? <FiCheckCircle /> :
@@ -296,8 +296,8 @@ export default function OrderDetail() {
                          <FiClock />}
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{item.descricao}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="font-medium text-foreground">{item.descricao}</p>
+                        <p className="text-sm text-muted-foreground">
                           {formatDate(item.data)}
                         </p>
                       </div>
@@ -312,8 +312,8 @@ export default function OrderDetail() {
           <div className="space-y-6">
             
             {/* Resumo Financeiro */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Resumo</h2>
+            <div className="bg-card rounded-lg shadow-sm border border-border p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Resumo</h2>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal</span>
@@ -329,10 +329,10 @@ export default function OrderDetail() {
                   <span>Frete</span>
                   <span>R$ {order.valores?.frete?.toFixed(2) || '0,00'}</span>
                 </div>
-                <div className="border-t border-gray-200 pt-3">
+                <div className="border-t border-border pt-3">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-primary-600">
+                    <span className="text-foreground">
                       R$ {order.valores?.total?.toFixed(2) || '0,00'}
                     </span>
                   </div>
@@ -342,8 +342,8 @@ export default function OrderDetail() {
 
             {/* Informações de Pagamento */}
             {order.pagamento && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="bg-card rounded-lg shadow-sm border border-border p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
                   <FiCreditCard className="inline mr-2" />
                   Pagamento
                 </h2>
