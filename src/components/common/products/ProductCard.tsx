@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../../../contexts/CartContext'
-import Button from '../Button'
-import Badge from '../Badge'
+import { Button } from '../../ui/button'
+import { Badge } from '../../ui/badge'
 import {
   FiShoppingCart,
   FiHeart,
@@ -68,13 +68,13 @@ export default function ProductCard({ produto, viewMode: _viewMode = 'grid' }: P
   return (
     <Link
       to={`/produto/${produto.id}`}
-      className="group block bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden"
+      className="group block bg-card rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-border overflow-hidden"
     >
       {/* Mobile: horizontal list layout | sm+: vertical card layout */}
       <div className="flex sm:flex-col">
 
         {/* Image */}
-        <div className="relative w-28 flex-shrink-0 sm:w-full sm:aspect-square overflow-hidden bg-gray-100">
+        <div className="relative w-28 flex-shrink-0 sm:w-full sm:aspect-square overflow-hidden bg-muted">
           <img
             src={imgSrc}
             alt={produto.nome}
@@ -86,32 +86,32 @@ export default function ProductCard({ produto, viewMode: _viewMode = 'grid' }: P
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {desconto > 0 && (
-              <Badge variant="danger" size="sm">-{desconto}%</Badge>
+              <Badge variant="destructive" className="text-xs">-{desconto}%</Badge>
             )}
             {produto.destaque && (
-              <Badge variant="warning" size="sm">
+              <Badge variant="warning" className="text-xs">
                 <FiTrendingUp className="mr-0.5" size={10} />
                 Destaque
               </Badge>
             )}
             {!temEstoque && (
-              <Badge variant="dark" size="sm">Esgotado</Badge>
+              <Badge variant="secondary" className="text-xs">Esgotado</Badge>
             )}
           </div>
 
           {/* Favourite button — sm+ only */}
           <button
             onClick={handleToggleFavorite}
-            className={`hidden sm:flex absolute top-2 right-2 p-1.5 rounded-full bg-white shadow-md transition-all items-center justify-center ${
-              isFavorite ? 'text-red-500 scale-110' : 'text-gray-400 hover:text-red-500 hover:scale-110'
+            className={`hidden sm:flex absolute top-2 right-2 p-1.5 rounded-full bg-background shadow-md transition-all items-center justify-center ${
+              isFavorite ? 'text-destructive scale-110' : 'text-muted-foreground hover:text-destructive hover:scale-110'
             }`}
           >
             <FiHeart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
           </button>
 
           {/* Hover overlay — sm+ only */}
-          <div className="hidden sm:flex absolute inset-0 bg-primary-600 bg-opacity-0 group-hover:bg-opacity-10 transition-opacity items-center justify-center opacity-0 group-hover:opacity-100">
-            <Button variant="white" size="sm" className="shadow-lg">
+          <div className="hidden sm:flex absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-opacity items-center justify-center opacity-0 group-hover:opacity-100">
+            <Button variant="secondary" size="sm" className="shadow-lg">
               <FiEye className="mr-1" size={14} />
               Ver Detalhes
             </Button>
@@ -120,11 +120,11 @@ export default function ProductCard({ produto, viewMode: _viewMode = 'grid' }: P
 
         {/* Content */}
         <div className="flex flex-col flex-1 p-2.5 sm:p-3 min-w-0">
-          <p className="text-xs text-gray-500 mb-0.5 uppercase tracking-wide truncate">
+          <p className="text-xs text-muted-foreground mb-0.5 uppercase tracking-wide truncate">
             {produto.categoriaNome || 'Sem categoria'}
           </p>
 
-          <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 leading-tight">
+          <h3 className="text-sm font-semibold text-foreground mb-1 line-clamp-2 leading-tight">
             {produto.nome}
           </h3>
 
@@ -135,21 +135,21 @@ export default function ProductCard({ produto, viewMode: _viewMode = 'grid' }: P
                 <FiStar
                   key={i}
                   size={12}
-                  className={i < (produto.avaliacao || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}
+                  className={i < (produto.avaliacao || 0) ? 'text-yellow-400 fill-current' : 'text-muted-foreground/30'}
                 />
               ))}
             </div>
-            <span className="text-xs text-gray-500">({produto.numeroAvaliacoes || 0})</span>
+            <span className="text-xs text-muted-foreground">({produto.numeroAvaliacoes || 0})</span>
           </div>
 
           {/* Price */}
           <div className="mt-auto">
             {desconto > 0 && precoBase != null && (
-              <p className="text-xs text-gray-400 line-through leading-none mb-0.5">
+              <p className="text-xs text-muted-foreground line-through leading-none mb-0.5">
                 R$ {precoBase.toFixed(2)}
               </p>
             )}
-            <p className="text-base font-bold text-primary-600 leading-tight">
+            <p className="text-base font-bold text-primary leading-tight">
               R$ {precoFinal.toFixed(2)}
             </p>
             {desconto > 0 && precoBase != null && (

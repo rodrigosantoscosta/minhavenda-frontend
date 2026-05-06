@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { FiShoppingBag, FiTruck, FiTag } from 'react-icons/fi'
-import { Button } from '@/components/ui/button'
+import { Button } from '../ui/button'
 
 export default function Hero() {
   return (

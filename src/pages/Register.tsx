@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type React from 'react'
+import type { FormEvent, ChangeEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/common/Toast'
@@ -27,7 +27,7 @@ export default function Register() {
   
   const { register, loading } = useAuth()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -92,7 +92,7 @@ export default function Register() {
   const passwordStrength = getPasswordStrength(formData.senha)
 
   // FIX: handle result and navigate on success; show error toast on failure
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!validate()) return
 
@@ -282,8 +282,7 @@ export default function Register() {
             <Button
               type="submit"
               fullWidth
-              disabled={loading}
-              disabled={!acceptedTerms}
+              disabled={loading || !acceptedTerms}
             >
               {loading ? 'Criando conta...' : 'Criar Conta'}
             </Button>
