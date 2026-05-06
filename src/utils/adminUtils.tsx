@@ -1,4 +1,5 @@
 /**
+/**
  * src/utils/adminUtils.tsx
  * Shared formatting helpers and UI atoms for the admin dashboard.
  */
@@ -15,9 +16,9 @@ export const T = {
   border2:   '#2a2d38',
   muted:     '#6B7280',
   sub:       '#9CA3AF',
-  accent:    '#F97316',
-  accentBg:  'rgba(249,115,22,0.12)',
-  accentBd:  'rgba(249,115,22,0.25)',
+  accent:    '#18181b',
+  accentBg:  'rgba(24,24,27,0.12)',
+  accentBd:  'rgba(24,24,27,0.25)',
   green:     '#22C55E',
   greenBg:   'rgba(34,197,94,0.1)',
   red:       '#EF4444',
