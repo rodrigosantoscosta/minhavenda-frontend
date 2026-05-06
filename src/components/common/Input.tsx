@@ -54,7 +54,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
     border rounded-lg
     ${error
       ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-      : 'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
+      : 'border-input focus:ring-ring focus:border-ring'
     }
     ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
     focus:outline-none focus:ring-2

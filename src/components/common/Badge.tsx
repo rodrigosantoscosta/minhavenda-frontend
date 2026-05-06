@@ -21,7 +21,7 @@ export default function Badge({
   className = ''
 }: BadgeProps): React.JSX.Element {
   const variants = {
-    primary:   'bg-primary-100 text-primary-800',
+    primary:   'bg-muted text-foreground',
     success:   'bg-emerald-100 text-emerald-800',
     // Skill: solid fills for danger/warning — legible at xs size on images
     danger:    'bg-red-500 text-white',

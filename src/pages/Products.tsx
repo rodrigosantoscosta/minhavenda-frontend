@@ -81,7 +81,7 @@ export default function Products() {
 
   const loadProdutos = async () => {
     try {
-      page === 0 ? setLoading(true) : setLoadingMore(true)
+      if (page === 0) { setLoading(true) } else { setLoadingMore(true) }
 
       const params: Record<string, unknown> = { page, size: pageSize, ativo: true }
       if (searchTerm) params.termo = searchTerm
@@ -176,7 +176,7 @@ export default function Products() {
                 placeholder="Buscar produtos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full pl-12 pr-12 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring"
               />
               {searchTerm && (
                 <button
@@ -202,7 +202,7 @@ export default function Products() {
               <FiFilter className="mr-2" />
               Filtros
               {activeFiltersCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {activeFiltersCount}
                 </span>
               )}
@@ -227,7 +227,7 @@ export default function Products() {
               {activeFiltersCount > 0 && (
                 <button
                   onClick={handleClearFilters}
-                  className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+                  className="text-sm text-foreground hover:text-foreground/70 font-medium flex items-center gap-1"
                 >
                   <FiX size={14} />
                   Limpar
@@ -244,7 +244,7 @@ export default function Products() {
                 <select
                   value={selectedCategory || ''}
                   onChange={(e) => handleCategoryChange(e.target.value || null)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring text-sm"
                 >
                   <option value="">Todas</option>
                   {categorias.map(cat => (
@@ -263,7 +263,7 @@ export default function Products() {
                   placeholder="R$ 0,00"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring text-sm"
                 />
               </div>
 
@@ -277,7 +277,7 @@ export default function Products() {
                   placeholder="R$ 9999,99"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring text-sm"
                 />
               </div>
 
@@ -289,7 +289,7 @@ export default function Products() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring text-sm"
                 >
                   <option value="recentes">Mais Recentes</option>
                   <option value="preco_asc">Menor Preço</option>

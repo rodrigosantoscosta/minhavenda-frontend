@@ -123,7 +123,7 @@ const SearchPage = () => {
                 : 'Use a barra de busca no header para encontrar produtos.'
             }
             icon={<MagnifyingGlassIcon className="h-12 w-12 text-gray-400" />}
-            action={<button onClick={() => navigate('/busca')} className="mt-2 text-primary-600 underline">Limpar busca</button>}
+            action={<button onClick={() => navigate('/busca')} className="mt-2 text-foreground underline">Limpar busca</button>}
           />
         </div>
       </div>
@@ -193,7 +193,7 @@ const SearchPage = () => {
                   title="Erro na busca"
                   description={error}
                   icon={<MagnifyingGlassIcon className="h-12 w-12 text-red-400" />}
-                  action={<button onClick={() => buscarProdutos(currentParams)} className="mt-2 text-primary-600 underline">Tentar novamente</button>}
+                  action={<button onClick={() => buscarProdutos(currentParams)} className="mt-2 text-foreground underline">Tentar novamente</button>}
                 />
               </div>
             ) : (

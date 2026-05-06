@@ -155,7 +155,7 @@ export default function SuccessModal({
         <div className="bg-gray-50 rounded-lg p-4 text-left space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">Número do Pedido:</span>
-            <span className="font-mono font-semibold text-primary-600">
+            <span className="font-mono font-semibold text-foreground">
               {order.id}
             </span>
           </div>
@@ -190,26 +190,26 @@ export default function SuccessModal({
         </div>
 
         {/* Próximos Passos */}
-        <div className="bg-primary-50 border border-primary-200 rounded-xl p-4">
-          <h3 className="font-medium text-primary-900 mb-3 flex items-center gap-2">
+        <div className="bg-muted border border-border rounded-xl p-4">
+          <h3 className="font-medium text-foreground mb-3 flex items-center gap-2">
             <FiClock className="w-4 h-4" />
             Próximos Passos
           </h3>
-          <div className="space-y-2 text-sm text-primary-800">
+          <div className="space-y-2 text-sm text-foreground/80">
             <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 bg-primary-600 rounded-full mt-1.5 flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-foreground rounded-full mt-1.5 flex-shrink-0" />
               <span>Você receberá um e-mail com a confirmação do pedido</span>
             </div>
             <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 bg-primary-600 rounded-full mt-1.5 flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-foreground rounded-full mt-1.5 flex-shrink-0" />
               <span>Aguardando aprovação do pagamento</span>
             </div>
             <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 bg-primary-600 rounded-full mt-1.5 flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-foreground rounded-full mt-1.5 flex-shrink-0" />
               <span>Após aprovação, seu pedido será separado e enviado</span>
             </div>
             <div className="flex items-start gap-2">
-              <div className="w-1.5 h-1.5 bg-primary-600 rounded-full mt-1.5 flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-foreground rounded-full mt-1.5 flex-shrink-0" />
               <span>Você receberá o código de rastreamento por e-mail</span>
             </div>
           </div>

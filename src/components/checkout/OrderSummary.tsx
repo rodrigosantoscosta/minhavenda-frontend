@@ -94,8 +94,8 @@ export default function OrderSummary({
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary-50 rounded-lg">
-            <FiShoppingBag className="w-5 h-5 text-primary-600" />
+          <div className="p-2 bg-muted rounded-lg">
+            <FiShoppingBag className="w-5 h-5 text-foreground" />
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">
@@ -203,8 +203,8 @@ export default function OrderSummary({
 
           {/* Mensagem Frete Grátis */}
           {!temFreteGratis && subtotal > 0 && subtotal < 200 && (
-            <div className="bg-primary-50 border border-primary-200 rounded-xl p-3">
-              <div className="flex items-center gap-2 text-sm text-primary-800">
+            <div className="bg-muted border border-border rounded-xl p-3">
+              <div className="flex items-center gap-2 text-sm text-foreground/80">
                 <FiTruck className="w-4 h-4 flex-shrink-0" />
                 <span>
                   Faltam <strong>{formatarValor(faltaParaFreteGratis)}</strong> para frete grátis!
@@ -219,7 +219,7 @@ export default function OrderSummary({
           {/* Total */}
           <div className="flex justify-between text-base font-bold text-gray-900">
             <span>Total</span>
-            <span className="text-primary-600 text-lg">
+            <span className="text-foreground text-lg">
               {formatarValor(total)}
             </span>
           </div>
@@ -271,11 +271,11 @@ export default function OrderSummary({
         <div className="border-t border-gray-200 pt-3">
           <div className="space-y-2 text-xs text-gray-600">
             <div className="flex items-start gap-2">
-              <FiTruck className="w-3 h-3 text-primary-600 mt-0.5 flex-shrink-0" />
+              <FiTruck className="w-3 h-3 text-foreground mt-0.5 flex-shrink-0" />
               <span>Entrega em até 7 dias úteis após aprovação do pagamento</span>
             </div>
             <div className="flex items-start gap-2">
-              <FiPercent className="w-3 h-3 text-primary-600 mt-0.5 flex-shrink-0" />
+              <FiPercent className="w-3 h-3 text-foreground mt-0.5 flex-shrink-0" />
               <span>Preços e condições válidos por 24 horas</span>
             </div>
           </div>

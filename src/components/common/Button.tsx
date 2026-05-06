@@ -49,9 +49,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
 
   // Skill: shadows-as-borders for elevation variants
   const variantStyles = {
-    primary:   'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus:ring-primary-500/50 shadow-card hover:shadow-card-hover',
+    primary:   'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 focus:ring-ring/50 shadow-card hover:shadow-card-hover',
     secondary: 'bg-gray-700 text-white hover:bg-gray-800 active:bg-gray-900 focus:ring-gray-500/50 shadow-card hover:shadow-card-hover',
-    outline:   'bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50 active:bg-primary-100 focus:ring-primary-500/50',
+    outline:   'bg-transparent border-2 border-primary text-primary hover:bg-muted active:bg-muted/80 focus:ring-ring/50',
     danger:    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-500/50 shadow-card hover:shadow-card-hover',
     ghost:     'bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-400/50',
     // Skill: white variant used by ProductCard hover overlay

@@ -23,7 +23,7 @@ export default function ProductInfo({ produto }: { produto: Product }) {
               onClick={() => setActiveTab(tab.id)}
               className={`px-6 py-4 font-medium whitespace-nowrap transition-colors ${
                 activeTab === tab.id
-                  ? 'text-primary-600 border-b-2 border-primary-600'
+                  ? 'text-foreground border-b-2 border-foreground'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >

@@ -82,8 +82,8 @@ const SearchBar = ({
             border border-gray-200 rounded-xl
             bg-white text-gray-900 placeholder-gray-400
             text-sm font-sans
-            hover:border-primary-300
-            focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500
+            hover:border-ring/50
+            focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring
             transition-[border-color,box-shadow] duration-150
             ${isLoading ? 'bg-gray-50' : ''}
           `}
@@ -116,7 +116,7 @@ const SearchBar = ({
             transition-[background-color,transform,opacity] duration-150 ease-spring
             active:scale-[0.96]
             ${searchTerm.trim() && !isLoading
-              ? 'bg-primary-600 text-white hover:bg-primary-700'
+              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             }
           `}

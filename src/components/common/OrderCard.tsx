@@ -69,8 +69,8 @@ export default function OrderCard({ order, showCancelButton = false, onCancel, c
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 pb-4 border-b border-gray-200">
         <div className="flex items-center space-x-3 mb-3 md:mb-0">
-          <div className="p-3 bg-primary-50 rounded-lg">
-            <FiPackage className="w-6 h-6 text-primary-600" />
+          <div className="p-3 bg-muted rounded-lg">
+            <FiPackage className="w-6 h-6 text-foreground" />
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">Pedido #{id}</h3>
@@ -125,7 +125,7 @@ export default function OrderCard({ order, showCancelButton = false, onCancel, c
           <p className="text-lg font-bold text-gray-900">{formatarValor(orderTotal)}</p>
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <span className="text-primary-600 font-medium hover:underline text-sm sm:text-base">
+          <span className="text-foreground font-medium hover:underline text-sm sm:text-base">
             Ver detalhes →
           </span>
           {showCancelButton && onCancel && (

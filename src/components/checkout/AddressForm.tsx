@@ -244,8 +244,8 @@ export default function AddressForm({
     <div className="space-y-6">
       {showTitle && (
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-primary-50 rounded-lg">
-            <FiMapPin className="w-5 h-5 text-primary-600" />
+          <div className="p-2 bg-muted rounded-lg">
+            <FiMapPin className="w-5 h-5 text-foreground" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
@@ -278,7 +278,7 @@ export default function AddressForm({
                 type="button"
                 onClick={handleCepSearch}
                 disabled={isSearchingCep || formData.cep.length !== 9}
-                className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent border border-transparent hover:border-primary-200 flex items-center justify-center"
+                className="p-2 text-foreground hover:bg-muted rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent border border-transparent hover:border-border flex items-center justify-center"
                 title="Buscar CEP"
                 tabIndex={-1}
               >

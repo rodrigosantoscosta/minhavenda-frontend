@@ -15,7 +15,7 @@ export default function NotFound() {
         </div>
 
         {/* Número 404 */}
-        <h1 className="text-9xl font-bold text-primary-600 mb-4">
+        <h1 className="text-9xl font-bold text-foreground mb-4">
           404
         </h1>
         
@@ -63,7 +63,7 @@ export default function NotFound() {
         <div className="mt-8">
           <p className="text-sm text-gray-500">
             Precisa de ajuda?{' '}
-            <Link to="/contato" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link to="/contato" className="text-foreground hover:text-foreground/70 font-medium">
               Entre em contato
             </Link>
           </p>

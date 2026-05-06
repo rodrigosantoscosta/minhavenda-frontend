@@ -36,7 +36,7 @@ export default function Breadcrumb({ items = [] }: BreadcrumbProps): React.JSX.E
               // Link clicável
               <Link
                 to={item.path}
-                className="text-gray-600 hover:text-primary-600 transition-colors line-clamp-1"
+                className="text-muted-foreground hover:text-foreground transition-colors line-clamp-1"
               >
                 {isFirst && item.label === 'Home' ? (
                   <FiHome size={16} />

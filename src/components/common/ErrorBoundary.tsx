@@ -102,7 +102,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
               <div className="space-y-3">
                 <button
                   onClick={this.handleReload}
-                  className="w-full bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                  className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   Recarregar Página
                 </button>

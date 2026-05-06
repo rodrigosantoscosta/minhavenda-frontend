@@ -63,7 +63,7 @@ export default function QuantitySelector({
         disabled={disabled}
         min={min}
         max={max}
-        className="w-20 px-4 py-3 text-center font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
+        className="w-20 px-4 py-3 text-center font-medium focus:outline-none focus:ring-2 focus:ring-ring disabled:bg-muted disabled:cursor-not-allowed"
         aria-label="Quantidade"
       />
 

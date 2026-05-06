@@ -67,27 +67,27 @@ const STATUS_CONFIG: Record<string, StatusConfig> = {
     label: 'Pago',
     description: 'Pagamento confirmado',
     color: 'info',
-    bgColor: 'bg-primary-50',
-    borderColor: 'border-primary-200',
-    textColor: 'text-primary-800',
+    bgColor: 'bg-muted',
+    borderColor: 'border-border',
+    textColor: 'text-foreground',
     icon: FiCheck
   },
   PROCESSANDO: {
     label: 'Processando',
     description: 'Em preparação',
     color: 'info',
-    bgColor: 'bg-primary-50',
-    borderColor: 'border-primary-200',
-    textColor: 'text-primary-800',
+    bgColor: 'bg-muted',
+    borderColor: 'border-border',
+    textColor: 'text-foreground',
     icon: FiRefreshCw
   },
   ENVIADO: {
     label: 'Enviado',
     description: 'A caminho',
     color: 'info',
-    bgColor: 'bg-primary-50',
-    borderColor: 'border-primary-200',
-    textColor: 'text-primary-800',
+    bgColor: 'bg-muted',
+    borderColor: 'border-border',
+    textColor: 'text-foreground',
     icon: FiTruck
   },
   ENTREGUE: {
@@ -302,7 +302,7 @@ export function StatusTimeline({
             <div className={`
               flex items-center justify-center w-8 h-8 rounded-full border-2
               ${isActive
-                ? 'bg-primary-600 border-primary-600 text-white'
+                ? 'bg-primary border-primary text-primary-foreground'
                 : 'bg-gray-100 border-gray-300 text-gray-400'
               }
             `}>
@@ -319,7 +319,7 @@ export function StatusTimeline({
               )}
             </div>
             {isActive && index < statusOrder.length - 1 && (
-              <div className="flex-1 h-0.5 bg-primary-200 ml-2" />
+              <div className="flex-1 h-0.5 bg-border ml-2" />
             )}
           </div>
         )

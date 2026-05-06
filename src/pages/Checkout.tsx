@@ -204,8 +204,8 @@ export default function Checkout() {
             </Link>
           </div>
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-primary-50 rounded-lg">
-              <FiLock className="w-6 h-6 text-primary-600" />
+            <div className="p-3 bg-muted rounded-lg">
+              <FiLock className="w-6 h-6 text-foreground" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Finalizar Compra</h1>
@@ -235,8 +235,8 @@ export default function Checkout() {
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-primary-50 rounded-lg">
-                  <FiCreditCard className="w-5 h-5 text-primary-600" />
+                <div className="p-2 bg-muted rounded-lg">
+                  <FiCreditCard className="w-5 h-5 text-foreground" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Forma de Pagamento</h3>
@@ -255,7 +255,7 @@ export default function Checkout() {
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="sr-only peer"
                     />
-                    <div className="cursor-pointer rounded-lg border-2 p-4 text-center transition-all peer-checked:border-primary-600 peer-checked:bg-primary-50 peer-checked:text-primary-700 border-gray-200 hover:border-gray-300">
+                    <div className="cursor-pointer rounded-lg border-2 p-4 text-center transition-all peer-checked:border-foreground peer-checked:bg-muted peer-checked:text-foreground border-border hover:border-ring/50">
                       <div className="font-medium">PIX</div>
                       <div className="text-sm text-gray-500">à vista</div>
                     </div>
@@ -270,7 +270,7 @@ export default function Checkout() {
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="sr-only peer"
                     />
-                    <div className="cursor-pointer rounded-lg border-2 p-4 text-center transition-all peer-checked:border-primary-600 peer-checked:bg-primary-50 peer-checked:text-primary-700 border-gray-200 hover:border-gray-300">
+                    <div className="cursor-pointer rounded-lg border-2 p-4 text-center transition-all peer-checked:border-foreground peer-checked:bg-muted peer-checked:text-foreground border-border hover:border-ring/50">
                       <div className="font-medium">Cartão</div>
                       <div className="text-sm text-gray-500">parcelado</div>
                     </div>
@@ -285,7 +285,7 @@ export default function Checkout() {
                     <select
                       value={installments}
                       onChange={(e) => setInstallments(Number(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring"
                     >
                       {calcularParcelas(total).map((parcela) => (
                         <option key={parcela.numero} value={parcela.numero}>{parcela.texto}</option>
@@ -353,9 +353,9 @@ export default function Checkout() {
 
               <div className="text-xs text-gray-500 text-center">
                 Ao confirmar, você aceita nossos{' '}
-                <a href="/termos" className="text-primary-600 hover:underline">Termos de Serviço</a>
+                <a href="/termos" className="text-foreground hover:underline">Termos de Serviço</a>
                 {' '}e{' '}
-                <a href="/privacidade" className="text-primary-600 hover:underline">Política de Privacidade</a>
+                <a href="/privacidade" className="text-foreground hover:underline">Política de Privacidade</a>
               </div>
             </div>
           </div>

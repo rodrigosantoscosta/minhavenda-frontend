@@ -132,7 +132,7 @@ export default function ProductPage() {
         {loading && (
           <div className="flex justify-center items-center h-96">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground mx-auto mb-4"></div>
               <p className="text-gray-600">Carregando produtos...</p>
             </div>
           </div>

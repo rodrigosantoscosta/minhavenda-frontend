@@ -233,8 +233,8 @@ export default function Profile() {
             {/* Meus Pedidos → /pedidos */}
             <Link to="/pedidos" className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow text-left block">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                  <FiPackage className="text-primary-600" size={24} />
+                <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
+                  <FiPackage className="text-foreground" size={24} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Meus Pedidos</h3>

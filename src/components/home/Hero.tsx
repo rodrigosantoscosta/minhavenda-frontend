@@ -1,8 +1,10 @@
+import { Link } from 'react-router-dom'
 import { FiShoppingBag, FiTruck, FiTag } from 'react-icons/fi'
+import { Button } from '@/components/ui/button'
 
 export default function Hero() {
   return (
-    <div className="relative bg-gradient-to-r from-primary-600 to-primary-800 overflow-hidden">
+    <div className="relative bg-zinc-950 overflow-hidden">
       {/* Padrão de Fundo */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -15,50 +17,50 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Conteúdo */}
           <div className="text-white">
-            <div className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 rounded-full mb-6">
+            <div className="inline-flex items-center px-4 py-2 bg-white/20 rounded-full mb-6">
               <FiTag className="mr-2" />
               <span className="text-sm font-medium">Ofertas de até 50% OFF</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Encontre os melhores <span className="text-primary-200">produtos</span> com os melhores <span className="text-primary-200">preços</span>
+              Encontre os melhores <span className="text-zinc-300">produtos</span> com os melhores <span className="text-zinc-300">preços</span>
             </h1>
 
-            <p className="text-xl text-primary-100 mb-8">
+            <p className="text-xl text-zinc-400 mb-8">
               Milhares de produtos em diversas categorias. Entrega rápida e segura para todo o Brasil.
             </p>
 
-            {/* <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/produtos">
-                <Button variant="white" size="lg" className="shadow-lg">
+                <Button variant="secondary" size="lg" className="shadow-lg">
                   <FiShoppingBag className="mr-2" />
                   Ver Produtos
                 </Button>
               </Link>
               <Link to="/produtos?promocao=true">
-                <Button variant="outline-white" size="lg">
+                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
                   <FiTag className="mr-2" />
                   Ver Ofertas
                 </Button>
               </Link>
-            </div> */}
+            </div>
 
             {/* Features */}
             <div className="grid grid-cols-3 gap-4 mt-12">
               <div className="text-center">
                 <FiTruck className="text-3xl mx-auto mb-2" />
                 <p className="text-sm font-medium">Frete Grátis</p>
-                <p className="text-xs text-primary-200">em compras acima de R$ 99</p>
+                <p className="text-xs text-zinc-300">em compras acima de R$ 99</p>
               </div>
               <div className="text-center">
                 <FiTag className="text-3xl mx-auto mb-2" />
                 <p className="text-sm font-medium">Ofertas Diárias</p>
-                <p className="text-xs text-primary-200">produtos com desconto</p>
+                <p className="text-xs text-zinc-300">produtos com desconto</p>
               </div>
               <div className="text-center">
                 <FiShoppingBag className="text-3xl mx-auto mb-2" />
                 <p className="text-sm font-medium">Compra Segura</p>
-                <p className="text-xs text-primary-200">ambiente protegido</p>
+                <p className="text-xs text-zinc-300">ambiente protegido</p>
               </div>
             </div>
           </div>
@@ -67,11 +69,11 @@ export default function Hero() {
           <div className="hidden lg:block">
             <div className="relative">
               {/* Círculo de fundo */}
-              <div className="absolute inset-0 bg-white bg-opacity-10 rounded-full blur-3xl" />
+              <div className="absolute inset-0 bg-white/10 rounded-full blur-3xl" />
               
               {/* Imagem placeholder - substituir por imagem real */}
               <img
-                src="https://placehold.net/5-600x600.png"
+                src="https://placehold.co/600x600/14b8a6/ffffff?text=Shopping"
                 alt="Shopping"
                 className="relative z-10 w-full h-auto drop-shadow-2xl"
               />

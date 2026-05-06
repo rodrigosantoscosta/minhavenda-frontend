@@ -59,8 +59,8 @@ export default function OAuthCallback() {
       <div className="flex flex-col items-center gap-5 animate-fadeIn">
         {/* Brand spinner */}
         <div className="relative w-12 h-12">
-          <div className="absolute inset-0 rounded-full border-2 border-primary-100" />
-          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary-600 animate-spin" />
+          <div className="absolute inset-0 rounded-full border-2 border-border" />
+          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-foreground animate-spin" />
         </div>
 
         {/* Google colour bar — signals which provider is authenticating */}

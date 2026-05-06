@@ -181,7 +181,7 @@ export default function ProductDetail() {
             <div className="flex items-center gap-3 mb-3">
               <Link
                 to={`/produtos?categoriaId=${produto.categoria?.id}`}
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                className="text-sm text-foreground hover:text-foreground/70 font-medium"
               >
                 {produto.categoria?.nome}
               </Link>
@@ -211,7 +211,7 @@ export default function ProductDetail() {
                 <p className="text-lg text-gray-500 line-through mb-1">R$ {precoBase?.toFixed(2)}</p>
               )}
               <div className="flex items-baseline gap-3">
-                <p className="text-4xl font-bold text-primary-600">R$ {precoFinal.toFixed(2)}</p>
+                <p className="text-4xl font-bold text-foreground">R$ {precoFinal.toFixed(2)}</p>
                 {desconto > 0 && (
                   <span className="text-lg text-green-600 font-medium">
                     Economize R$ {(precoBase - precoFinal).toFixed(2)}
@@ -294,21 +294,21 @@ export default function ProductDetail() {
 
             <div className="bg-gray-50 rounded-lg p-6 space-y-4">
               <div className="flex items-start gap-3">
-                <FiTruck className="text-primary-600 mt-1" size={24} />
+                <FiTruck className="text-foreground mt-1" size={24} />
                 <div>
                   <p className="font-medium text-gray-900">Frete Grátis</p>
                   <p className="text-sm text-gray-600">para compras acima de R$ 99</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <FiShield className="text-primary-600 mt-1" size={24} />
+                <FiShield className="text-foreground mt-1" size={24} />
                 <div>
                   <p className="font-medium text-gray-900">Garantia de 30 dias</p>
                   <p className="text-sm text-gray-600">Devolução grátis</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <FiCreditCard className="text-primary-600 mt-1" size={24} />
+                <FiCreditCard className="text-foreground mt-1" size={24} />
                 <div>
                   <p className="font-medium text-gray-900">Pagamento Seguro</p>
                   <p className="text-sm text-gray-600">Compra 100% protegida</p>

@@ -15,7 +15,7 @@ export default function RelatedProducts({ produtos = [] }: { produtos?: Product[
         </h2>
         <Link 
           to="/produtos" 
-          className="flex items-center text-primary-600 hover:text-primary-700 font-medium transition-colors"
+          className="flex items-center text-foreground hover:text-foreground/70 font-medium transition-colors"
         >
           Ver mais
           <FiChevronRight className="ml-1" size={20} />
