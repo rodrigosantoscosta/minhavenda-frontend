@@ -59,6 +59,10 @@ export function useToast(): ToastContextType {
 export function ToastProvider({ children }: ToastProviderProps): React.JSX.Element {
   const [toasts, setToasts] = useState<ToastItem[]>([])
 
+  const removeToast = useCallback((id: number): void => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
+  }, [])
+
   const addToast = useCallback(({ type = 'info', message, duration = 5000 }: { type?: ToastType; message: string; duration?: number }): number => {
     const id = Date.now()
     const toast: ToastItem = { id, type, message, duration }
@@ -72,11 +76,7 @@ export function ToastProvider({ children }: ToastProviderProps): React.JSX.Eleme
     }
 
     return id
-  }, [])
-
-  const removeToast = useCallback((id: number): void => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id))
-  }, [])
+  }, [removeToast])
 
   const success = useCallback((message: string, duration?: number): number => {
     return addToast({ type: 'success', message, duration })
@@ -157,10 +157,10 @@ function Toast({ type, message, onClose }: ToastComponentProps): React.JSX.Eleme
     },
     info: {
       icon: <FiInfo className="w-5 h-5" />,
-      bgColor: 'bg-primary-50',
-      borderColor: 'border-primary-500',
-      textColor: 'text-primary-900',
-      iconColor: 'text-primary-600',
+      bgColor: 'bg-zinc-50',
+      borderColor: 'border-zinc-500',
+      textColor: 'text-zinc-900',
+      iconColor: 'text-zinc-600',
     },
   }
 

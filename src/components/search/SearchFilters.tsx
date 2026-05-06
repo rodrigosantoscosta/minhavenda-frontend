@@ -4,15 +4,6 @@ import { FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { get } from '../../services/api'
 import logger from '../../utils/logger'
 
-/**
- * Componente SearchFilters - Filtros avançados para busca
- * @param {Object} props
- * @param {Object} props.filters - Filtros atuais
- * @param {function} props.onFiltersChange - Callback quando filtros mudam
- * @param {boolean} props.isOpen - Se painel está aberto
- * @param {function} props.onToggle - Callback para alternar painel
- * @param {string} props.className - Classes CSS adicionais
- */
 interface SearchFiltersProps {
   filters?: Record<string, unknown>
   onFiltersChange?: (filters: Record<string, unknown>) => void
@@ -26,7 +17,7 @@ const SearchFilters = ({
   onFiltersChange,
   isOpen: _isOpen = false,
   onToggle: _onToggleFilter,
-  className = ""
+  className = ''
 }: SearchFiltersProps) => {
   const [categorias, setCategorias] = useState<Category[]>([])
   const [isLoadingCategorias, setIsLoadingCategorias] = useState(false)
@@ -95,32 +86,44 @@ const SearchFilters = ({
     handleFilterChange(field, numericValue)
   }
 
+  const inputClass =
+    'w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground ' +
+    'hover:border-ring/50 focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring ' +
+    'transition-[border-color,box-shadow] duration-150 font-sans text-sm'
+
+  const hasActiveFilters = Object.entries(localFilters).some(
+    ([key, value]) => value !== '' && value !== null && value !== undefined && key !== 'ativo'
+  )
+
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 ${className}`}>
+    <div className={`bg-card rounded-lg border border-border ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center space-x-2">
-          <FunnelIcon className="h-5 w-5 text-gray-500" />
-          <h3 className="text-lg font-medium text-gray-900">Filtros</h3>
+      <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex items-center gap-2">
+          <FunnelIcon className="h-5 w-5 text-muted-foreground" />
+          <h3 className="font-display font-semibold text-foreground text-base">Filtros</h3>
         </div>
         <button
           onClick={_onToggleFilter}
-          className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+          className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-150"
           aria-label="Fechar filtros"
         >
-          <XMarkIcon className="h-5 w-5" />
+          <XMarkIcon className="h-4 w-4" />
         </button>
       </div>
 
-      {/* Conteúdo */}
+      {/* Content */}
       <div className="p-4 space-y-6">
+
         {/* Categoria */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+          <label className="block text-sm font-sans font-medium text-foreground mb-2">
+            Categoria
+          </label>
           <select
             value={(localFilters.categoriaId as string) || ''}
             onChange={(e) => handleFilterChange('categoriaId', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md hover:border-primary-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-[border-color,box-shadow] duration-150"
+            className={inputClass}
             disabled={isLoadingCategorias}
           >
             <option value="">Todas as categorias</option>
@@ -129,79 +132,80 @@ const SearchFilters = ({
             ))}
           </select>
           {isLoadingCategorias && (
-            <p className="mt-1 text-xs text-gray-500">Carregando categorias...</p>
+            <p className="mt-1 text-xs text-muted-foreground font-sans">Carregando categorias...</p>
           )}
         </div>
 
         {/* Faixa de Preço */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Faixa de Preço</label>
+          <label className="block text-sm font-sans font-medium text-foreground mb-2">
+            Faixa de Preço
+          </label>
           <div className="space-y-3">
-            <div>
-              <label className="block text-xs text-gray-600 mb-1">Preço Mínimo</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
-                <input
-                  type="text"
-                  value={(localFilters.precoMin as string) || ''}
-                  onChange={(e) => handlePrecoChange('precoMin', e.target.value)}
-                  placeholder="0,00"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-primary-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-[border-color,box-shadow] duration-150"
-                />
+            {[
+              { field: 'precoMin', label: 'Preço Mínimo' },
+              { field: 'precoMax', label: 'Preço Máximo' },
+            ].map(({ field, label }) => (
+              <div key={field}>
+                <label className="block text-xs text-muted-foreground font-sans mb-1">{label}</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-sans">
+                    R$
+                  </span>
+                  <input
+                    type="text"
+                    value={(localFilters[field] as string) || ''}
+                    onChange={(e) => handlePrecoChange(field, e.target.value)}
+                    placeholder="0,00"
+                    className={`${inputClass} pl-8`}
+                  />
+                </div>
               </div>
-            </div>
-            <div>
-              <label className="block text-xs text-gray-600 mb-1">Preço Máximo</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
-                <input
-                  type="text"
-                  value={(localFilters.precoMax as string) || ''}
-                  onChange={(e) => handlePrecoChange('precoMax', e.target.value)}
-                  placeholder="0,00"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md hover:border-primary-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-[border-color,box-shadow] duration-150"
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Botões de Ação */}
-        <div className="flex space-x-3 pt-4 border-t border-gray-200">
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t border-border">
           <button
             onClick={handleApplyFilters}
-            className="flex-1 bg-primary-600 text-white py-2 px-4 rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-[background-color,transform] duration-150 active:scale-[0.96] font-sans font-medium text-sm"
+            className="flex-1 bg-primary text-primary-foreground py-2 px-4 rounded-lg
+              hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring/50
+              transition-[background-color,transform] duration-150 active:scale-[0.96]
+              font-sans font-medium text-sm"
           >
             Aplicar Filtros
           </button>
           <button
             onClick={handleClearFilters}
-            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+            className="flex-1 bg-muted text-muted-foreground py-2 px-4 rounded-lg
+              hover:bg-muted/70 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring/30
+              transition-colors duration-150 font-sans text-sm"
           >
             Limpar
           </button>
         </div>
 
-        {/* Filtros ativos (resumo) */}
-        {Object.entries(localFilters).some(([key, value]) =>
-          value !== '' && value !== null && value !== undefined && key !== 'ativo'
-        ) && (
-          <div className="pt-4 border-t border-gray-200">
-            <p className="text-sm font-medium text-gray-700 mb-2">Filtros ativos:</p>
+        {/* Active filters summary */}
+        {hasActiveFilters && (
+          <div className="pt-4 border-t border-border">
+            <p className="text-xs font-display font-semibold text-foreground uppercase tracking-wider mb-2">
+              Filtros ativos
+            </p>
             <div className="space-y-1">
               {!!localFilters.categoriaId && (
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-muted-foreground font-sans">
                   Categoria: {categorias.find(c => c.id === parseInt(localFilters.categoriaId as string))?.nome || 'Selecionada'}
                 </p>
               )}
               {!!localFilters.precoMin && (
-                <p className="text-xs text-gray-600">
-                  Preço mínimo: R$ {parseFloat(localFilters.precoMin as string).toFixed(2)}
+                <p className="text-xs text-muted-foreground font-sans">
+                  Preço mín: R$ {parseFloat(localFilters.precoMin as string).toFixed(2)}
                 </p>
               )}
               {!!localFilters.precoMax && (
-                <p className="text-xs text-gray-600">
-                  Preço máximo: R$ {parseFloat(localFilters.precoMax as string).toFixed(2)}
+                <p className="text-xs text-muted-foreground font-sans">
+                  Preço máx: R$ {parseFloat(localFilters.precoMax as string).toFixed(2)}
                 </p>
               )}
             </div>

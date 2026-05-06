@@ -13,72 +13,57 @@ interface NotificationItem {
   createdAt: string
 }
 
-type TypeIconProps = {
-  type: 'new_order' | 'status_change' | 'cancelled'
+type TypeIconProps = { type: NotificationItem['type'] }
+
+function timeAgo(isoString: string): string {
+  const diff = Date.now() - new Date(isoString).getTime()
+  const minutes = Math.floor(diff / 60_000)
+  if (minutes < 1) return 'agora'
+  if (minutes < 60) return `${minutes}min atrás`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h atrás`
+  return `${Math.floor(hours / 24)}d atrás`
 }
 
-/**
- * Ícone de sino com badge de não lidas e dropdown de notificações de pedidos.
- * Deve ser renderizado apenas quando o usuário está autenticado.
- */
 export default function NotificationBell(): React.JSX.Element {
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const { notifications, unreadCount, markAsRead } = useNotificationContext()
 
-  // Fechar ao clicar fora
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpen(false)
       }
     }
-    if (open) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
+    if (open) document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [open])
 
-  // Clicar numa notificação: marcar como lida e navegar para o pedido
   function handleItemClick(notification: NotificationItem): void {
     markAsRead(String(notification.id))
     setOpen(false)
-    if (notification.orderId) {
-      navigate(`/pedido/${notification.orderId}`)
-    }
+    if (notification.orderId) navigate(`/pedido/${notification.orderId}`)
   }
 
-  // Ícone por tipo
   function TypeIcon({ type }: TypeIconProps): React.JSX.Element {
-    if (type === 'cancelled') return <FiXCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-    if (type === 'status_change') return <FiRefreshCw className="w-4 h-4 text-primary-500 flex-shrink-0" />
-    return <FiPackage className="w-4 h-4 text-primary-500 flex-shrink-0" />
-  }
-
-  // Formatar timestamp
-  function timeAgo(isoString: string): string {
-    const diff = Date.now() - new Date(isoString).getTime()
-    const minutes = Math.floor(diff / 60_000)
-    if (minutes < 1) return 'agora'
-    if (minutes < 60) return `${minutes}min atrás`
-    const hours = Math.floor(minutes / 60)
-    if (hours < 24) return `${hours}h atrás`
-    const days = Math.floor(hours / 24)
-    return `${days}d atrás`
+    if (type === 'cancelled')    return <FiXCircle    className="w-4 h-4 text-destructive shrink-0" />
+    if (type === 'status_change') return <FiRefreshCw  className="w-4 h-4 text-foreground shrink-0" />
+    return                               <FiPackage    className="w-4 h-4 text-foreground shrink-0" />
   }
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Botão do sino */}
+      {/* Bell button — min 40×40 hit area */}
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        className="relative flex items-center justify-center w-10 h-10 rounded-lg hover:bg-muted transition-colors duration-150"
         aria-label="Notificações"
       >
-        <FiBell className="w-6 h-6 text-gray-700" />
+        <FiBell className="w-5 h-5 text-foreground" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-display font-bold rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center tabular-nums px-1">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -86,51 +71,54 @@ export default function NotificationBell(): React.JSX.Element {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 mt-1.5 w-80 bg-white rounded-2xl shadow-dropdown z-50 overflow-hidden">
-          {/* Header do dropdown */}
-          <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-900">Notificações</span>
+        <div className="absolute right-0 mt-1.5 w-80 bg-card rounded-xl shadow-dropdown border border-border z-50 overflow-hidden animate-fadeInUp origin-top-right">
+          {/* Header */}
+          <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+            <span className="text-sm font-display font-semibold text-foreground">Notificações</span>
             {unreadCount > 0 && (
-              <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-destructive/10 text-destructive font-medium px-2 py-0.5 rounded-full font-sans">
                 {unreadCount} nova{unreadCount > 1 ? 's' : ''}
               </span>
             )}
           </div>
 
-          {/* Lista */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-gray-100">
+          {/* List */}
+          <div className="max-h-80 overflow-y-auto divide-y divide-border">
             {notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
-                <FiBell className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Nenhuma notificação</p>
+                <FiBell className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground font-sans">Nenhuma notificação</p>
               </div>
             ) : (
               (notifications as NotificationItem[]).map((notif) => (
                 <button
                   key={notif.id}
                   onClick={() => handleItemClick(notif)}
-                  className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex gap-3 items-start ${
-                    !notif.read ? 'bg-primary-50 hover:bg-primary-100' : ''
-                  }`}
+                  className={[
+                    'w-full text-left px-4 py-3 flex gap-3 items-start',
+                    'transition-colors duration-100',
+                    notif.read
+                      ? 'hover:bg-muted/60'
+                      : 'bg-muted hover:bg-muted/70',
+                  ].join(' ')}
                 >
-                  {/* Dot de não lida */}
-                  <div className="mt-0.5">
+                  {/* Unread dot */}
+                  <div className="mt-1 shrink-0 w-2">
                     {!notif.read && (
-                      <span className="block w-2 h-2 rounded-full bg-primary-500 mt-1" />
+                      <span className="block w-2 h-2 rounded-full bg-foreground" />
                     )}
-                    {notif.read && <span className="block w-2 h-2" />}
                   </div>
 
                   <TypeIcon type={notif.type} />
 
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium text-gray-900 ${!notif.read ? 'font-semibold' : ''}`}>
+                    <p className={`text-sm text-foreground font-sans ${!notif.read ? 'font-semibold' : 'font-medium'}`}>
                       {notif.title}
                     </p>
-                    <p className="text-xs text-gray-600 mt-0.5 truncate">
+                    <p className="text-xs text-muted-foreground font-sans mt-0.5 truncate">
                       {notif.message}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-muted-foreground/60 font-sans mt-1 tabular-nums">
                       {timeAgo(notif.createdAt)}
                     </p>
                   </div>
@@ -141,10 +129,10 @@ export default function NotificationBell(): React.JSX.Element {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-4 py-2 border-t border-gray-200">
+            <div className="px-4 py-2 border-t border-border">
               <button
                 onClick={() => { setOpen(false); navigate('/pedidos') }}
-                className="text-xs text-primary-600 hover:text-primary-700 font-medium w-full text-center py-1"
+                className="text-xs text-foreground hover:text-foreground/70 font-display font-semibold w-full text-center py-1 transition-colors duration-150"
               >
                 Ver todos os pedidos
               </button>
