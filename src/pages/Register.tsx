@@ -210,7 +210,7 @@ export default function Register() {
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full transition-all ${passwordStrength.color}`}
+                      className={`h-2 rounded-full transition-[width,background-color] ${passwordStrength.color}`}
                       style={{ width: `${(passwordStrength.strength / 6) * 100}%` }}
                     />
                   </div>

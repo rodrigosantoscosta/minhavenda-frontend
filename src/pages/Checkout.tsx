@@ -8,6 +8,8 @@ import { useNotificationContext } from '../contexts/NotificationContext'
 import { registerOrderStatus } from '../services/notificationService'
 import AddressForm from '../components/checkout/AddressForm'
 import OrderSummary from '../components/checkout/OrderSummary'
+import CheckoutSteps from '../components/checkout/CheckoutSteps'
+import PaymentSelector, { type PaymentMethod } from '../components/checkout/PaymentSelector'
 import SuccessModal from '../components/common/SuccessModal'
 import Button from '../components/common/Button'
 import Loading from '../components/common/Loading'
@@ -25,7 +27,6 @@ import logger from '../utils/logger'
 export default function Checkout() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  // FIX: use clearCart() instead of setItems([]) so the backend cart is also cleared
   const { items: cartItems, clearCart } = useCart()
   const { addNotification } = useNotificationContext()
   
@@ -34,7 +35,7 @@ export default function Checkout() {
   const [endereco, setEndereco] = useState<Record<string, string> | undefined>(undefined)
   const [enderecoValido, setEnderecoValido] = useState(false)
   const [enderecoErrors, setEnderecoErrors] = useState({})
-  const [paymentMethod, setPaymentMethod] = useState('PIX')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('PIX')
   const [installments, setInstallments] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
@@ -116,10 +117,8 @@ export default function Checkout() {
   }
 
   const handleAddressChange = useCallback(({ address, isValid, errors: addrErrors }: { address: Record<string, string>; isValid: boolean; errors?: Record<string, string> }) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (address) setEndereco(address as any)
     setEnderecoValido(isValid)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setEnderecoErrors(addrErrors as any)
   }, [])
 
@@ -169,10 +168,6 @@ export default function Checkout() {
       setCreatedOrder(order)
       setShowSuccessModal(true)
 
-      // FIX: clearCart() calls DELETE /carrinho for authenticated users,
-      // keeping backend and frontend state in sync.
-      // Previously: setItems([]) + localStorage.removeItem('cart')
-      // only cleared local state — a refresh would reload the old cart from the server.
       await clearCart()
 
     } catch (err) {
@@ -191,9 +186,10 @@ export default function Checkout() {
   if (!user || (items.length === 0 && !showSuccessModal)) return <Loading />
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-8">
+      <div className="container mx-auto px-4">
         
+        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
             <Link to="/carrinho">
@@ -203,24 +199,27 @@ export default function Checkout() {
               </Button>
             </Link>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-muted rounded-lg">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-secondary rounded-xl">
               <FiLock className="w-6 h-6 text-foreground" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Finalizar Compra</h1>
-              {/* <p className="text-gray-600">Ambiente 100% seguro - Página criptografada</p> */}
+              <h1 className="font-display text-2xl font-bold text-foreground">Finalizar Compra</h1>
             </div>
           </div>
+
+          {/* Steps */}
+          <CheckoutSteps currentStep={1} />
         </div>
 
+        {/* Error */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="mb-6 bg-destructive/5 border border-destructive/20 rounded-xl p-4">
             <div className="flex items-start gap-3">
-              <FiAlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <FiAlertCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-medium text-red-900 mb-1">Erro ao processar pedido</h3>
-                <p className="text-sm text-red-700">{error}</p>
+                <h3 className="font-medium text-destructive mb-1">Erro ao processar pedido</h3>
+                <p className="text-sm text-destructive/80">{error}</p>
               </div>
             </div>
           </div>
@@ -228,64 +227,38 @@ export default function Checkout() {
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
+          {/* Form */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            {/* Address */}
+            <div className="bg-card rounded-xl shadow-card border border-border p-6">
+              <h3 className="font-sans font-semibold text-lg text-foreground mb-4">Endereço de Entrega</h3>
               <AddressForm onAddressChange={handleAddressChange as any} errors={enderecoErrors} />
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            {/* Payment */}
+            <div className="bg-card rounded-xl shadow-card border border-border p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-muted rounded-lg">
+                <div className="p-2 bg-secondary rounded-lg">
                   <FiCreditCard className="w-5 h-5 text-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Forma de Pagamento</h3>
-                  <p className="text-sm text-gray-600">Escolha como deseja pagar</p>
+                  <h3 className="font-sans font-semibold text-lg text-foreground">Forma de Pagamento</h3>
+                  <p className="text-sm text-muted-foreground">Escolha como deseja pagar</p>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className="relative">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="PIX"
-                      checked={paymentMethod === 'PIX'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="sr-only peer"
-                    />
-                    <div className="cursor-pointer rounded-lg border-2 p-4 text-center transition-all peer-checked:border-foreground peer-checked:bg-muted peer-checked:text-foreground border-border hover:border-ring/50">
-                      <div className="font-medium">PIX</div>
-                      <div className="text-sm text-gray-500">à vista</div>
-                    </div>
-                  </label>
-
-                  <label className="relative">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="CREDIT_CARD"
-                      checked={paymentMethod === 'CREDIT_CARD'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="sr-only peer"
-                    />
-                    <div className="cursor-pointer rounded-lg border-2 p-4 text-center transition-all peer-checked:border-foreground peer-checked:bg-muted peer-checked:text-foreground border-border hover:border-ring/50">
-                      <div className="font-medium">Cartão</div>
-                      <div className="text-sm text-gray-500">parcelado</div>
-                    </div>
-                  </label>
-                </div>
+                <PaymentSelector value={paymentMethod} onChange={setPaymentMethod} />
 
                 {paymentMethod === 'CREDIT_CARD' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Número de Parcelas
                     </label>
                     <select
                       value={installments}
                       onChange={(e) => setInstallments(Number(e.target.value))}
-                      className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-ring"
+                      className="w-full px-3 py-2 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring focus:border-ring text-sm"
                     >
                       {calcularParcelas(total).map((parcela) => (
                         <option key={parcela.numero} value={parcela.numero}>{parcela.texto}</option>
@@ -294,15 +267,15 @@ export default function Checkout() {
                   </div>
                 )}
 
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-secondary/50 rounded-lg p-4">
                   <div className="space-y-2 text-sm">
                     {paymentMethod === 'PIX' && (
-                      <div className="flex items-center gap-2 text-green-700">
+                      <div className="flex items-center gap-2 text-success">
                         <FiCheck className="w-4 h-4" />
-                        {/* <span>5% de desconto no pagamento via PIX</span> */}
+                        <span>Pagamento instantâneo — confirmação imediata</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <FiLock className="w-4 h-4" />
                       <span>Pagamento 100% seguro</span>
                     </div>
@@ -310,10 +283,26 @@ export default function Checkout() {
                 </div>
               </div>
             </div>
+
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full"
+              disabled={!enderecoValido || isSubmitting}
+              loading={isSubmitting}
+            >
+              {isSubmitting ? 'Processando...' : (
+                <>
+                  <FiLock className="mr-2" />
+                  Confirmar Pedido
+                </>
+              )}
+            </Button>
           </div>
 
+          {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-4 space-y-4">
+            <div className="sticky top-20 space-y-4">
               <OrderSummary
                 items={items}
                 endereco={endereco}
@@ -322,27 +311,12 @@ export default function Checkout() {
                 showPayment={true}
               />
 
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full"
-                disabled={!enderecoValido || isSubmitting}
-                loading={isSubmitting}
-              >
-                {isSubmitting ? 'Processando...' : (
-                  <>
-                    <FiLock className="mr-2" />
-                    Confirmar Pedido
-                  </>
-                )}
-              </Button>
-
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="bg-warning/5 border border-warning/20 rounded-xl p-4">
                 <div className="flex items-start gap-3">
-                  <FiTruck className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-amber-800">
+                  <FiTruck className="w-5 h-5 text-warning mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-warning/80">
                     <p className="font-medium mb-1">Importante:</p>
-                    <ul className="space-y-1 text-amber-700">
+                    <ul className="space-y-1">
                       <li>Verifique se o endereço está correto</li>
                       <li>O pedido será processado após confirmação</li>
                       <li>Você receberá um e-mail com os detalhes</li>
@@ -351,7 +325,7 @@ export default function Checkout() {
                 </div>
               </div>
 
-              <div className="text-xs text-gray-500 text-center">
+              <div className="text-xs text-muted-foreground text-center">
                 Ao confirmar, você aceita nossos{' '}
                 <a href="/termos" className="text-foreground hover:underline">Termos de Serviço</a>
                 {' '}e{' '}

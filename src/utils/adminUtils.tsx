@@ -9,26 +9,26 @@ import React from 'react'
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
 export const T = {
-  bg:        '#0A0B0E',
-  surface:   '#0D0E12',
-  card:      '#111318',
-  border:    '#1E2028',
-  border2:   '#2a2d38',
-  muted:     '#6B7280',
-  sub:       '#9CA3AF',
-  accent:    '#18181b',
-  accentBg:  'rgba(24,24,27,0.12)',
-  accentBd:  'rgba(24,24,27,0.25)',
-  green:     '#22C55E',
-  greenBg:   'rgba(34,197,94,0.1)',
-  red:       '#EF4444',
-  redBg:     'rgba(239,68,68,0.1)',
-  redBd:     'rgba(239,68,68,0.2)',
-  amber:     '#F59E0B',
-  amberBg:   'rgba(245,158,11,0.1)',
-  blue:      '#60A5FA',
-  blueBg:    'rgba(96,165,250,0.1)',
-  teal:      '#10B981',
+  bg:        'hsl(var(--background))',
+  surface:   'hsl(var(--background))',
+  card:      'hsl(var(--card))',
+  border:    'hsl(var(--border))',
+  border2:   'hsl(var(--border))',
+  muted:     'hsl(var(--muted-foreground))',
+  sub:       'hsl(var(--muted-foreground))',
+  accent:    '#F97316',
+  accentBg:  'rgba(249,115,22,0.1)',
+  accentBd:  'rgba(249,115,22,0.2)',
+  green:     '#16A34A',
+  greenBg:   'rgba(22,163,74,0.1)',
+  red:       '#DC2626',
+  redBg:     'rgba(220,38,38,0.1)',
+  redBd:     'rgba(220,38,38,0.2)',
+  amber:     '#D97706',
+  amberBg:   'rgba(217,119,6,0.1)',
+  blue:      '#2563EB',
+  blueBg:    'rgba(37,99,235,0.1)',
+  teal:      '#059669',
 }
 
 // ─── Currency ─────────────────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ export function StatusBadge({ status }: { status: string }): React.JSX.Element {
   return (
     <span
       className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider font-mono whitespace-nowrap"
-      style={{ color: cfg.color, backgroundColor: cfg.bg, border: `1px solid ${cfg.color}40` }}
+      style={{ color: cfg.color, backgroundColor: cfg.bg, border: `1px solid ${cfg.color}30` }}
     >
       {cfg.label}
     </span>
@@ -100,7 +100,7 @@ export function PageLoader(): React.JSX.Element {
         <div className="relative w-9 h-9">
           <div
             className="absolute inset-0 rounded-full border-2"
-            style={{ borderColor: 'rgba(249,115,22,0.15)' }}
+            style={{ borderColor: 'rgba(249,115,22,0.2)' }}
           />
           <div
             className="absolute inset-0 rounded-full border-2 border-transparent animate-spin"
@@ -161,7 +161,7 @@ export function AdminModal({
           className="flex items-center justify-between px-5 py-4 flex-shrink-0"
           style={{ borderBottom: `1px solid ${T.border}` }}
         >
-          <h2 className="text-base font-display font-bold text-white">{title}</h2>
+          <h2 className="text-base font-display font-bold text-foreground">{title}</h2>
           <button
             onClick={onClose}
             className="flex items-center justify-center w-7 h-7 rounded-lg text-xl leading-none transition-colors font-sans"
@@ -218,9 +218,10 @@ export function ConfirmModal({
 
 /** Combined input className — no need for separate style object */
 export const inputCls = [
-  'w-full rounded-xl px-3 py-2.5 text-sm text-white font-sans',
-  'focus:outline-none focus:ring-1 focus:ring-orange-500/60',
+  'w-full rounded-xl px-3 py-2.5 text-sm text-foreground font-sans',
+  'focus:outline-none focus:ring-2 focus:ring-orange-500/50',
   'transition-[border-color,box-shadow] duration-150',
+  'hover:border-blue-400',
 ].join(' ')
 
 export const inputStyle = { backgroundColor: T.bg, border: `1px solid ${T.border}` }
@@ -266,7 +267,7 @@ export function Tr({ children, onClick }: { children: React.ReactNode, onClick?:
       className={`transition-colors duration-100 ${onClick ? 'cursor-pointer' : ''}`}
       style={{ borderBottom: `1px solid ${T.border}` }}
       onClick={onClick}
-      onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'}
+      onMouseEnter={e => e.currentTarget.style.backgroundColor = 'hsl(var(--muted) / 0.5)'}
       onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
     >
       {children}
@@ -279,7 +280,7 @@ export function Tr({ children, onClick }: { children: React.ReactNode, onClick?:
 export function PageTitle({ children, subtitle }: { children: React.ReactNode, subtitle?: string }): React.JSX.Element {
   return (
     <div>
-      <h1 className="text-2xl sm:text-3xl font-display font-bold text-white text-balance">{children}</h1>
+      <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground text-balance">{children}</h1>
       {subtitle && <p className="text-sm font-sans mt-1" style={{ color: T.muted }}>{subtitle}</p>}
     </div>
   )
@@ -340,7 +341,7 @@ export function BtnSecondary({
       onClick={onClick}
       disabled={disabled}
       className={`
-        px-4 py-2 rounded-xl text-sm font-sans font-medium text-white
+        px-4 py-2 rounded-xl text-sm font-sans font-medium text-foreground
         transition-[background-color,transform,opacity] duration-150
         active:scale-[0.96] disabled:opacity-50 disabled:cursor-not-allowed
         ${className}

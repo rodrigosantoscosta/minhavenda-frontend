@@ -1,57 +1,52 @@
-# Next Steps & Pending Work
+﻿# Next Steps & Pending Work
 
 ## High Priority
 
-- [ ] **Create Module 4: The Smart Cart** — optimistic UI, debounced sync, mock fallback, how cart uses auth state
-- [ ] **Assemble full course HTML** — run build.sh or manually combine _base.html, all modules, and _footer.html into a single index.html
-- [ ] **Fix remaining TypeScript errors** — 828 errors remain in components, pages, and contexts (prop types, context usage, missing dependencies)
-- [ ] **Wire `startPolling` token argument in `AuthContext.tsx`** — `notificationService.startPolling`
-  now requires a second `token` argument. Update the call site in `AuthContext`:
-  ```ts
-  startPolling(addNotification, authService.getToken())
-  ```
-  Without this, the SSE connection will be rejected as unauthenticated (401).
-- [ ] **Run full Playwright test suite** — verify all E2E tests pass with TypeScript codebase
+- [ ] Add dark mode toggle for admin panel (optional, currently light-only)
+- [ ] Create reusable `AdminDataTable.tsx` component with sorting and pagination
+- [ ] Create `AdminStatCard.tsx` component for KPI cards
+- [ ] Apply minimalist redesign to remaining pages (ProductDetail, Cart, Checkout, Orders, Profile)
 
 ## Medium Priority
 
-- [ ] Extract error handling to `useFormError` hook — reusable across Login, Register, Checkout.
-- [ ] Standardize API error response handling via `src/utils/errorHandler.js`.
-- [ ] Review 401 interceptor in `api.js` to exclude password reset and email verification endpoints.
-- [ ] Add "Mark all as read" button to NotificationBell dropdown.
-- [ ] Show notification count on mobile menu (bell is desktop-only; add badge to mobile user info block).
-- [ ] Add SSE connection status indicator — subtle "reconnecting…" state in NotificationBell when stream is down.
+- [ ] Audit remaining pages (Home, ProductDetail, Cart, Orders, Profile, Checkout) for any missed hardcoded colors
+- [ ] Add skeleton loading states to admin pages (currently only PageLoader spinner)
+- [ ] Add pagination to admin tables (Produtos, Pedidos, Categorias)
+- [ ] Verify all admin pages at 390px viewport width (iPhone 14)
+- [ ] Migrate remaining custom components to shadcn (custom modals, custom selects)
 
-## Low Priority / Nice to Have
+## Low Priority
 
-- [ ] Add unit tests for `useNotifications` hook (localStorage persistence, max-20 cap, markAsRead, sort order).
-- [ ] Add unit tests for `notificationService.ts` — mock `fetch`, verify SSE parser handles partial
-  chunks, blank lines, and unknown event names correctly.
-- [ ] Add form validation hook `useFormValidation.js`.
-- [ ] Lazy load pages with `React.lazy()` for bundle splitting.
-- [ ] Add `React.memo` to pure presentational components.
-- [ ] Improve accessibility — ARIA labels for bell button and dropdown items.
-- [ ] Add clear-all-notifications option (expose `clearAll` from hook in the UI).
+- [ ] Add `loading="lazy"` to below-fold admin product images
+- [ ] Consider lazy-loading recharts library on admin dashboard
 
 ## Completed
+- [x] Header: Centered search bar, simplified layout — done 2026-05-17
+- [x] CategoryNav: Simplified to text links, only "Todos" as dark pill — done 2026-05-17
+- [x] SearchBar: Minimal design, icon on left, no buttons — done 2026-05-17
+- [x] ProductCard: Removed buttons, added hover text highlight, vertical layout, 4-column grid — done 2026-05-17
+- [x] Minimalist redesign: Header (no announcement bar, no MV badge, shadcn DropdownMenu) — done 2026-05-17
+- [x] Phase 9: Admin dashboard polish (aria-labels, focus rings, mobile layouts, touch targets, hover states) — done 2026-05-17
+- [x] ProductCardSkeleton updated to new design system — done 2026-05-17
+- [x] AdminCategorias mobile card layout added — done 2026-05-17
+- [x] Apply make-interfaces-feel-better skill (transition-all fixes, image outlines, scale on press) — done 2026-05-17
 
-- [x] Module 5: The Admin Empire — admin dashboard, DLQ, role-based access, two-tier architecture — done 2026-04-10
-- [x] Module 3: Auth, Tokens, and Silent Refresh — dual-token JWT, silent refresh, Google OAuth, interceptor 401 handling — done 2026-04-10
-- [x] Complete TypeScript migration of mock service files (factories.ts, mockProductService.ts) — done 2026-04-08
-- [x] Complete TypeScript migration of entire codebase (84 files) — done 2026-04-07
-- [x] DRE date selection: Inline native date inputs (no modals) — done 2026-04-07
-- [x] DRE Custom Date Panel: Two separate modals for start/end date selection — done 2026-04-07
-- [x] DRE Custom Date Panel UX flow improvement (step indicator, disabled dates, better guidance) — done 2026-04-07
-- [x] Period selector UI/UX overhaul on DRE Module (preset pills, mobile-first, 44px targets, scale-on-press, shadow button) — done 2026-04-07
-- [x] Replace polling with SSE in `notificationService.js` — `fetch` + `ReadableStream` with JWT auth,
-  SSE parser, auto-reconnect, `AbortController` on logout — done 2026-03-07
-- [x] `case 429` block in `api.js` + `api:rate-limited` CustomEvent (manual apply pending) — done 2026-03-07
-- [x] `docs/CHANGES_EXPLAINED.md` — plain-language explanation of both changes — done 2026-03-07
-- [x] In-app notification system for pedidos (bell icon, dropdown, localStorage persistence, unread badge, mark-as-read) — done 2026-03-07
-- [x] Polling bridge for RabbitMQ async order events — done 2026-03-07
-- [x] Cancel Order button on OrderDetail for PENDENTE/PAGO statuses — done 2026-03-07
-- [x] Notification fired on checkout order creation — done 2026-03-07
-- [x] AGENTS.md rule for LAST_CHANGES.md and NEXT_STEPS.md — done 2026-03-07
-- [x] Login error display fix (sessionStorage pattern) — done previously
-- [x] Form submission preventDefault fix — done previously
-- [x] AuthContext token expiration monitoring — done previously
+- [x] Button.tsx danger variant migrated to bg-destructive â€” done 2026-05-17
+- [x] AdminDashboard chart colors adjusted for light theme accessibility â€” done 2026-05-17
+- [x] Admin panel dark â†’ light theme migration (14 files) â€” done 2026-05-17
+- [x] SearchPage + Checkout shadcn/ui CSS variables migration â€” done 2026-05-17
+- [x] Pagination.tsx migration â€” done 2026-05-17
+- [x] AddressForm.tsx migration â€” done 2026-05-17
+- [x] Button.tsx secondary/ghost/white variants migration â€” done 2026-05-17
+- [x] OrderSummary.tsx migration â€” done 2026-05-17
+- [x] SuccessModal.tsx migration â€” done 2026-05-17
+- [x] shadcn/ui ALL 12 componentes â€” done 2026-05-04
+- [x] Setup CSS variables + dark mode â€” done 2026-05-04
+- [x] Login page redesign â€” done 2026-05-04
+- [x] Register page redesign â€” done 2026-05-04
+- [x] Home page: Hero + FeaturedCategories â€” done 2026-05-04
+- [x] ProductCard redesign (ui/Badge, ui/Button, CSS variables) â€” done 2026-05-04
+- [x] Fix ProtectedRoute â€” done 2026-05-04
+- [x] Login tests â€” done 2026-05-04
+
+

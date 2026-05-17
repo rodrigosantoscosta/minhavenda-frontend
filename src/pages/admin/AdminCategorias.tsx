@@ -7,6 +7,14 @@ import adminService from '../../services/adminService'
 import { formatDate, PageLoader, EmptyState, AdminCard, ConfirmModal, PageTitle, Th, Tr, inputCls, inputStyle, BtnPrimary } from '../../utils/adminUtils'
 import { useToast } from '../../components/common/Toast'
 
+function ActionBtn({ onClick, icon: Icon, color, ariaLabel }: { onClick: () => void; icon: React.ElementType; color: string; ariaLabel?: string }) {
+  return (
+    <button onClick={onClick} className="p-1.5 rounded-md transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center" style={{ color }} aria-label={ariaLabel}>
+      <Icon size={14} />
+    </button>
+  )
+}
+
 export default function AdminCategorias() {
   const [categorias, setCategorias] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -15,7 +23,6 @@ export default function AdminCategorias() {
   const [editId, setEditId] = useState<string | number | null>(null)
   const [editForm, setEditForm] = useState({ nome: '', descricao: '' })
   const [deleteId, setDeleteId] = useState<string | number | null>(null)
-  const [saving, setSaving] = useState(false)
   const toast = useToast()
 
   useEffect(() => {
@@ -27,7 +34,6 @@ export default function AdminCategorias() {
 
   const handleCreate = async () => {
     if (!newForm.nome) { toast.error('Nome é obrigatório'); return }
-    setSaving(true)
     try {
       const cat = await adminService.criarCategoria({ nome: newForm.nome, descricao: newForm.descricao } as any)
       setCategorias(cs => [...cs, cat])
@@ -35,19 +41,16 @@ export default function AdminCategorias() {
       setCreating(false)
       toast.success('Categoria criada!')
     } catch (err) { toast.error((err as any)?.response?.data?.message || 'Erro ao criar') }
-    finally { setSaving(false) }
   }
 
   const handleEdit = async () => {
     if (!editId || !editForm.nome) return
-    setSaving(true)
     try {
       const cat = await adminService.atualizarCategoria(editId, editForm)
       setCategorias(cs => cs.map(c => c.id === editId ? cat : c))
       setEditId(null)
       toast.success('Categoria atualizada!')
     } catch { toast.error('Erro ao atualizar') }
-    finally { setSaving(false) }
   }
 
   const handleDelete = async () => {
@@ -63,9 +66,6 @@ export default function AdminCategorias() {
   const setEdit = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setEditForm(f => ({ ...f, [k]: e.target.value }))
 
   const inlineCls = `${inputCls} py-1.5`
-  const ActionBtn = ({ onClick, icon: Icon, color }: { onClick: () => void; icon: React.ElementType; color: string }) => (
-    <button onClick={onClick} className="p-1.5 rounded-md transition-colors" style={{ color }}><Icon size={14} /></button>
-  )
 
   return (
     <AdminLayout>
@@ -75,74 +75,118 @@ export default function AdminCategorias() {
           <BtnPrimary onClick={() => setCreating(true)}><FiPlus size={16} /> Nova Categoria</BtnPrimary>
         </div>
 
-        <AdminCard>
-          {loading ? <PageLoader /> : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead><tr>
-                  <Th>ID</Th><Th>Nome</Th><Th>Descrição</Th><Th>Ativo</Th><Th>Criado em</Th><Th>Ações</Th>
-                </tr></thead>
-                <tbody>
-                  {/* New row */}
-                  {creating && (
-                    <tr style={{ backgroundColor: 'rgba(249,115,22,0.05)', borderBottom: '1px solid #1E2028' }}>
-                      <td className="px-5 py-3 text-xs font-mono" style={{ color: '#6B7280' }}>novo</td>
-                      <td className="px-5 py-3"><input autoFocus className={inlineCls} style={inputStyle} placeholder="Nome *" value={newForm.nome} onChange={setNew('nome')} /></td>
-                      <td className="px-5 py-3"><input className={inlineCls} style={inputStyle} placeholder="Descrição" value={newForm.descricao} onChange={setNew('descricao')} /></td>
-                      <td className="px-5 py-3 text-xs" style={{ color: '#6B7280' }}>Ativo</td>
-                      <td></td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-1">
-                          <ActionBtn onClick={handleCreate} icon={saving ? FiCheck : FiCheck} color="#22C55E" />
-                          <ActionBtn onClick={() => setCreating(false)} icon={FiX} color="#6B7280" />
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-
-                  {categorias.length === 0 && !creating
-                    ? <tr><td colSpan={6}><EmptyState message="Nenhuma categoria" /></td></tr>
-                    : categorias.map(c => (
-                      <Tr key={c.id}>
-                        <td className="px-5 py-3 text-xs font-mono" style={{ color: '#6B7280' }}>{c.id}</td>
-                        {editId === c.id ? (
-                          <>
-                            <td className="px-5 py-3"><input autoFocus className={inlineCls} style={inputStyle} value={editForm.nome} onChange={setEdit('nome')} /></td>
-                            <td className="px-5 py-3"><input className={inlineCls} style={inputStyle} value={editForm.descricao} onChange={setEdit('descricao')} /></td>
-                            <td colSpan={2}></td>
-                            <td className="px-5 py-3">
-                              <div className="flex items-center gap-1">
-                                <ActionBtn onClick={handleEdit} icon={FiCheck} color="#22C55E" />
-                                <ActionBtn onClick={() => setEditId(null)} icon={FiX} color="#6B7280" />
-                              </div>
-                            </td>
-                          </>
-                        ) : (
-                          <>
-                            <td className="px-5 py-3 text-sm font-medium text-white">{c.nome}</td>
-                            <td className="px-5 py-3 text-sm" style={{ color: '#9CA3AF' }}>{c.descricao || '—'}</td>
-                            <td className="px-5 py-3">
-                              <span className="text-xs font-mono uppercase px-2 py-0.5 rounded-md"
-                                style={c.ativo ? { color: '#22C55E', backgroundColor: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' } : { color: '#6B7280', backgroundColor: '#1E2028', border: '1px solid #2a2d38' }}>
-                                {c.ativo ? 'Ativo' : 'Inativo'}
-                              </span>
-                            </td>
-                            <td className="px-5 py-3 text-xs font-mono" style={{ color: '#9CA3AF' }}>{formatDate((c as any).dataCadastro)}</td>
-                            <td className="px-5 py-3">
-                              <div className="flex items-center gap-1">
-                                <ActionBtn onClick={() => { setEditId(c.id); setEditForm({ nome: c.nome, descricao: c.descricao || '' }) }} icon={FiEdit2} color="#6B7280" />
-                                <ActionBtn onClick={() => setDeleteId(c.id)} icon={FiTrash2} color="#6B7280" />
-                              </div>
-                            </td>
-                          </>
-                        )}
-                      </Tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+        {/* Mobile card list */}
+        <div className="sm:hidden space-y-3">
+          {loading ? <PageLoader /> : categorias.length === 0 ? <EmptyState message="Nenhuma categoria" /> : (
+            categorias.map(c => (
+              <AdminCard key={c.id} className="p-4">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{c.nome}</p>
+                    <p className="text-xs font-sans mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{c.descricao || 'Sem descrição'}</p>
+                  </div>
+                  <span className="text-xs font-mono uppercase px-2 py-0.5 rounded-md shrink-0"
+                    style={c.ativo ? { color: '#16A34A', backgroundColor: 'rgba(22,163,74,0.1)', border: '1px solid rgba(22,163,74,0.2)' } : { color: 'hsl(var(--muted-foreground))', backgroundColor: 'hsl(var(--muted))', border: '1px solid hsl(var(--border))' }}>
+                    {c.ativo ? 'Ativo' : 'Inativo'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-sans" style={{ color: 'hsl(var(--muted-foreground))' }}>{formatDate((c as any).dataCadastro)}</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => { setEditId(c.id); setEditForm({ nome: c.nome, descricao: c.descricao || '' }) }}
+                      className="p-2 rounded-xl min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
+                      style={{ color: 'hsl(var(--muted-foreground))' }}
+                      aria-label={`Editar categoria ${c.nome}`}
+                    >
+                      <FiEdit2 size={16} />
+                    </button>
+                    <button
+                      onClick={() => setDeleteId(c.id)}
+                      className="p-2 rounded-xl min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
+                      style={{ color: 'hsl(var(--muted-foreground))' }}
+                      aria-label={`Excluir categoria ${c.nome}`}
+                    >
+                      <FiTrash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              </AdminCard>
+            ))
           )}
-        </AdminCard>
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden sm:block">
+          <AdminCard>
+            {loading ? <PageLoader /> : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead><tr>
+                    <Th>ID</Th><Th>Nome</Th><Th>Descrição</Th><Th>Ativo</Th><Th>Criado em</Th><Th>Ações</Th>
+                  </tr></thead>
+                  <tbody>
+                    {/* New row */}
+                    {creating && (
+                      <tr style={{ backgroundColor: 'rgba(249,115,22,0.05)', borderBottom: '1px solid hsl(var(--border))' }}>
+                        <td className="px-5 py-3 text-xs font-mono" style={{ color: 'hsl(var(--muted-foreground))' }}>novo</td>
+                        <td className="px-5 py-3"><input autoFocus className={inlineCls} style={inputStyle} placeholder="Nome *" value={newForm.nome} onChange={setNew('nome')} /></td>
+                        <td className="px-5 py-3"><input className={inlineCls} style={inputStyle} placeholder="Descrição" value={newForm.descricao} onChange={setNew('descricao')} /></td>
+                        <td className="px-5 py-3 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>Ativo</td>
+                        <td></td>
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-1">
+                            <ActionBtn onClick={handleCreate} icon={FiCheck} color="#22C55E" ariaLabel="Confirmar criação" />
+                            <ActionBtn onClick={() => setCreating(false)} icon={FiX} color="hsl(var(--muted-foreground))" ariaLabel="Cancelar criação" />
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+
+                    {categorias.length === 0 && !creating
+                      ? <tr><td colSpan={6}><EmptyState message="Nenhuma categoria" /></td></tr>
+                      : categorias.map(c => (
+                        <Tr key={c.id}>
+                          <td className="px-5 py-3 text-xs font-mono" style={{ color: 'hsl(var(--muted-foreground))' }}>{c.id}</td>
+                          {editId === c.id ? (
+                            <>
+                              <td className="px-5 py-3"><input autoFocus className={inlineCls} style={inputStyle} value={editForm.nome} onChange={setEdit('nome')} /></td>
+                              <td className="px-5 py-3"><input className={inlineCls} style={inputStyle} value={editForm.descricao} onChange={setEdit('descricao')} /></td>
+                              <td colSpan={2}></td>
+                              <td className="px-5 py-3">
+                                <div className="flex items-center gap-1">
+                                  <ActionBtn onClick={handleEdit} icon={FiCheck} color="#22C55E" ariaLabel="Confirmar edição" />
+                                  <ActionBtn onClick={() => setEditId(null)} icon={FiX} color="hsl(var(--muted-foreground))" ariaLabel="Cancelar edição" />
+                                </div>
+                              </td>
+                            </>
+                          ) : (
+                            <>
+                              <td className="px-5 py-3 text-sm font-medium text-foreground">{c.nome}</td>
+                              <td className="px-5 py-3 text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{c.descricao || '—'}</td>
+                              <td className="px-5 py-3">
+                                <span className="text-xs font-mono uppercase px-2 py-0.5 rounded-md"
+                                  style={c.ativo ? { color: '#16A34A', backgroundColor: 'rgba(22,163,74,0.1)', border: '1px solid rgba(22,163,74,0.2)' } : { color: 'hsl(var(--muted-foreground))', backgroundColor: 'hsl(var(--muted))', border: '1px solid hsl(var(--border))' }}>
+                                  {c.ativo ? 'Ativo' : 'Inativo'}
+                                </span>
+                              </td>
+                              <td className="px-5 py-3 text-xs font-mono" style={{ color: 'hsl(var(--muted-foreground))' }}>{formatDate((c as any).dataCadastro)}</td>
+                              <td className="px-5 py-3">
+                                <div className="flex items-center gap-1">
+                                  <ActionBtn onClick={() => { setEditId(c.id); setEditForm({ nome: c.nome, descricao: c.descricao || '' }) }} icon={FiEdit2} color="hsl(var(--muted-foreground))" ariaLabel={`Editar categoria ${c.nome}`} />
+                                  <ActionBtn onClick={() => setDeleteId(c.id)} icon={FiTrash2} color="hsl(var(--muted-foreground))" ariaLabel={`Excluir categoria ${c.nome}`} />
+                                </div>
+                              </td>
+                            </>
+                          )}
+                        </Tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </AdminCard>
+        </div>
       </div>
 
       <ConfirmModal open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={handleDelete} title="Excluir Categoria" message="Esta categoria será excluída permanentemente." />

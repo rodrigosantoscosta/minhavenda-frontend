@@ -80,7 +80,7 @@ const PresetPill = forwardRef<HTMLButtonElement, { label: string; active: boolea
       color:  active ? T.accent : T.sub,
       border: `1px solid ${active ? T.accentBd : T.border}`,
     }}
-    onMouseEnter={e => { if (!active) { e.currentTarget.style.borderColor = T.border2; e.currentTarget.style.color = '#E5E7EB' } }}
+    onMouseEnter={e => { if (!active) { e.currentTarget.style.borderColor = T.border2; e.currentTarget.style.color = 'hsl(var(--foreground))' } }}
     onMouseLeave={e => { if (!active) { e.currentTarget.style.borderColor = T.border;  e.currentTarget.style.color = T.sub   } }}
   >
     {active && <FiCheck size={11} />}
@@ -229,7 +229,7 @@ export default function AdminRelatoriosFinanceiros() {
                       style={{
                         backgroundColor: T.bg,
                         border: `1px solid ${T.border}`,
-                        color: '#E5E7EB',
+                        color: 'hsl(var(--foreground))',
                         WebkitAppearance: 'none',
                         MozAppearance: 'textfield',
                         appearance: 'none',
@@ -287,7 +287,7 @@ export default function AdminRelatoriosFinanceiros() {
                       style={{
                         backgroundColor: T.bg,
                         border: `1px solid ${T.border}`,
-                        color: '#E5E7EB',
+                        color: 'hsl(var(--foreground))',
                         WebkitAppearance: 'none',
                         MozAppearance: 'textfield',
                         appearance: 'none',
@@ -330,7 +330,7 @@ export default function AdminRelatoriosFinanceiros() {
                   style={{
                     backgroundColor: T.accent,
                     color: '#000',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(249,115,22,0.15)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1), 0 4px 12px rgba(249,115,22,0.15)',
                   }}
                   onMouseEnter={e => { if (!loading) e.currentTarget.style.backgroundColor = '#EA6C10' }}
                   onMouseLeave={e => { if (!loading) e.currentTarget.style.backgroundColor = T.accent }}

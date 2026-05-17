@@ -18,14 +18,14 @@ const NAV_ITEMS = [
 
 // Design tokens
 const T = {
-  bg:      '#0A0B0E',
-  surface: '#0D0E12',
-  card:    '#111318',
-  border:  '#1E2028',
-  muted:   '#6B7280',
-  sub:     '#9CA3AF',
+  bg:      'hsl(var(--background))',
+  surface: 'hsl(var(--card))',
+  card:    'hsl(var(--card))',
+  border:  'hsl(var(--border))',
+  muted:   'hsl(var(--muted-foreground))',
+  sub:     'hsl(var(--muted-foreground))',
   accent:  '#F97316',
-  accentBg:'rgba(249,115,22,0.12)',
+  accentBg:'rgba(249,115,22,0.1)',
 }
 
 function SidebarContent({ onNavClick, onLogout }: { onNavClick: () => void; onLogout: () => void }) {
@@ -87,7 +87,7 @@ function SidebarContent({ onNavClick, onLogout }: { onNavClick: () => void; onLo
           onClick={onLogout}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-sans transition-colors duration-150 hover:text-white"
           style={{ color: T.muted }}
-          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)'}
+          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'hsl(var(--muted) / 0.5)'}
           onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
         >
           <FiLogOut size={16} />
@@ -118,7 +118,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div
       className="flex h-screen overflow-hidden"
-      style={{ backgroundColor: T.bg, color: '#fff' }}
+      style={{ backgroundColor: T.bg, color: 'hsl(var(--foreground))' }}
     >
       {/* ── Desktop sidebar — always visible lg+ ── */}
       <aside
@@ -131,7 +131,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* ── Mobile drawer backdrop ── */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/30 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -150,7 +150,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           onClick={() => setMobileOpen(false)}
           className="absolute top-4 right-4 p-1.5 rounded-lg transition-colors"
           style={{ color: T.muted }}
-          onMouseEnter={e => e.currentTarget.style.color = '#fff'}
+          onMouseEnter={e => e.currentTarget.style.color = 'hsl(var(--foreground))'}
           onMouseLeave={e => e.currentTarget.style.color = T.muted}
           aria-label="Fechar menu"
         >
@@ -171,7 +171,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             onClick={() => setMobileOpen(true)}
             className="flex items-center justify-center w-9 h-9 rounded-xl transition-colors"
             style={{ color: T.muted }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)'}
+            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'hsl(var(--muted) / 0.5)'}
             onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
             aria-label="Abrir menu"
           >
@@ -187,7 +187,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           {/* Current page breadcrumb */}
-          <p className="text-sm font-display font-semibold text-white flex-1 truncate">
+          <p className="text-sm font-display font-semibold text-foreground flex-1 truncate">
             {currentPage}
           </p>
         </header>

@@ -8,7 +8,7 @@ const TOOLTIP_STYLE = {
   border: `1px solid ${T.border}`,
   borderRadius: 8,
   fontSize: 12,
-  color: '#fff',
+  color: 'hsl(var(--foreground))',
 }
 
 const CATEGORY_COLORS = {
@@ -59,7 +59,7 @@ export default function DespesasReport({ data }: DespesasReportProps) {
             <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: T.muted }}>
               Total de Despesas Operacionais
             </p>
-            <p className="text-2xl font-bold text-white">{formatBRL(total)}</p>
+            <p className="text-2xl font-bold text-foreground">{formatBRL(total)}</p>
           </div>
         </div>
       </AdminCard>
@@ -69,7 +69,7 @@ export default function DespesasReport({ data }: DespesasReportProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Chart */}
           <AdminCard className="p-6">
-            <p className="text-sm font-semibold text-white mb-5">Despesas por Categoria</p>
+            <p className="text-sm font-semibold text-foreground mb-5">Despesas por Categoria</p>
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
                 <Pie
@@ -107,7 +107,7 @@ export default function DespesasReport({ data }: DespesasReportProps) {
             <div className="px-6 py-4" style={{ borderBottom: `1px solid ${T.border}` }}>
               <div className="flex items-center gap-2">
                 <FiTag size={16} style={{ color: T.sub }} />
-                <p className="text-sm font-semibold text-white">Detalhamento</p>
+                <p className="text-sm font-semibold text-foreground">Detalhamento</p>
               </div>
             </div>
             <div className="overflow-x-auto">
@@ -124,7 +124,7 @@ export default function DespesasReport({ data }: DespesasReportProps) {
                     const pct = total > 0 ? (d.total / total) * 100 : 0
                     return (
                       <Tr key={d.categoria}>
-                        <td className="px-6 py-3 text-sm font-sans text-white">
+                        <td className="px-6 py-3 text-sm font-sans text-foreground">
                           <div className="flex items-center gap-2">
                             <span
                               className="w-3 h-3 rounded-full flex-shrink-0"

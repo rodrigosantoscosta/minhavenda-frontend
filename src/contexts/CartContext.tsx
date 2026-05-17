@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+/* eslint-disable react-refresh/only-export-components */
 import type { ReactNode } from 'react'
 import type { CartItem, Cart, Product } from '../types'
 import useAuthToken from '../hooks/useAuthToken'

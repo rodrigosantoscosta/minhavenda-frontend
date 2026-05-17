@@ -50,12 +50,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   // Skill: shadows-as-borders for elevation variants
   const variantStyles = {
     primary:   'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 focus:ring-ring/50 shadow-card hover:shadow-card-hover',
-    secondary: 'bg-gray-700 text-white hover:bg-gray-800 active:bg-gray-900 focus:ring-gray-500/50 shadow-card hover:shadow-card-hover',
+    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 active:bg-secondary/90 focus:ring-ring/50 shadow-card hover:shadow-card-hover',
     outline:   'bg-transparent border-2 border-primary text-primary hover:bg-muted active:bg-muted/80 focus:ring-ring/50',
-    danger:    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-500/50 shadow-card hover:shadow-card-hover',
-    ghost:     'bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-400/50',
+    danger:    'bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 focus:ring-destructive/50 shadow-card hover:shadow-card-hover',
+    ghost:     'bg-transparent text-foreground hover:bg-accent active:bg-accent/80 focus:ring-ring/50',
     // Skill: white variant used by ProductCard hover overlay
-    white:     'bg-white text-gray-900 hover:bg-gray-50 active:bg-gray-100 focus:ring-gray-400/50 shadow-card hover:shadow-card-hover',
+    white:     'bg-card text-foreground hover:bg-accent active:bg-accent/80 focus:ring-ring/50 shadow-card hover:shadow-card-hover',
     success:   'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 focus:ring-emerald-500/50 shadow-card hover:shadow-card-hover',
   }
 

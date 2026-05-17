@@ -18,7 +18,7 @@ function KpiCard({ label, value, icon: Icon, color, bg }: { label: string; value
           <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: T.muted }}>
             {label}
           </p>
-          <p className="text-xl font-bold text-white">{value}</p>
+          <p className="text-xl font-bold text-foreground">{value}</p>
         </div>
       </div>
     </AdminCard>
@@ -71,8 +71,8 @@ export default function DreReport({ data }: { data: DreReportData }) {
                        linha.descricao.includes('Líquido')
     return {
       fontWeight: isSubtotal ? 700 : 400,
-      color: isSubtotal ? '#fff' : T.sub,
-      backgroundColor: isSubtotal ? 'rgba(255,255,255,0.03)' : 'transparent',
+      color: isSubtotal ? 'hsl(var(--foreground))' : T.sub,
+      backgroundColor: isSubtotal ? 'hsl(var(--muted) / 0.3)' : 'transparent',
       borderTop: isSubtotal ? `1px solid ${T.border}` : 'none',
     }
   }
@@ -102,7 +102,7 @@ export default function DreReport({ data }: { data: DreReportData }) {
       {/* ── DRE Hierarchical Table ────────────────────────────────────── */}
       <AdminCard>
         <div className="px-6 py-4" style={{ borderBottom: `1px solid ${T.border}` }}>
-          <p className="text-sm font-semibold text-white">Demonstrativo de Resultado do Exercício</p>
+          <p className="text-sm font-semibold text-foreground">Demonstrativo de Resultado do Exercício</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">

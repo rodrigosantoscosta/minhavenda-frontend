@@ -248,10 +248,10 @@ export default function AddressForm({
             <FiMapPin className="w-5 h-5 text-foreground" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-foreground">
               Endereço de Entrega
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Informe onde deseja receber seu pedido
             </p>
           </div>
@@ -278,7 +278,7 @@ export default function AddressForm({
                 type="button"
                 onClick={handleCepSearch}
                 disabled={isSearchingCep || formData.cep.length !== 9}
-                className="p-2 text-foreground hover:bg-muted rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent border border-transparent hover:border-border flex items-center justify-center"
+                className="p-2 text-foreground hover:bg-muted rounded-lg transition-[background-color,border-color,color] duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent border border-transparent hover:border-border flex items-center justify-center"
                 title="Buscar CEP"
                 tabIndex={-1}
               >

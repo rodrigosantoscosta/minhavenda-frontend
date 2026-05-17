@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react'
+/* eslint-disable react-refresh/only-export-components */
 import type { ReactNode } from 'react'
 import { useNotifications } from '../hooks/useNotifications'
 

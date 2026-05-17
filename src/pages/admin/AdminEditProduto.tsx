@@ -57,16 +57,16 @@ export default function AdminEditProduto() {
   }
 
   if (loading) return <AdminLayout><PageLoader /></AdminLayout>
-  if (!produto) return <AdminLayout><p className="text-center py-20" style={{ color: '#6B7280' }}>Produto não encontrado</p></AdminLayout>
+  if (!produto) return <AdminLayout><p className="text-center py-20" style={{ color: 'hsl(var(--muted-foreground))' }}>Produto não encontrado</p></AdminLayout>
 
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Link to="/admin/produtos" className="transition-colors hover:text-white" style={{ color: '#6B7280' }}><FiArrowLeft size={20} /></Link>
+          <Link to="/admin/produtos" className="transition-colors hover:text-foreground" style={{ color: 'hsl(var(--muted-foreground))' }} aria-label="Voltar para lista de produtos"><FiArrowLeft size={20} aria-hidden="true" /></Link>
           <div>
             <PageTitle>Editar Produto</PageTitle>
-            <p className="text-sm mt-0.5" style={{ color: '#6B7280' }}>{produto.nome} · {formatBRL(produto.preco)}</p>
+            <p className="text-sm mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{produto.nome} · {formatBRL(produto.preco)}</p>
           </div>
         </div>
 
@@ -89,7 +89,7 @@ export default function AdminEditProduto() {
             </AdminCard>
 
             <AdminCard className="p-6 space-y-4">
-              <p className="text-sm font-semibold text-white">Dimensões e Peso</p>
+              <p className="text-sm font-semibold text-foreground">Dimensões e Peso</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[['Peso (kg)', 'pesoKg'], ['Altura (cm)', 'alturaCm'], ['Largura (cm)', 'larguraCm'], ['Comprimento (cm)', 'comprimentoCm']].map(([lbl, k]) => (
                   <div key={k}><FieldLabel>{lbl}</FieldLabel><input type="number" step="0.01" className={inputCls} style={inputStyle} value={form[k as keyof typeof form] as string} onChange={set(k!)} /></div>
@@ -101,25 +101,28 @@ export default function AdminEditProduto() {
           {/* Right */}
           <div className="space-y-5">
             <AdminCard className="p-6">
-              <p className="text-sm font-semibold text-white mb-3">Imagem</p>
+              <p className="text-sm font-semibold text-foreground mb-3">Imagem</p>
               {form.urlImagem && (
-                <img src={form.urlImagem} alt="preview" className="w-full aspect-square object-cover rounded-xl mb-3" style={{ border: '1px solid #1E2028' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                <img src={form.urlImagem} alt="preview" className="w-full aspect-square object-cover rounded-xl mb-3 outline outline-1 -outline-offset-1 outline-black/10" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
               )}
               <FieldLabel>URL da Imagem</FieldLabel>
               <input className={inputCls} style={inputStyle} value={form.urlImagem} onChange={set('urlImagem')} placeholder="https://..." />
             </AdminCard>
 
             <AdminCard className="p-6">
-              <p className="text-sm font-semibold text-white mb-4">Status</p>
+              <p className="text-sm font-semibold text-foreground mb-4">Status</p>
               <div className="flex items-center justify-between">
-                <span className="text-sm" style={{ color: '#9CA3AF' }}>Produto ativo</span>
+                <span className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>Produto ativo</span>
                 <button
                   type="button"
                   onClick={() => setForm(f => ({ ...f, ativo: !f.ativo }))}
-                  className="relative w-12 h-6 rounded-full transition-colors"
-                  style={{ backgroundColor: form.ativo ? '#F97316' : '#1E2028' }}
+                  className="relative w-12 h-6 rounded-full transition-colors min-w-[44px] min-h-[44px]"
+                  style={{ backgroundColor: form.ativo ? '#F97316' : 'hsl(var(--border))' }}
+                  aria-label={form.ativo ? 'Desativar produto' : 'Ativar produto'}
+                  role="switch"
+                  aria-checked={form.ativo}
                 >
-                  <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform" style={{ transform: form.ativo ? 'translateX(24px)' : 'translateX(2px)' }} />
+                  <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform" style={{ transform: form.ativo ? 'translateX(24px)' : 'translateX(2px)' }} />
                 </button>
               </div>
             </AdminCard>

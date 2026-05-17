@@ -107,13 +107,13 @@ const SearchPage = () => {
 
   if (!isLoading && produtos.length === 0 && !error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-1">
+            <h1 className="text-3xl font-bold text-foreground mb-1">
               {searchTerm ? `Resultados para "${searchTerm}"` : 'Buscar Produtos'}
             </h1>
-            <p className="text-gray-600">0 produtos encontrados</p>
+            <p className="text-muted-foreground">0 produtos encontrados</p>
           </div>
           <EmptyState
             title="Nenhum produto encontrado"
@@ -131,15 +131,15 @@ const SearchPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-1">
+          <h1 className="text-3xl font-bold text-foreground mb-1">
             {searchTerm ? `Resultados para "${searchTerm}"` : 'Buscar Produtos'}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             {pagination.totalElements > 0
               ? `${pagination.totalElements} produto${pagination.totalElements !== 1 ? 's' : ''} encontrado${pagination.totalElements !== 1 ? 's' : ''}`
               : '\u00a0'}
@@ -150,7 +150,7 @@ const SearchPage = () => {
         <div className="mb-4 lg:hidden">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-gray-700"
+            className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:bg-accent text-sm text-foreground"
           >
             <FiFilter size={16} />
             Filtros
@@ -163,7 +163,7 @@ const SearchPage = () => {
           {/* Sidebar */}
           <aside className={`w-64 flex-shrink-0 lg:block ${showFilters ? 'block' : 'hidden'}`}>
             {/* Ordenação */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+            <div className="bg-card rounded-lg border border-border p-4 mb-4">
               <SortOptions
                 value={currentParams.sort || 'nome:asc'}
                 onChange={handleSortChange}

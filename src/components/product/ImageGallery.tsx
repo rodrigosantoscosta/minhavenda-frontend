@@ -71,7 +71,7 @@ export default function ImageGallery({
               <button
                 key={index}
                 onClick={() => onSelectImage(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
+                className={`w-2 h-2 rounded-full transition-[background-color,transform] ${
                   index === selectedIndex
                     ? 'bg-white w-8'
                     : 'bg-white bg-opacity-50 hover:bg-opacity-75'
@@ -90,7 +90,7 @@ export default function ImageGallery({
             <button
               key={index}
               onClick={() => onSelectImage(index)}
-              className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+              className={`aspect-square rounded-lg overflow-hidden border-2 transition-[border-color,transform] ${
                 index === selectedIndex
                   ? 'border-foreground ring-2 ring-ring/30'
                   : 'border-gray-200 hover:border-gray-300'

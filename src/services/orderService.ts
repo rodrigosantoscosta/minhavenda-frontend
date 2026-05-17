@@ -279,7 +279,7 @@ async function payOrderMock(orderId: string | number): Promise<Order> {
   await new Promise(resolve => setTimeout(resolve, 1000))
   const stored = localStorage.getItem('mockOrders')
   if (!stored) throw new Error('Pedido não encontrado')
-  let orders = JSON.parse(stored) as Order[]
+  const orders = JSON.parse(stored) as Order[]
   const orderIndex = orders.findIndex(o => o.id === orderId)
   if (orderIndex === -1) throw new Error('Pedido não encontrado')
   const order = orders[orderIndex]
@@ -369,7 +369,7 @@ function generateOrderHistory(order: Order): OrderHistoryEntry[] {
 
 function calculateDeliveryEstimate(order: Order): string | null {
   if (order.status === 'ENTREGUE' || order.status === 'CANCELADO') return null
-  let dataEstimada = new Date(order.dataCriacao)
+  const dataEstimada = new Date(order.dataCriacao)
   let diasAdicionados = 0
   while (diasAdicionados < 7) {
     dataEstimada.setDate(dataEstimada.getDate() + 1)
@@ -439,7 +439,7 @@ async function finalizeCheckoutMock(checkoutData: Record<string, unknown>): Prom
     observacoes: checkoutData.observacoes as string,
   }
   const stored = localStorage.getItem('mockOrders')
-  let orders = stored ? JSON.parse(stored) as Order[] : []
+  const orders = stored ? JSON.parse(stored) as Order[] : []
   orders.push(mockOrder)
   localStorage.setItem('mockOrders', JSON.stringify(orders))
   return mockOrder

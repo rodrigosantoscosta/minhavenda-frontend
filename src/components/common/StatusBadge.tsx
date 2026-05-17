@@ -247,7 +247,7 @@ export function StatusBadgeWithTooltip({
           absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2
           w-64 p-3 bg-gray-900 text-white text-sm rounded-lg
           opacity-0 invisible group-hover:opacity-100 group-hover:visible
-          transition-all duration-200 z-10
+          transition-[background-color,color,transform] duration-200 z-10
         `}>
           <div className="font-medium mb-1">{statusInfo.tooltip}</div>
           <div className="space-y-1">

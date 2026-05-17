@@ -48,35 +48,35 @@ export default function FeaturedCategories({
             key={categoria.id}
             onClick={() => onCategorySelect(isSelected ? null : categoria.id)}
             className={`
-              group flex flex-col items-center p-3 rounded-xl transition-all duration-300
+              group flex flex-col items-center p-3 rounded-xl transition-[background-color,transform,color] duration-300
               ${isSelected
-                ? 'bg-primary-600 text-white shadow-lg scale-105'
-                : 'bg-white hover:bg-primary-50 border border-gray-200 hover:border-primary-300 hover:shadow-md'
+                ? 'bg-primary text-primary-foreground shadow-lg scale-105'
+                : 'bg-background hover:bg-primary/5 border border-input hover:border-primary hover:shadow-md'
               }
             `}
           >
             <div className={`
               p-2.5 rounded-full mb-2 transition-colors
               ${isSelected
-                ? 'bg-white bg-opacity-20'
-                : 'bg-primary-100 group-hover:bg-primary-200'
+                ? 'bg-white/20'
+                : 'bg-primary/10 group-hover:bg-primary/20'
               }
             `}>
               <Icon 
                 size={18} 
-                className={isSelected ? 'text-white' : 'text-primary-600'}
+                className={isSelected ? 'text-primary-foreground' : 'text-primary'}
               />
             </div>
             <span className={`
               text-sm font-medium text-center transition-colors
-              ${isSelected ? 'text-white' : 'text-gray-700 group-hover:text-primary-600'}
+              ${isSelected ? 'text-primary-foreground' : 'text-foreground group-hover:text-primary'}
             `}>
               {categoria.nome}
             </span>
             {(categoria.totalProdutos ?? 0) > 0 && (
               <span className={`
                 text-xs mt-1 transition-colors
-                ${isSelected ? 'text-primary-100' : 'text-gray-500'}
+                ${isSelected ? 'text-primary-foreground/70' : 'text-muted-foreground'}
               `}>
                 {categoria.totalProdutos ?? 0} {categoria.totalProdutos === 1 ? 'produto' : 'produtos'}
               </span>

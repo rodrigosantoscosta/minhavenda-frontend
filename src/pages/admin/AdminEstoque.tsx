@@ -145,7 +145,7 @@ function SummaryBar({ rows, activeFilter, onFilter }: { rows: EstoqueRow[]; acti
         <div className="col-span-3 flex items-center gap-2 px-1">
           <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ backgroundColor: T.border }}>
             <div
-              className="h-full rounded-full transition-all duration-300"
+              className="h-full rounded-full transition-[width,background-color] duration-300"
               style={{ width: `${(loadedCount / total) * 100}%`, backgroundColor: T.accent }}
             />
           </div>
@@ -206,7 +206,7 @@ function StockModal({ open, onClose, action, produto, onSuccess }: {
         >
           <FiPackage size={16} style={{ color: T.muted }} />
           <div className="min-w-0">
-            <p className="text-sm font-sans font-medium text-white truncate">{produto?.nome}</p>
+            <p className="text-sm font-sans font-medium text-foreground truncate">{produto?.nome}</p>
             <p className="text-xs font-sans" style={{ color: T.muted }}>{produto?.categoriaNome || 'Sem categoria'}</p>
           </div>
           {produto?.estoque && (
@@ -236,7 +236,7 @@ function StockModal({ open, onClose, action, produto, onSuccess }: {
           <button
             onClick={submit}
             disabled={loading || !qty}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-sans font-semibold text-white transition-[opacity,transform] duration-150 active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-sans font-semibold text-foreground transition-[opacity,transform] duration-150 active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed"
             style={{ backgroundColor: accentColor }}
           >
             {loading ? 'Aguarde...' : 'Confirmar'}
@@ -371,20 +371,22 @@ export default function AdminEstoque() {
               <FiSearch size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: T.muted }} />
               <input
                 placeholder="Buscar produto..."
-                className="w-full rounded-xl pl-9 pr-3 py-2.5 text-sm text-white font-sans focus:outline-none focus:ring-1 focus:ring-orange-500/50 transition-[border-color,box-shadow] duration-150"
+                className="w-full rounded-xl pl-9 pr-3 py-2.5 text-sm text-foreground font-sans focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-[border-color,box-shadow] duration-150 hover:border-blue-400"
                 style={{ backgroundColor: T.card, border: `1px solid ${T.border}` }}
                 value={search}
                 onChange={e => setSearch(e.target.value)}
+                aria-label="Buscar produto por nome"
               />
             </div>
 
             {/* Category filter */}
             {categories.length > 1 && (
               <select
-                className="rounded-xl px-3 py-2.5 text-sm text-white font-sans focus:outline-none focus:ring-1 focus:ring-orange-500/50 transition-[border-color] duration-150"
+                className="rounded-xl px-3 py-2.5 text-sm text-foreground font-sans focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-[border-color] duration-150 hover:border-blue-400"
                 style={{ backgroundColor: T.card, border: `1px solid ${T.border}` }}
                 value={catFilter}
                 onChange={e => setCatFilter(e.target.value)}
+                aria-label="Filtrar por categoria"
               >
                 <option value="">Todas as categorias</option>
                 {categories.map(c => <option key={c} value={c}>{c}</option>)}
@@ -407,7 +409,7 @@ export default function AdminEstoque() {
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex-1 min-w-0">
                         <SeverityBadge qty={qty} />
-                        <p className="text-sm font-sans font-semibold text-white mt-1.5 truncate">{row.nome}</p>
+                        <p className="text-sm font-sans font-semibold text-foreground mt-1.5 truncate">{row.nome}</p>
                         <p className="text-xs font-sans mt-0.5" style={{ color: T.muted }}>{row.categoriaNome || 'Sem categoria'}</p>
                       </div>
                       <div className="text-right shrink-0">
@@ -451,7 +453,7 @@ export default function AdminEstoque() {
                             <Tr key={row.id}>
                               {/* Product */}
                               <td className="px-5 py-3.5">
-                                <p className="text-sm font-sans font-medium text-white">{row.nome}</p>
+                                <p className="text-sm font-sans font-medium text-foreground">{row.nome}</p>
                                 <p className="text-xs font-sans mt-0.5" style={{ color: T.muted }}>
                                   {row.categoriaNome || 'Sem categoria'}
                                 </p>

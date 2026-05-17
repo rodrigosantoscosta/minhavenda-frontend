@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { Spinner } from './Loading'
@@ -75,17 +75,12 @@ export function AdminRoute({ children }: { children: ReactNode }): React.JSX.Ele
 export function PublicRoute({ children, redirectTo = '/' }: PublicRouteProps): React.JSX.Element {
   const { isAuthenticated, loading } = useAuth()
 
-  // Only show spinner on initial auth check, not during login
-  const [initialCheck, setInitialCheck] = useState(true)
-
-  useEffect(() => {
-    if (!loading) {
-      setInitialCheck(false)
-    }
-  }, [loading])
+  // Show spinner only on the very first auth check (loading=true on mount).
+  // useState lazy initializer runs once — no setState-in-effect, no ref-in-render.
+  const [everLoaded] = useState(() => !loading)
 
   // Only show spinner during first mount check
-  if (loading && initialCheck) {
+  if (loading && !everLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Spinner />

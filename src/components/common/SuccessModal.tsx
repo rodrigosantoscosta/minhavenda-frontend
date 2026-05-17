@@ -143,47 +143,47 @@ export default function SuccessModal({
 
         {/* Mensagem Principal */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             Pedido Confirmado!
           </h2>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Seu pedido foi criado com sucesso e já está sendo processado.
           </p>
         </div>
 
         {/* Informações do Pedido */}
-        <div className="bg-gray-50 rounded-lg p-4 text-left space-y-3">
+        <div className="bg-muted/50 rounded-lg p-4 text-left space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Número do Pedido:</span>
+            <span className="text-sm text-muted-foreground">Número do Pedido:</span>
             <span className="font-mono font-semibold text-foreground">
               {order.id}
             </span>
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Data do Pedido:</span>
-            <span className="text-sm text-gray-900">
+            <span className="text-sm text-muted-foreground">Data do Pedido:</span>
+            <span className="text-sm text-foreground">
               {formatDate(order.dataCriacao)}
             </span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Valor Total:</span>
-            <span className="font-semibold text-gray-900">
+            <span className="text-sm text-muted-foreground">Valor Total:</span>
+            <span className="font-semibold text-foreground">
               {formatarValor(order.valores?.total || order.total)}
             </span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Forma de Pagamento:</span>
+            <span className="text-sm text-muted-foreground">Forma de Pagamento:</span>
             <span className="text-sm text-gray-900 capitalize">
               {order.pagamento?.metodo?.replace('_', ' ') || 'Pix'}
             </span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Previsão de Entrega:</span>
-            <span className="text-sm text-gray-900">
+            <span className="text-sm text-muted-foreground">Previsão de Entrega:</span>
+            <span className="text-sm text-foreground">
               Até {getDeliveryEstimate()}
             </span>
           </div>
@@ -217,8 +217,8 @@ export default function SuccessModal({
 
         {/* Resumo Rápido dos Itens */}
         {order.itens && order.itens.length > 0 && (
-          <div className="border-t border-gray-200 pt-4">
-            <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+          <div className="border-t border-border pt-4">
+            <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
               <FiPackage className="w-4 h-4" />
               Resumo do Pedido ({order.itens.length} {order.itens.length === 1 ? 'item' : 'itens'})
             </h4>
@@ -229,19 +229,19 @@ export default function SuccessModal({
                     <img
                       src={item.produto?.imagem || 'https://placehold.co/600x400/transparent/F00'}
                       alt={item.produto?.nome}
-                      className="w-8 h-8 object-cover rounded bg-gray-100"
+                      className="w-8 h-8 object-cover rounded bg-muted"
                     />
-                    <span className="text-gray-700">
+                    <span className="text-muted-foreground">
                       {item.quantidade}x {item.produto?.nome || item.nome}
                     </span>
                   </div>
-                  <span className="text-gray-900 font-medium">
+                  <span className="text-foreground font-medium">
                     {formatarValor(item.subtotal || (item.precoUnitario * item.quantidade))}
                   </span>
                 </div>
               ))}
               {order.itens.length > 3 && (
-                <div className="text-sm text-gray-500 text-center pt-1">
+                <div className="text-sm text-muted-foreground text-center pt-1">
                   +{order.itens.length - 3} outros itens
                 </div>
               )}
@@ -251,7 +251,7 @@ export default function SuccessModal({
 
         {/* Ações */}
         {showActions && (
-          <div className="space-y-3 pt-4 border-t border-gray-200">
+          <div className="space-y-3 pt-4 border-t border-border">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button
                 onClick={handleViewOrder}
@@ -284,7 +284,7 @@ export default function SuccessModal({
 
         {/* Informação de Auto-fechamento */}
         {autoCloseDelay > 0 && (
-          <div className="text-xs text-gray-500 pt-2 border-t border-gray-200">
+          <div className="text-xs text-muted-foreground pt-2 border-t border-border">
             Esta janela fechará automaticamente em {autoCloseDelay / 1000} segundos
           </div>
         )}

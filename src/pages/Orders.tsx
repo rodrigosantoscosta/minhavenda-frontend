@@ -146,7 +146,7 @@ export default function Orders() {
   // Loading inicial
   if (loading && orders.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center min-h-[60vh]">
             <Loading />
@@ -157,17 +157,17 @@ export default function Orders() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="font-display text-3xl font-bold text-foreground mb-2">
                 Meus Pedidos
               </h1>
-              <p className="text-gray-600">
+              <p className="font-sans text-muted-foreground">
                 Acompanhe o status e detalhes dos seus pedidos
               </p>
             </div>
@@ -202,8 +202,8 @@ export default function Orders() {
         {/* Filtros */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <FiFilter className="w-5 h-5 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Filtrar por:</span>
+            <FiFilter className="w-5 h-5 text-muted-foreground" />
+            <span className="text-sm font-sans font-medium text-foreground">Filtrar por:</span>
           </div>
           
           <div className="flex flex-wrap gap-2">
@@ -218,20 +218,20 @@ export default function Orders() {
                   onClick={() => handleFilterChange(option.value)}
                   className={`
                     inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2
-                    font-medium text-sm transition-all
+                    font-medium text-sm transition-[background-color,color]
                     ${isActive 
-                      ? 'border-primary-600 bg-primary-50 text-primary-700' 
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                      ? 'border-foreground bg-foreground text-background' 
+                      : 'border-border bg-card text-foreground hover:border-foreground/30 hover:bg-muted'
                     }
                   `}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{option.label}</span>
                   <span className={`
-                    px-2 py-0.5 rounded-full text-xs
+                    px-2 py-0.5 rounded-full text-xs tabular-nums
                     ${isActive 
-                      ? 'bg-primary-600 text-white' 
-                      : 'bg-gray-100 text-gray-600'
+                      ? 'bg-background/20 text-background' 
+                      : 'bg-muted text-muted-foreground'
                     }
                   `}>
                     {count}
@@ -292,7 +292,7 @@ export default function Orders() {
 
             {/* Informações da Paginação */}
             {pagination && (
-              <div className="text-center text-sm text-gray-500 pt-4 border-t border-gray-200">
+              <div className="text-center text-sm text-muted-foreground font-sans pt-4 border-t border-border">
                 Mostrando {orders.length} de {pagination.total} pedidos
                 {pagination.totalPages > 1 && (
                   <span> • Página {pagination.page} de {pagination.totalPages}</span>
@@ -304,20 +304,20 @@ export default function Orders() {
 
         {/* Resumo Rápido (Mobile) */}
         {orders.length > 0 && (
-          <div className="mt-8 lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <h3 className="font-medium text-gray-900 mb-3">Resumo Rápido</h3>
+          <div className="mt-8 lg:hidden bg-card rounded-lg shadow-sm border border-border p-4">
+            <h3 className="font-display font-semibold text-foreground mb-3">Resumo Rápido</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary-600">
+                <div className="text-2xl font-display font-bold text-foreground tabular-nums">
                   {orders.filter(o => o.status === 'ENTREGUE').length}
                 </div>
-                <div className="text-xs text-gray-600">Entregues</div>
+                <div className="text-xs font-sans text-muted-foreground">Entregues</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-display font-bold text-primary-600 tabular-nums">
+                <div className="text-2xl font-display font-bold text-foreground tabular-nums">
                   {orders.filter(o => ['PENDENTE', 'PAGO', 'ENVIADO'].includes(o.status)).length}
                 </div>
-                <div className="text-xs text-gray-600">Em Andamento</div>
+                <div className="text-xs font-sans text-muted-foreground">Em Andamento</div>
               </div>
             </div>
           </div>

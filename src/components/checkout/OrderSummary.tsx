@@ -89,19 +89,19 @@ export default function OrderSummary({
   const faltaParaFreteGratis = 200 - subtotal
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
+    <div className={`bg-card rounded-lg shadow-sm border border-border ${className}`}>
       
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-border">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-muted rounded-lg">
             <FiShoppingBag className="w-5 h-5 text-foreground" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">
+            <h3 className="font-semibold text-foreground">
               Resumo do Pedido
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               {getTotalItems()} {getTotalItems() === 1 ? 'item' : 'itens'}
             </p>
           </div>
@@ -120,7 +120,7 @@ export default function OrderSummary({
                 <img
                   src={item.imagem || 'https://placehold.co/600x400/transparent/F00'}
                   alt={item.nome}
-                  className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-lg bg-gray-100"
+                  className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-lg bg-muted"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'https://placehold.co/600x400/transparent/F00'
                   }}
@@ -129,10 +129,10 @@ export default function OrderSummary({
 
               {/* Informações do Item */}
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-medium text-gray-900 truncate">
+                <h4 className="text-sm font-medium text-foreground truncate">
                   {item.nome}
                 </h4>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   {item.quantidade}x {formatarValor(getPrecoValue(item.preco))}
                 </p>
                 
@@ -142,7 +142,7 @@ export default function OrderSummary({
                   const precoOriginal = getPrecoValue(item.precoOriginal) || preco
                   return precoOriginal > preco ? (
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-gray-400 line-through">
+                      <span className="text-xs text-muted-foreground/60 line-through">
                         {formatarValor(precoOriginal)}
                       </span>
                       <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
@@ -155,7 +155,7 @@ export default function OrderSummary({
 
               {/* Subtotal do Item */}
               <div className="flex-shrink-0 text-right">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-foreground">
                   {formatarValor(getPrecoValue(item.preco) * item.quantidade)}
                 </p>
               </div>
@@ -164,13 +164,13 @@ export default function OrderSummary({
         </div>
 
         {/* Divisor */}
-        <div className="border-t border-gray-200" />
+        <div className="border-t border-border" />
 
         {/* Valores */}
         <div className="space-y-2">
           
           {/* Subtotal */}
-          <div className="flex justify-between text-sm text-gray-700">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>Subtotal ({getTotalItems()} itens)</span>
             <span>{formatarValor(subtotal)}</span>
           </div>
@@ -187,7 +187,7 @@ export default function OrderSummary({
           )}
 
           {/* Frete */}
-          <div className="flex justify-between text-sm text-gray-700">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <FiTruck className="w-3 h-3" />
               Frete
@@ -217,7 +217,7 @@ export default function OrderSummary({
           <div className="border-t border-gray-200 my-2" />
 
           {/* Total */}
-          <div className="flex justify-between text-base font-bold text-gray-900">
+          <div className="flex justify-between text-base font-bold text-foreground">
             <span>Total</span>
             <span className="text-foreground text-lg">
               {formatarValor(total)}
@@ -228,16 +228,16 @@ export default function OrderSummary({
         {/* Endereço de Entrega */}
         {showAddress && endereco && (
           <>
-            <div className="border-t border-gray-200" />
+            <div className="border-t border-border" />
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <FiMapPin className="w-4 h-4" />
                 Endereço de Entrega
               </div>
-              <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+              <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
                 <p>{formatarEndereco(endereco)}</p>
                 {endereco.cep && (
-                  <p className="text-xs text-gray-500 mt-1">CEP: {endereco.cep}</p>
+                  <p className="text-xs text-muted-foreground mt-1">CEP: {endereco.cep}</p>
                 )}
               </div>
             </div>
@@ -247,18 +247,18 @@ export default function OrderSummary({
         {/* Forma de Pagamento */}
         {showPayment && pagamento && (
           <>
-            <div className="border-t border-gray-200" />
+            <div className="border-t border-border" />
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <FiCreditCard className="w-4 h-4" />
                 Forma de Pagamento
               </div>
-              <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+              <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
                 <p className="font-medium capitalize">
                   {typeof pagamento === 'object' && pagamento ? pagamento.metodo?.replace('_', ' ') : String(pagamento || 'Pix')}
                 </p>
                 {typeof pagamento === 'object' && pagamento?.parcelas && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {pagamento.parcelas}x de {formatarValor(total / pagamento.parcelas)}
                   </p>
                 )}
@@ -269,7 +269,7 @@ export default function OrderSummary({
 
         {/* Informações Adicionais */}
         <div className="border-t border-gray-200 pt-3">
-          <div className="space-y-2 text-xs text-gray-600">
+          <div className="space-y-2 text-xs text-muted-foreground">
             <div className="flex items-start gap-2">
               <FiTruck className="w-3 h-3 text-foreground mt-0.5 flex-shrink-0" />
               <span>Entrega em até 7 dias úteis após aprovação do pagamento</span>

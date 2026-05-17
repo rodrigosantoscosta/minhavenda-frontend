@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 
+type ScrollBehaviorType = 'auto' | 'instant' | 'smooth'
+
 interface ScrollOnPageChangeOptions {
-  behavior?: ScrollBehavior
+  behavior?: ScrollBehaviorType
 }
 
 /**
@@ -22,7 +24,7 @@ interface ScrollOnPageChangeOptions {
  * @param options
  */
 export function useScrollOnPageChange(page: number, options: ScrollOnPageChangeOptions = {}): void {
-  const { behavior = 'instant' } = options
+  const { behavior = 'instant' as ScrollBehaviorType } = options
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior })

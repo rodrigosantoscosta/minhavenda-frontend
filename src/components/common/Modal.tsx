@@ -85,7 +85,7 @@ export default function Modal({
           className={`
             relative w-full ${sizeStyles[size]}
             bg-white rounded-lg shadow-xl
-            transform transition-all
+            transform transition-[opacity,transform]
           `}
         >
           {/* Header */}

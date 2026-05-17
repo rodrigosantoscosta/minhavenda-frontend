@@ -21,7 +21,8 @@ import {
   FiTruck,
   FiShield,
   FiCreditCard,
-  FiStar
+  FiStar,
+  FiCheck
 } from 'react-icons/fi'
 
 export default function ProductDetail() {
@@ -79,19 +80,15 @@ export default function ProductDetail() {
     }
   }
 
-  // FIX 2: removed duplicate toast — addItem in CartContext already shows its own success toast
   const handleAddToCart = () => {
     if (!produto) return
-    // FIX 1: guard only when stock is known (not null)
     if (quantidadeEstoque !== null && quantidade > quantidadeEstoque) {
       toast.error(`Apenas ${quantidadeEstoque} unidades disponíveis`)
       return
     }
     addItem(produto, quantidade)
-    // No toast here — CartContext.addItem already fires one
   }
 
-  // FIX 3: only navigate to cart if the add didn't bail out early
   const handleBuyNow = async () => {
     if (!produto) return
     if (quantidadeEstoque !== null && quantidade > quantidadeEstoque) {
@@ -140,7 +137,6 @@ export default function ProductDetail() {
 
   const precoBase = typeof produto.preco === 'object' ? (produto.preco as any)?.valor : produto.preco
   const precoPromocional = produto.precoPromocional ?? null
-  // FIX 1: null means unknown/unlimited — do NOT default to 1
   const quantidadeEstoque = produto.quantidadeEstoque ?? null
 
   const desconto = precoPromocional && precoBase
@@ -148,7 +144,6 @@ export default function ProductDetail() {
     : 0
 
   const precoFinal = precoPromocional ?? precoBase ?? 0
-  // FIX 1: out of stock only when explicitly 0; null = assume available
   const temEstoque = quantidadeEstoque === null || quantidadeEstoque > 0
   const estoqueMinimo = quantidadeEstoque !== null && quantidadeEstoque <= 5 && quantidadeEstoque > 0
 
@@ -160,15 +155,18 @@ export default function ProductDetail() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="min-h-screen bg-background">
+      {/* Breadcrumb */}
+      <div className="bg-card border-b border-border">
+        <div className="container mx-auto px-4 py-3">
           <Breadcrumb items={breadcrumbItems} />
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      {/* Product Detail */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
+          {/* Gallery */}
           <div>
             <ImageGallery
               images={produto.imagens || (produto.imagem ? [produto.imagem] : [])}
@@ -177,11 +175,13 @@ export default function ProductDetail() {
             />
           </div>
 
+          {/* Product Info */}
           <div>
+            {/* Category + Badges */}
             <div className="flex items-center gap-3 mb-3">
               <Link
                 to={`/produtos?categoriaId=${produto.categoria?.id}`}
-                className="text-sm text-foreground hover:text-foreground/70 font-medium"
+                className="text-sm text-muted-foreground hover:text-foreground font-medium transition-colors"
               >
                 {produto.categoria?.nome}
               </Link>
@@ -189,63 +189,94 @@ export default function ProductDetail() {
               {desconto > 0 && <Badge variant="danger" size="sm">-{desconto}%</Badge>}
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{produto.nome}</h1>
+            {/* Title */}
+            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground mb-4 tracking-tight">
+              {produto.nome}
+            </h1>
 
+            {/* Rating */}
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <FiStar
                     key={i}
-                    size={20}
-                    className={i < ((produto.avaliacoes?.length || 0) > 0 ? 4 : 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'}
+                    size={18}
+                    className={i < ((produto.avaliacoes?.length || 0) > 0 ? 4 : 0) ? 'text-yellow-400 fill-current' : 'text-muted-foreground/30'}
                   />
                 ))}
               </div>
-              <span className="text-sm text-gray-600">({produto.numeroAvaliacoes || 0} avaliações)</span>
-              <span className="text-sm text-gray-400">|</span>
-              <span className="text-sm text-gray-600">{produto.vendidos || 0} vendidos</span>
+              <span className="text-sm text-muted-foreground">({produto.numeroAvaliacoes || 0} avaliações)</span>
+              <span className="text-sm text-muted-foreground">|</span>
+              <span className="text-sm text-muted-foreground">{produto.vendidos || 0} vendidos</span>
             </div>
 
-            <div className="mb-6">
+            {/* Price */}
+            <div className="mb-6 pb-6 border-b border-border">
               {desconto > 0 && (
-                <p className="text-lg text-gray-500 line-through mb-1">R$ {precoBase?.toFixed(2)}</p>
+                <p className="text-lg text-muted-foreground line-through mb-1 tabular-nums">
+                  R$ {precoBase?.toFixed(2)}
+                </p>
               )}
-              <div className="flex items-baseline gap-3">
-                <p className="text-4xl font-bold text-foreground">R$ {precoFinal.toFixed(2)}</p>
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <p className="text-3xl font-bold text-foreground tabular-nums">
+                  R$ {precoFinal.toFixed(2)}
+                </p>
                 {desconto > 0 && (
-                  <span className="text-lg text-green-600 font-medium">
+                  <span className="text-base text-success font-medium">
                     Economize R$ {(precoBase - precoFinal).toFixed(2)}
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 ou 10x de R$ {(precoFinal / 10).toFixed(2)} sem juros
               </p>
             </div>
 
+            {/* Description */}
             {produto.descricao && (
-              <div className="mb-6 pb-6 border-b">
-                <p className="text-gray-700 leading-relaxed">{produto.descricao}</p>
+              <div className="mb-6">
+                <h3 className="font-sans font-semibold text-base text-foreground mb-2">Descrição</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{produto.descricao}</p>
               </div>
             )}
 
-            <div className="mb-6">
-              {!temEstoque ? (
-                <Badge variant="danger">Produto Esgotado</Badge>
-              ) : estoqueMinimo ? (
-                <Badge variant="warning">Últimas {quantidadeEstoque} unidades!</Badge>
-              ) : quantidadeEstoque !== null ? (
-                <p className="text-sm text-green-600 font-medium">
-                  ✓ Em estoque ({quantidadeEstoque} disponíveis)
-                </p>
-              ) : (
-                <p className="text-sm text-green-600 font-medium">✓ Em estoque</p>
+            {/* Features Checklist */}
+            <ul className="mb-6 space-y-2">
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                <FiCheck className="text-success shrink-0" size={16} />
+                Frete grátis para compras acima de R$ 99
+              </li>
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                <FiCheck className="text-success shrink-0" size={16} />
+                Garantia de 30 dias — devolução grátis
+              </li>
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                <FiCheck className="text-success shrink-0" size={16} />
+                Pagamento 100% seguro
+              </li>
+              {temEstoque && (
+                <li className="flex items-center gap-2 text-sm text-success font-medium">
+                  <FiCheck className="shrink-0" size={16} />
+                  {estoqueMinimo
+                    ? `Últimas ${quantidadeEstoque} unidades!`
+                    : quantidadeEstoque !== null
+                    ? `Em estoque (${quantidadeEstoque} disponíveis)`
+                    : 'Em estoque'}
+                </li>
               )}
-            </div>
+            </ul>
 
+            {/* Stock Status */}
+            {!temEstoque && (
+              <div className="mb-6">
+                <Badge variant="danger">Produto Esgotado</Badge>
+              </div>
+            )}
+
+            {/* Quantity */}
             {temEstoque && (
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Quantidade:</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Quantidade:</label>
                 <QuantitySelector
                   value={quantidade}
                   onChange={handleQuantityChange}
@@ -255,6 +286,7 @@ export default function ProductDetail() {
               </div>
             )}
 
+            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <Button
                 onClick={handleAddToCart}
@@ -266,60 +298,70 @@ export default function ProductDetail() {
                 <FiShoppingCart className="mr-2" />
                 {isInCart(produto.id) ? 'Atualizar Carrinho' : 'Adicionar ao Carrinho'}
               </Button>
-              <Button onClick={handleBuyNow} disabled={!temEstoque} variant="outline" size="lg">
+              <Button
+                onClick={handleBuyNow}
+                disabled={!temEstoque}
+                variant="success"
+                size="lg"
+                className="flex-1"
+              >
                 Comprar Agora
               </Button>
             </div>
 
+            {/* Favorite + Share */}
             <div className="flex gap-3 mb-8">
               <button
                 onClick={handleToggleFavorite}
                 className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${
                   isFavorite
                     ? 'border-red-300 bg-red-50 text-red-600'
-                    : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                    : 'border-border hover:border-ring/50 text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <FiHeart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
+                <FiHeart size={18} fill={isFavorite ? 'currentColor' : 'none'} />
                 <span className="text-sm font-medium">{isFavorite ? 'Favoritado' : 'Favoritar'}</span>
               </button>
               <button
                 onClick={handleShare}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-gray-400 text-gray-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:border-ring/50 text-muted-foreground hover:text-foreground transition-colors"
               >
-                <FiShare2 size={20} />
+                <FiShare2 size={18} />
                 <span className="text-sm font-medium">Compartilhar</span>
               </button>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+            {/* Trust Badges */}
+            <div className="bg-secondary rounded-xl p-5 space-y-4">
               <div className="flex items-start gap-3">
-                <FiTruck className="text-foreground mt-1" size={24} />
+                <FiTruck className="text-foreground mt-0.5 shrink-0" size={20} />
                 <div>
-                  <p className="font-medium text-gray-900">Frete Grátis</p>
-                  <p className="text-sm text-gray-600">para compras acima de R$ 99</p>
+                  <p className="font-medium text-foreground text-sm">Entrega Rápida</p>
+                  <p className="text-xs text-muted-foreground">para compras acima de R$ 99</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <FiShield className="text-foreground mt-1" size={24} />
+                <FiShield className="text-foreground mt-0.5 shrink-0" size={20} />
                 <div>
-                  <p className="font-medium text-gray-900">Garantia de 30 dias</p>
-                  <p className="text-sm text-gray-600">Devolução grátis</p>
+                  <p className="font-medium text-foreground text-sm">Garantia de 30 dias</p>
+                  <p className="text-xs text-muted-foreground">Devolução grátis</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <FiCreditCard className="text-foreground mt-1" size={24} />
+                <FiCreditCard className="text-foreground mt-0.5 shrink-0" size={20} />
                 <div>
-                  <p className="font-medium text-gray-900">Pagamento Seguro</p>
-                  <p className="text-sm text-gray-600">Compra 100% protegida</p>
+                  <p className="font-medium text-foreground text-sm">Pagamento Seguro</p>
+                  <p className="text-xs text-muted-foreground">Compra 100% protegida</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Product Info (specs, details) */}
         <ProductInfo produto={produto} />
 
+        {/* Related Products */}
         {produtosRelacionados.length > 0 && (
           <div className="mt-12">
             <RelatedProducts produtos={produtosRelacionados} />

@@ -16,6 +16,15 @@ import {
   FiSettings,
   FiChevronDown
 } from 'react-icons/fi'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '../ui/dropdown-menu'
+import { Avatar, AvatarFallback } from '../ui/avatar'
+import { Separator } from '../ui/separator'
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -47,67 +56,42 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-background sticky top-0 z-50 shadow-[0_1px_0_0_hsl(var(--border))]">
-
-      {/* Announcement bar — zinc near-black */}
-      <div className="bg-foreground text-background py-1.5">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center text-xs font-sans font-medium tracking-wide">
-            <p className="hidden md:block opacity-70">
-              🚚 Frete grátis para compras acima de R$ 200
-            </p>
-            <div className="flex items-center gap-5 ml-auto">
-              <Link to="/ajuda" className="opacity-60 hover:opacity-100 transition-opacity duration-150">
-                Central de Ajuda
-              </Link>
-              <Link to="/rastreio" className="opacity-60 hover:opacity-100 transition-opacity duration-150">
-                Rastrear Pedido
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main header */}
-      <div className="container mx-auto px-4 py-3">
+    <header className="bg-background sticky top-0 z-50 border-b border-border">
+      <div className="container mx-auto px-4 py-2.5">
         <div className="flex items-center gap-4">
 
-          {/* Logo — Geist wordmark, Zinc & Slate */}
-          <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            {/* Concentric radius: outer p-1.5 (6px) + inner rounded-md (6px) → outer rounded-lg (10px) */}
-            <div className="bg-foreground rounded-lg p-1.5">
-              <div className="bg-zinc-700 rounded-md w-7 h-7 flex items-center justify-center">
-                <span className="font-display font-bold text-background text-sm leading-none tracking-tight">MV</span>
-              </div>
-            </div>
-            <span className="font-display font-bold text-foreground text-xl hidden sm:block tracking-tight">
+          {/* Logo — plain text */}
+          <Link to="/" className="shrink-0">
+            <span className="font-display font-bold text-foreground text-lg tracking-tight">
               MinhaVenda
             </span>
           </Link>
 
-          {/* Search — desktop */}
-          <div className="hidden md:flex flex-1 max-w-2xl">
-            <SearchBar
-              onSearch={handleSearch}
-              placeholder="Buscar produtos..."
-              showButton={false}
-              className="w-full"
-            />
+          {/* Search — centered, desktop */}
+          <div className="hidden md:flex flex-1 justify-center">
+            <div className="w-full max-w-md">
+              <SearchBar
+                onSearch={handleSearch}
+                placeholder="Buscar produtos..."
+                showButton={false}
+                className="w-full"
+              />
+            </div>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-1 ml-auto">
             {isAuthenticated && <NotificationBell />}
 
-            {/* Cart — skill: min 40×40 hit area */}
+            {/* Cart */}
             <Link
               to="/carrinho"
-              className="relative flex items-center justify-center w-10 h-10 rounded-lg hover:bg-muted transition-colors duration-150"
+              className="relative flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted transition-colors duration-150"
               aria-label="Carrinho de compras"
             >
-              <FiShoppingCart className="w-5 h-5 text-foreground" />
+              <FiShoppingCart className="w-4.5 h-4.5 text-foreground" />
               {getTotalItems() > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-foreground text-background text-[10px] font-display font-bold rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center tabular-nums px-1">
+                <span className="absolute -top-0.5 -right-0.5 bg-foreground text-background text-[10px] font-display font-bold rounded-full min-w-[16px] min-h-[16px] flex items-center justify-center tabular-nums px-0.5">
                   {getTotalItems()}
                 </span>
               )}
@@ -116,55 +100,54 @@ export default function Header() {
             {/* User menu — desktop */}
             <div className="hidden md:block">
               {isAuthenticated ? (
-                <div className="relative group">
-                  <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted transition-colors duration-150 active:scale-[0.96] transition-[transform,background-color]">
-                    {/* Avatar — concentric: rounded-full inside rounded-lg */}
-                    <div className="w-7 h-7 bg-foreground text-background rounded-full flex items-center justify-center font-display font-semibold text-xs">
-                      {getFirstName()[0].toUpperCase()}
-                    </div>
-                    <span className="text-sm font-sans font-medium text-foreground">
-                      {getFirstName()}
-                    </span>
-                    <FiChevronDown className="w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 group-hover:rotate-180" />
-                  </button>
-
-                  {/* Dropdown */}
-                  <div className="absolute right-0 mt-1.5 w-56 bg-card rounded-xl shadow-dropdown py-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-[opacity,transform] duration-200 origin-top-right scale-95 group-hover:scale-100 border border-border">
-                    <div className="px-4 py-3 border-b border-border">
-                      <p className="text-sm font-display font-semibold text-foreground text-balance">{user?.nome}</p>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors duration-150">
+                      <Avatar className="h-7 w-7">
+                        <AvatarFallback className="bg-foreground text-background text-xs font-display font-semibold">
+                          {getFirstName()[0].toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-sans font-medium text-foreground">
+                        {getFirstName()}
+                      </span>
+                      <FiChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-3 py-2 border-b border-border">
+                      <p className="text-sm font-display font-semibold text-foreground">{user?.nome}</p>
                       <p className="text-xs text-muted-foreground truncate mt-0.5 font-sans">{user?.email}</p>
                     </div>
-
-                    {[
-                      { to: '/perfil',         Icon: FiUser,     label: 'Meu Perfil' },
-                      { to: '/pedidos',        Icon: FiPackage,  label: 'Meus Pedidos' },
-                      { to: '/configuracoes',  Icon: FiSettings, label: 'Configurações' },
-                    ].map(({ to, Icon, label }) => (
-                      <Link
-                        key={to}
-                        to={to}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors duration-100 text-sm font-sans text-foreground"
-                      >
-                        <Icon className="w-4 h-4 text-muted-foreground" />
-                        {label}
+                    <DropdownMenuItem asChild>
+                      <Link to="/perfil" className="cursor-pointer">
+                        <FiUser className="w-4 h-4 mr-2 text-muted-foreground" />
+                        Meu Perfil
                       </Link>
-                    ))}
-
-                    <div className="border-t border-border my-1" />
-
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 w-full text-left transition-colors duration-100 text-sm font-sans text-destructive"
-                    >
-                      <FiLogOut className="w-4 h-4" />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/pedidos" className="cursor-pointer">
+                        <FiPackage className="w-4 h-4 mr-2 text-muted-foreground" />
+                        Meus Pedidos
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/configuracoes" className="cursor-pointer">
+                        <FiSettings className="w-4 h-4 mr-2 text-muted-foreground" />
+                        Configurações
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
+                      <FiLogOut className="w-4 h-4 mr-2" />
                       Sair
-                    </button>
-                  </div>
-                </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <Link
                   to="/login"
-                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-150 active:scale-[0.96] font-sans font-medium text-sm"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-150 font-sans font-medium text-sm"
                 >
                   <FiUser className="w-4 h-4" />
                   Entrar
@@ -172,21 +155,20 @@ export default function Header() {
               )}
             </div>
 
-            {/* Mobile menu toggle — min 40×40 */}
+            {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-muted transition-colors duration-150 shrink-0"
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted transition-colors duration-150 shrink-0"
               aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
             >
-              {/* Skill: CSS cross-fade icon swap without motion library */}
               <div className="relative w-5 h-5">
                 <FiX
-                  className={`absolute inset-0 w-5 h-5 text-foreground transition-[opacity,transform,filter] duration-300 ease-spring
-                    ${mobileMenuOpen ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-[0.25] blur-[4px]'}`}
+                  className={`absolute inset-0 w-5 h-5 text-foreground transition-[opacity,transform] duration-200
+                    ${mobileMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
                 />
                 <FiMenu
-                  className={`absolute inset-0 w-5 h-5 text-foreground transition-[opacity,transform,filter] duration-300 ease-spring
-                    ${mobileMenuOpen ? 'opacity-0 scale-[0.25] blur-[4px]' : 'opacity-100 scale-100 blur-0'}`}
+                  className={`absolute inset-0 w-5 h-5 text-foreground transition-[opacity,transform] duration-200
+                    ${mobileMenuOpen ? 'opacity-0 scale-75' : 'opacity-100 scale-100'}`}
                 />
               </div>
             </button>
@@ -194,7 +176,7 @@ export default function Header() {
         </div>
 
         {/* Search — mobile */}
-        <div className="md:hidden mt-3">
+        <div className="md:hidden mt-2.5">
           <SearchBar
             onSearch={handleSearch}
             placeholder="Buscar produtos..."
@@ -206,17 +188,18 @@ export default function Header() {
 
       {/* Mobile menu */}
       <div
-        className={`md:hidden border-t border-border bg-background overflow-hidden transition-[max-height,opacity] duration-300 ease-spring
+        className={`md:hidden border-t border-border bg-background overflow-hidden transition-[max-height,opacity] duration-300
           ${mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
       >
         <div className="container mx-auto px-4 py-4">
           {isAuthenticated ? (
             <>
-              {/* User info */}
-              <div className="flex items-center gap-3 px-4 py-3 bg-muted rounded-lg mb-3">
-                <div className="w-10 h-10 bg-foreground text-background rounded-full flex items-center justify-center font-display font-semibold">
-                  {getFirstName()[0].toUpperCase()}
-                </div>
+              <div className="flex items-center gap-3 px-3 py-2.5 bg-muted rounded-lg mb-3">
+                <Avatar className="h-9 w-9">
+                  <AvatarFallback className="bg-foreground text-background font-display font-semibold">
+                    {getFirstName()[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
                   <p className="text-sm font-display font-semibold text-foreground">{user?.nome}</p>
                   <p className="text-xs text-muted-foreground font-sans">{user?.email}</p>
@@ -233,20 +216,20 @@ export default function Header() {
                     key={to}
                     to={to}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-muted rounded-lg transition-colors duration-100 text-foreground font-sans"
+                    className="flex items-center gap-3 px-3 py-2.5 hover:bg-muted rounded-lg transition-colors duration-100 text-foreground font-sans text-sm"
                   >
-                    <Icon className="w-5 h-5 text-muted-foreground" />
+                    <Icon className="w-4 h-4 text-muted-foreground" />
                     {label}
                   </Link>
                 ))}
 
-                <div className="border-t border-border my-1" />
+                <Separator className="my-1" />
 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 rounded-lg w-full text-left transition-colors duration-100 text-destructive font-sans"
+                  className="flex items-center gap-3 px-3 py-2.5 hover:bg-red-50 rounded-lg w-full text-left transition-colors duration-100 text-destructive font-sans text-sm"
                 >
-                  <FiLogOut className="w-5 h-5" />
+                  <FiLogOut className="w-4 h-4" />
                   Sair
                 </button>
               </nav>
@@ -255,9 +238,9 @@ export default function Header() {
             <Link
               to="/login"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-150 font-sans font-medium"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-150 font-sans font-medium text-sm"
             >
-              <FiUser className="w-5 h-5" />
+              <FiUser className="w-4 h-4" />
               Entrar
             </Link>
           )}

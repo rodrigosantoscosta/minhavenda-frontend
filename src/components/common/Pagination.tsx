@@ -34,7 +34,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           aria-label="Página anterior"
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           <FiChevronLeft className="w-4 h-4" />
           Anterior
@@ -44,7 +44,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         <div className="flex items-center gap-1 mx-2">
           {pages.map((page, index) =>
             page === '...' ? (
-              <span key={`ellipsis-${index}`} className="w-9 text-center text-gray-400 select-none">
+              <span key={`ellipsis-${index}`} className="w-9 text-center text-muted-foreground/60 select-none">
                 ···
               </span>
             ) : (
@@ -53,10 +53,10 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                 onClick={() => onPageChange(page as number)}
                 aria-current={currentPage === page ? 'page' : undefined}
                 className={`
-                  w-9 h-9 rounded-lg text-sm font-semibold transition-all duration-150
+                  w-9 h-9 rounded-lg text-sm font-semibold transition-[background-color,color,transform] duration-150 active:not-disabled:scale-[0.96]
                   ${currentPage === page
                     ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    : 'text-muted-foreground hover:bg-muted'
                   }
                 `}
               >
@@ -71,7 +71,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           aria-label="Próxima página"
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           Próxima
           <FiChevronRight className="w-4 h-4" />
@@ -79,9 +79,9 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       </div>
 
       {/* Page indicator */}
-      <p className="text-xs text-gray-400 tracking-wide">
-        Página <span className="font-semibold text-gray-600">{currentPage}</span> de{' '}
-        <span className="font-semibold text-gray-600">{totalPages}</span>
+      <p className="text-xs text-muted-foreground tracking-wide">
+        Página <span className="font-semibold text-muted-foreground">{currentPage}</span> de{' '}
+        <span className="font-semibold text-muted-foreground">{totalPages}</span>
       </p>
     </div>
   )

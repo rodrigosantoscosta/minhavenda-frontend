@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+/* eslint-disable react-refresh/only-export-components */
 import type { ReactNode } from 'react'
 import type { User } from '../types'
 import authService from '../services/authService'
@@ -202,7 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.JSX.E
       }, 'Login response received')
 
       // Extrair user da resposta
-      let userData: User = response.user || {
+      const userData: User = response.user || {
         nome: response.nome,
         email: response.email,
         id: response.id,
@@ -249,7 +250,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.JSX.E
       }, 'Login failed')
 
 
-      let message = err.message || 'Erro ao fazer login'
+      const message = err.message || 'Erro ao fazer login'
 
       return { success: false, error: message }
     } finally {
@@ -273,7 +274,7 @@ export function AuthProvider({ children }: { children: ReactNode }): React.JSX.E
       }, 'Registration response received')
 
       // Extrair user da resposta
-      let userData: User = response.user || {
+      const userData: User = response.user || {
         nome: response.nome,
         email: response.email,
         id: response.id,

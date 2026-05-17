@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import type { Product, Category } from '../types'
 import { useCart } from '../contexts/CartContext'
 import productService from '../services/productService'
-import CategoryFilter from '../components/product/CategoryFilter'
+import CategoryNav from '../components/home/CategoryNav'
+import HeroSection from '../components/home/HeroSection'
+import FeaturesSection from '../components/home/FeaturesSection'
 import ProductsGrid from '../components/product/ProductsGrid'
 import Pagination from '../components/common/Pagination'
 import Loading from '../components/common/Loading'
-import { useScrollOnPageChange } from '../hooks/useScrollOnPageChange'
 import EmptyState from '../components/common/EmptyState'
 import Button from '../components/common/Button'
 import logger from '../utils/logger'
@@ -25,9 +26,16 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const pageSize = 12
-  useScrollOnPageChange(page)
 
   const [selectedCategory, setSelectedCategory] = useState<string | number | null>(null)
+
+  // Hero content — dynamic (can be fetched from backend in future)
+  const heroContent = {
+    title: 'Descubra Produtos Incríveis',
+    subtitle: 'Encontre tudo que você precisa com os melhores preços e entrega rápida para todo o Brasil.',
+    primaryCta: { label: 'Ver Produtos', href: '#products' },
+    secondaryCta: { label: 'Saiba Mais', href: '/sobre' },
+  }
 
   useEffect(() => {
     loadInitialData()
@@ -124,17 +132,38 @@ export default function Home() {
 
   return (
     <div className="bg-background min-h-screen">
-      {/* Catálogo Principal */}
-      <section className="py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header — skill: text-balance heading, tabular-nums count, stagger */}
-          <div className="flex items-end justify-between mb-6 border-b border-border pb-5">
+      {/* Hero Section */}
+      <HeroSection
+        title={heroContent.title}
+        subtitle={heroContent.subtitle}
+        primaryCta={heroContent.primaryCta}
+        secondaryCta={heroContent.secondaryCta}
+      />
+
+      {/* Category Navigation */}
+      {categorias.length > 0 && (
+        <div className="border-b border-border py-3">
+          <div className="container mx-auto px-4">
+            <CategoryNav
+              categorias={categorias}
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Products Section */}
+      <section className="py-10" id="products">
+        <div className="container mx-auto px-4">
+          {/* Section Header */}
+          <div className="flex items-end justify-between mb-6 pb-4 border-b border-border">
             <div className="animate-fadeInUp">
-              <h1 className="font-display font-bold text-2xl text-foreground tracking-tight text-balance">
+              <h2 className="font-display font-semibold text-xl text-foreground tracking-tight">
                 {selectedCategory
                   ? categorias.find(c => c.id === selectedCategory)?.nome
-                  : 'Todos os Produtos'}
-              </h1>
+                  : 'Produtos em Destaque'}
+              </h2>
               {totalElements > 0 && (
                 <p className="font-sans text-sm text-muted-foreground mt-1 tabular-nums animate-fadeInUp" style={{ animationDelay: '80ms' }}>
                   {totalElements} {totalElements === 1 ? 'produto' : 'produtos'}
@@ -142,29 +171,23 @@ export default function Home() {
               )}
             </div>
 
-            {selectedCategory && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleCategoryChange(null)}
-              >
-                Limpar filtro
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {selectedCategory && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCategoryChange(null)}
+                >
+                  Limpar filtro
+                </Button>
+              )}
+              <a href="/produtos" className="btn btn-ghost text-sm font-sans font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Ver Todos →
+              </a>
+            </div>
           </div>
 
-          {/* Category Filter */}
-          {categorias.length > 0 && (
-            <div className="mb-8">
-              <CategoryFilter
-                categorias={categorias}
-                selectedCategory={selectedCategory}
-                onCategoryChange={handleCategoryChange}
-              />
-            </div>
-          )}
-
-          {/* Products */}
+          {/* Products Grid */}
           {produtos.length === 0 ? (
             <EmptyState
               icon={<FiShoppingBag size={64} />}
@@ -203,6 +226,9 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* Features Section */}
+      <FeaturesSection />
     </div>
   )
 }

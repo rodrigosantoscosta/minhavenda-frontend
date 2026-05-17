@@ -25,6 +25,7 @@ export default function AdminPedidos() {
       .finally(() => setLoading(false))
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => { load(statusFiltro) }, [statusFiltro])
 
   return (
@@ -35,8 +36,8 @@ export default function AdminPedidos() {
         </PageTitle>
 
         {/* Filter tabs */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <FiFilter size={14} style={{ color: '#6B7280' }} />
+        <div className="flex items-center gap-2 flex-wrap" role="group" aria-label="Filtrar pedidos por status">
+          <FiFilter size={14} style={{ color: '#6B7280' }} aria-hidden="true" />
           {STATUSES.map(s => (
             <button
               key={s}
@@ -46,6 +47,7 @@ export default function AdminPedidos() {
                 backgroundColor: statusFiltro === s ? '#F97316' : '#1E2028',
                 color: statusFiltro === s ? '#fff' : '#6B7280',
               }}
+              aria-label={`Filtrar por ${s}`}
             >
               {s}
             </button>
@@ -60,7 +62,7 @@ export default function AdminPedidos() {
                 <AdminCard className="p-4 active:opacity-80 transition-opacity">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <StatusBadge status={p.status} />
-                    <span className="text-base font-mono font-bold text-white tabular-nums">{formatBRL(p.valorTotal)}</span>
+                    <span className="text-base font-mono font-bold text-foreground tabular-nums">{formatBRL(p.valorTotal)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono" style={{ color: '#9CA3AF' }}>#{shortId(p.id)}</span>
@@ -88,16 +90,19 @@ export default function AdminPedidos() {
                       <Tr key={p.id}>
                         <td className="px-5 py-3">
                           <span
-                            className="font-mono text-xs cursor-pointer transition-colors hover:text-white"
-                            style={{ color: '#9CA3AF' }}
+                            className="font-mono text-xs cursor-pointer transition-colors hover:text-foreground"
+                            style={{ color: 'hsl(var(--muted-foreground))' }}
                             title={String(p.id)}
                             onClick={() => { navigator.clipboard.writeText(String(p.id)); toast.success('ID copiado!') }}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Copiar ID do pedido ${shortId(p.id)}`}
                           >
                             {shortId(p.id)}
                           </span>
                         </td>
                         <td className="px-5 py-3"><StatusBadge status={p.status} /></td>
-                        <td className="px-5 py-3 text-sm font-mono font-bold text-white tabular-nums">{formatBRL(p.valorTotal)}</td>
+                        <td className="px-5 py-3 text-sm font-mono font-bold text-foreground tabular-nums">{formatBRL(p.valorTotal)}</td>
                         <td className="px-5 py-3 text-sm" style={{ color: '#9CA3AF' }}>{p.quantidadeItens}</td>
                         <td className="px-5 py-3 text-sm" style={{ color: '#9CA3AF' }}>{formatDate(p.dataCriacao)}</td>
                         <td className="px-5 py-3 text-sm" style={{ color: '#9CA3AF' }}>{formatDate(p.dataPagamento)}</td>
@@ -106,8 +111,9 @@ export default function AdminPedidos() {
                             to={`/admin/pedidos/${p.id}`}
                             className="inline-flex items-center gap-1 text-xs transition-colors hover:underline"
                             style={{ color: '#F97316' }}
+                            aria-label={`Ver detalhes do pedido ${shortId(p.id)}`}
                           >
-                            Ver Detalhes <FiChevronRight size={12} />
+                            Ver Detalhes <FiChevronRight size={12} aria-hidden="true" />
                           </Link>
                         </td>
                       </Tr>
